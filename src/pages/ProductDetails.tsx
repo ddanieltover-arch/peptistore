@@ -14,6 +14,7 @@ export default function ProductDetails() {
   const [recommended, setRecommended] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
+  const [selectedVariant, setSelectedVariant] = useState<any>(null);
   const [reviewText, setReviewText] = useState('');
   const [rating, setRating] = useState(5);
   const [showShare, setShowShare] = useState(false);
@@ -29,7 +30,12 @@ export default function ProductDetails() {
       setLoading(true);
       try {
         const { data: pData } = await supabase.from('products').select('*').eq('id', id).single();
-        if (pData) setProduct(pData);
+        if (pData) {
+          setProduct(pData);
+          if (pData.variants && pData.variants.length > 0) {
+            setSelectedVariant(pData.variants[0]);
+          }
+        }
 
         const { data: rData } = await supabase.from('reviews').select('*').eq('product_id', id);
         if (rData) setReviews(rData);
@@ -52,9 +58,10 @@ export default function ProductDetails() {
       addItem({
         productId: product.id,
         title: product.title,
-        price: product.price,
+        price: selectedVariant ? selectedVariant.price : product.price,
         quantity,
-        imageUrl: product.images?.[0] || ''
+        imageUrl: product.images?.[0] || '',
+        specification: selectedVariant ? selectedVariant.name : undefined
       });
       navigate('/cart');
     }
@@ -92,6 +99,8 @@ export default function ProductDetails() {
   if (loading) return <div className="p-8 text-center">Loading...</div>;
   if (!product) return <div className="p-8 text-center">Product not found.</div>;
 
+  const currentPrice = selectedVariant ? selectedVariant.price : product.price;
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-16">
@@ -127,7 +136,7 @@ export default function ProductDetails() {
             </div>
           </div>
           
-          <div className="flex items-center mb-6">
+          <div className="flex items-center mb-4">
             <div className="flex text-yellow-400 mr-2">
               {[...Array(5)].map((_, i) => (
                 <Star key={i} className={`h-5 w-5 ${i < (product.rating || 5) ? 'fill-current' : 'text-gray-300'}`} />
@@ -136,14 +145,36 @@ export default function ProductDetails() {
             <span className="text-gray-500 text-sm">({reviews.length} reviews)</span>
           </div>
           
-          <div className="text-3xl font-bold text-gray-900 mb-6">{formatCurrency(product.price)}</div>
+          <div className="text-3xl font-bold text-gray-900 mb-6">{formatCurrency(currentPrice)}</div>
           
           <p className="text-gray-600 mb-8 whitespace-pre-line">{product.description}</p>
 
+          {/* New Variant Selector Section */}
+          {product.variants && product.variants.length > 0 && (
+            <div className="mb-8 p-4 bg-gray-50 rounded-xl border border-gray-100">
+              <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-4">Specification</h3>
+              <div className="flex flex-wrap gap-2">
+                {product.variants.map((v: any, i: number) => (
+                  <button
+                    key={i}
+                    onClick={() => setSelectedVariant(v)}
+                    className={`px-4 py-2 rounded-lg text-sm font-medium border-2 transition-all ${
+                      selectedVariant?.name === v.name
+                        ? 'border-blue-600 bg-blue-50 text-blue-700 shadow-sm'
+                        : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300'
+                    }`}
+                  >
+                    {v.name}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
           {product.specifications && product.specifications.length > 0 && (
             <div className="mb-8">
-              <h3 className="font-semibold mb-2">Specifications:</h3>
-              <ul className="list-disc pl-5 text-gray-600">
+              <h3 className="font-semibold mb-2">Research Details:</h3>
+              <ul className="list-disc pl-5 text-gray-600 text-sm">
                 {product.specifications.map((spec: string, i: number) => (
                   <li key={i}>{spec}</li>
                 ))}
@@ -151,15 +182,15 @@ export default function ProductDetails() {
             </div>
           )}
 
-          <div className="flex items-center space-x-4 mb-8">
-            <div className="flex items-center border border-gray-300 rounded-md">
-              <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="px-4 py-3 text-gray-600 hover:bg-gray-100">-</button>
-              <span className="px-4 py-3 font-medium border-x border-gray-300">{quantity}</span>
-              <button onClick={() => setQuantity(quantity + 1)} className="px-4 py-3 text-gray-600 hover:bg-gray-100">+</button>
+          <div className="flex items-center space-x-4">
+            <div className="flex items-center border border-gray-300 rounded-xl overflow-hidden shadow-sm">
+              <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="px-4 py-3 text-gray-600 hover:bg-gray-100 transition-colors">-</button>
+              <span className="px-5 py-3 font-bold text-gray-900 border-x border-gray-300 bg-white">{quantity}</span>
+              <button onClick={() => setQuantity(quantity + 1)} className="px-4 py-3 text-gray-600 hover:bg-gray-100 transition-colors">+</button>
             </div>
             <button 
               onClick={handleAddToCart}
-              className="flex-1 bg-blue-600 text-white py-3 px-6 rounded-md font-bold hover:bg-blue-700 flex items-center justify-center transition-colors"
+              className="flex-1 bg-blue-600 text-white py-4 px-6 rounded-xl font-bold hover:bg-blue-700 flex items-center justify-center transition-all shadow-lg hover:shadow-xl active:scale-95"
             >
               <ShoppingCart className="mr-2 h-5 w-5" /> Add to Cart
             </button>

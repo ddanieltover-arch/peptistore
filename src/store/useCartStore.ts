@@ -7,13 +7,14 @@ export interface CartItem {
   price: number;
   quantity: number;
   imageUrl: string;
+  specification?: string;
 }
 
 interface CartState {
   items: CartItem[];
   addItem: (item: CartItem) => void;
-  removeItem: (productId: string) => void;
-  updateQuantity: (productId: string, quantity: number) => void;
+  removeItem: (productId: string, specification?: string) => void;
+  updateQuantity: (productId: string, quantity: number, specification?: string) => void;
   clearCart: () => void;
   getTotal: () => number;
 }
@@ -24,11 +25,14 @@ export const useCartStore = create<CartState>()(
       items: [],
       addItem: (item) => {
         const items = get().items;
-        const existingItem = items.find((i) => i.productId === item.productId);
+        const existingItem = items.find(
+          (i) => i.productId === item.productId && i.specification === item.specification
+        );
+        
         if (existingItem) {
           set({
             items: items.map((i) =>
-              i.productId === item.productId
+              i.productId === item.productId && i.specification === item.specification
                 ? { ...i, quantity: i.quantity + item.quantity }
                 : i
             ),
@@ -37,13 +41,19 @@ export const useCartStore = create<CartState>()(
           set({ items: [...items, item] });
         }
       },
-      removeItem: (productId) => {
-        set({ items: get().items.filter((i) => i.productId !== productId) });
+      removeItem: (productId, specification) => {
+        set({ 
+          items: get().items.filter(
+            (i) => !(i.productId === productId && i.specification === specification)
+          ) 
+        });
       },
-      updateQuantity: (productId, quantity) => {
+      updateQuantity: (productId, quantity, specification) => {
         set({
           items: get().items.map((i) =>
-            i.productId === productId ? { ...i, quantity } : i
+            i.productId === productId && i.specification === specification 
+              ? { ...i, quantity } 
+              : i
           ),
         });
       },

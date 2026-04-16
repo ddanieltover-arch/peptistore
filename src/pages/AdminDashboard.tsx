@@ -66,19 +66,29 @@ export default function AdminDashboard() {
     }
   };
 
+  const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
+  const [confirmWipe, setConfirmWipe] = useState(false);
+
   const handleDeleteProduct = async (id: string) => {
-    if (window.confirm('Are you sure you want to delete this product?')) {
-      try {
-        const { error } = await supabase.from('products').delete().eq('id', id);
-        if (error) throw error;
-        fetchProducts();
-      } catch (error) {
-        console.error("Error deleting product:", error);
-      }
+    if (confirmDelete !== id) {
+      setConfirmDelete(id);
+      setTimeout(() => setConfirmDelete(null), 3000);
+      return;
+    }
+    
+    console.log("Deleting product:", id);
+    try {
+      const { error } = await supabase.from('products').delete().eq('id', id);
+      if (error) throw error;
+      fetchProducts();
+      setConfirmDelete(null);
+    } catch (error) {
+      console.error("Error deleting product:", error);
     }
   };
 
   const seedReferenceCatalog = async () => {
+    console.log("Sync button clicked");
     setIsSeeding(true);
     try {
       const { data: categories } = await supabase.from('categories').select('slug');
@@ -102,7 +112,8 @@ export default function AdminDashboard() {
         categories: p.categories,
         specifications: p.specifications,
         rating: p.rating,
-        review_count: p.reviewCount
+        review_count: p.reviewCount,
+        variants: p.variants || []
       }));
 
       if (categoriesToCreate.length > 0) {
@@ -126,18 +137,24 @@ export default function AdminDashboard() {
   };
 
   const clearAndReseed = async () => {
-    if (!window.confirm('WARNING: This will delete ALL current products and categories and re-seed from the local catalog. Proceed?')) return;
+    if (!confirmWipe) {
+      setConfirmWipe(true);
+      setTimeout(() => setConfirmWipe(false), 3000);
+      return;
+    }
+
+    console.log("Standard Wipe & Re-seed initiated");
     setIsSeeding(true);
     try {
-      // Clear products and categories
+      console.log("Clearing products and categories...");
       await supabase.from('products').delete().neq('id', '00000000-0000-0000-0000-000000000000');
       await supabase.from('categories').delete().neq('id', '00000000-0000-0000-0000-000000000000');
 
-      // Re-seed categories
+      console.log("Re-seeding categories...");
       const { error: catError } = await supabase.from('categories').insert(referenceSeedCategories);
       if (catError) throw catError;
 
-      // Re-seed products
+      console.log("Re-seeding products...");
       const productsToCreate = referenceSeedProducts.map(p => ({
         title: p.title,
         description: p.description,
@@ -147,13 +164,15 @@ export default function AdminDashboard() {
         categories: p.categories,
         specifications: p.specifications,
         rating: p.rating,
-        review_count: p.reviewCount
+        review_count: p.reviewCount,
+        variants: p.variants || []
       }));
       const { error: prodError } = await supabase.from('products').insert(productsToCreate);
       if (prodError) throw prodError;
 
       await fetchProducts();
-      alert('Database wiped and re-seeded with Euro prices!');
+      setConfirmWipe(false);
+      alert('Database wiped and re-seeded with Euro prices and Specifications!');
     } catch (error) {
       console.error('Error re-seeding catalog:', error);
       alert('Migration failed. Check console.');
@@ -186,9 +205,11 @@ export default function AdminDashboard() {
               type="button"
               onClick={clearAndReseed}
               disabled={isSeeding || isSyncing}
-              className="w-full bg-red-600 text-white py-2 rounded-md font-medium hover:bg-red-700 disabled:opacity-60 disabled:cursor-not-allowed"
+              className={`w-full text-white py-2 rounded-md font-medium transition-all ${
+                confirmWipe ? 'bg-orange-600 hover:bg-orange-700' : 'bg-red-600 hover:bg-red-700'
+              } disabled:opacity-60 disabled:cursor-not-allowed`}
             >
-              Wipe & Re-seed (Migration to €)
+              {isSeeding ? 'Syncing...' : confirmWipe ? 'Click again to confirm WIPE' : 'Wipe & Re-seed (Migration to €)'}
             </button>
           </div>
           <form onSubmit={handleAddProduct} className="space-y-4">
@@ -240,9 +261,19 @@ export default function AdminDashboard() {
                         <p className="text-sm text-gray-500">{formatCurrency(product.price)} | Stock: {product.inventory}</p>
                       </div>
                     </div>
-                    <button onClick={() => handleDeleteProduct(product.id)} className="text-red-500 hover:text-red-700 p-2">
-                      <Trash2 className="h-5 w-5" />
-                    </button>
+                    <div className="flex items-center space-x-2">
+                      {confirmDelete === product.id && (
+                        <span className="text-[10px] font-bold text-red-600 uppercase animate-pulse">Confirm?</span>
+                      )}
+                      <button 
+                        onClick={() => handleDeleteProduct(product.id)} 
+                        className={`p-2 rounded-md transition-colors ${
+                          confirmDelete === product.id ? 'bg-red-100 text-red-600' : 'text-red-500 hover:text-red-700 hover:bg-red-50'
+                        }`}
+                      >
+                        <Trash2 className="h-5 w-5" />
+                      </button>
+                    </div>
                   </li>
                 ))}
                 {products.length === 0 && (
