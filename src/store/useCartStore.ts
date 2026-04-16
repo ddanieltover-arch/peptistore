@@ -12,17 +12,24 @@ export interface CartItem {
 
 interface CartState {
   items: CartItem[];
+  promoCode: string | null;
+  discount: number; // Percentage or absolute? Let's use percentage for simplicity
   addItem: (item: CartItem) => void;
   removeItem: (productId: string, specification?: string) => void;
   updateQuantity: (productId: string, quantity: number, specification?: string) => void;
   clearCart: () => void;
+  applyPromoCode: (code: string) => boolean;
+  clearPromoCode: () => void;
   getTotal: () => number;
+  getSubtotal: () => number;
 }
 
 export const useCartStore = create<CartState>()(
   persist(
     (set, get) => ({
       items: [],
+      promoCode: null,
+      discount: 0,
       addItem: (item) => {
         const items = get().items;
         const existingItem = items.find(
@@ -57,9 +64,22 @@ export const useCartStore = create<CartState>()(
           ),
         });
       },
-      clearCart: () => set({ items: [] }),
-      getTotal: () => {
+      clearCart: () => set({ items: [], promoCode: null, discount: 0 }),
+      applyPromoCode: (code: string) => {
+        if (code.toUpperCase() === 'PEPTIDE10') {
+          set({ promoCode: 'PEPTIDE10', discount: 10 });
+          return true;
+        }
+        return false;
+      },
+      clearPromoCode: () => set({ promoCode: null, discount: 0 }),
+      getSubtotal: () => {
         return get().items.reduce((total, item) => total + item.price * item.quantity, 0);
+      },
+      getTotal: () => {
+        const subtotal = get().getSubtotal();
+        const discountAmount = (subtotal * get().discount) / 100;
+        return subtotal - discountAmount;
       },
     }),
     {

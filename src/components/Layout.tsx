@@ -4,6 +4,7 @@ import { ShoppingCart, Heart, User, LogOut, Menu, X, Search } from 'lucide-react
 import { useAuthStore } from '../store/useAuthStore';
 import { useCartStore } from '../store/useCartStore';
 import { supabase } from '../supabase';
+import ToastContainer from './ToastContainer';
 
 export default function Layout() {
   const { user, profile } = useAuthStore();
@@ -174,6 +175,7 @@ export default function Layout() {
           &copy; {new Date().getFullYear()} PeptiStore. All rights reserved. For research purposes only.
         </div>
       </footer>
+      <ToastContainer />
     </div>
   );
 }

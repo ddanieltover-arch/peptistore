@@ -2,11 +2,23 @@ import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCartStore } from '../store/useCartStore';
 import { formatCurrency } from '../lib/utils';
-import { Trash2, Plus, Minus } from 'lucide-react';
+import { Trash2, Plus, Minus, Tag, X } from 'lucide-react';
 
 export default function Cart() {
-  const { items, removeItem, updateQuantity, getTotal } = useCartStore();
+  const { items, removeItem, updateQuantity, getTotal, getSubtotal, promoCode, discount, applyPromoCode, clearPromoCode } = useCartStore();
+  const [promoInput, setPromoInput] = React.useState('');
+  const [promoError, setPromoError] = React.useState('');
   const navigate = useNavigate();
+
+  const handleApplyPromo = () => {
+    const success = applyPromoCode(promoInput);
+    if (success) {
+      setPromoInput('');
+      setPromoError('');
+    } else {
+      setPromoError('Invalid promotion code');
+    }
+  };
 
   if (items.length === 0) {
     return (
@@ -75,33 +87,76 @@ export default function Cart() {
           ))}
         </div>
         
-        <div className="bg-white p-8 rounded-lg shadow-sm border border-gray-100 h-fit sticky top-24">
+        <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 h-fit sticky top-24">
           <h2 className="text-2xl font-bold mb-6 text-gray-900">Order Summary</h2>
-          <div className="space-y-4 mb-8">
-            <div className="flex justify-between text-gray-600 font-medium">
-              <span>Subtotal</span>
-              <span className="text-gray-900">{formatCurrency(getTotal())}</span>
+          
+          <div className="mb-6">
+            <label className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 block">Promo Code</label>
+            <div className="flex gap-2">
+              <input 
+                type="text" 
+                value={promoInput}
+                onChange={(e) => setPromoInput(e.target.value)}
+                placeholder="Enter code (PEPTIDE10)"
+                className="flex-grow px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all font-medium"
+              />
+              <button 
+                onClick={handleApplyPromo}
+                className="px-6 py-3 bg-gray-900 text-white rounded-xl text-sm font-bold hover:bg-black transition-all active:scale-95"
+              >
+                Apply
+              </button>
             </div>
-            <div className="flex justify-between text-gray-600 font-medium">
+            {promoError && <p className="text-red-500 text-[10px] font-bold mt-2 uppercase tracking-tight">{promoError}</p>}
+            {promoCode && (
+              <div className="flex items-center justify-between mt-3 bg-blue-50 px-3 py-2 rounded-lg border border-blue-100">
+                <div className="flex items-center">
+                  <Tag className="h-4 w-4 text-blue-600 mr-2" />
+                  <span className="text-sm font-bold text-blue-700">{promoCode} Applied</span>
+                </div>
+                <button onClick={clearPromoCode} className="text-blue-400 hover:text-blue-600">
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+            )}
+          </div>
+
+          <div className="space-y-4 mb-8">
+            <div className="flex justify-between text-gray-500 font-bold text-sm uppercase tracking-tight">
+              <span>Subtotal</span>
+              <span className="text-gray-900">{formatCurrency(getSubtotal())}</span>
+            </div>
+            
+            {discount > 0 && (
+              <div className="flex justify-between text-blue-600 font-bold text-sm uppercase tracking-tight">
+                <span>Discount ({discount}%)</span>
+                <span>-{formatCurrency((getSubtotal() * discount) / 100)}</span>
+              </div>
+            )}
+
+            <div className="flex justify-between text-gray-500 font-bold text-sm uppercase tracking-tight">
               <span>Shipping</span>
-              <span className="text-gray-400 italic text-sm">Calculated at checkout</span>
+              <span className="text-gray-400 italic text-xs">Calculated at checkout</span>
             </div>
             <div className="h-px bg-gray-100 my-4"></div>
             <div className="flex justify-between items-center">
-               <span className="text-lg font-bold text-gray-900">Total</span>
-               <span className="text-2xl font-black text-blue-600">{formatCurrency(getTotal())}</span>
+               <span className="text-lg font-black text-gray-900 uppercase">Total</span>
+               <span className="text-3xl font-black text-blue-600">{formatCurrency(getTotal())}</span>
             </div>
           </div>
           <button 
             onClick={() => navigate('/checkout')}
-            className="w-full bg-blue-600 text-white py-4 rounded-xl font-bold hover:bg-blue-700 transition-all shadow-lg hover:shadow-xl active:scale-[0.98]"
+            className="w-full bg-blue-600 text-white py-4 rounded-2xl font-black text-lg hover:bg-blue-700 transition-all shadow-xl shadow-blue-200 hover:shadow-blue-300 active:scale-[0.98]"
           >
-            Proceed to Checkout
+            Checkout Now
           </button>
-          <div className="mt-6 p-4 bg-blue-50 rounded-lg text-center">
-            <p className="text-blue-700 text-xs font-semibold uppercase tracking-widest flex items-center justify-center">
-              <span className="mr-2">🔒</span> Secure Crypto Payment Only
-            </p>
+          <div className="mt-6 flex items-center justify-center gap-4 border-t border-gray-50 pt-6">
+            <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest flex items-center">
+              <span className="mr-1 text-blue-500">✔</span> Secure Shipping
+            </div>
+            <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest flex items-center">
+              <span className="mr-1 text-blue-500">✔</span> Global Delivery
+            </div>
           </div>
         </div>
       </div>
