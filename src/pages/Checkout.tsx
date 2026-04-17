@@ -4,7 +4,7 @@ import { useCartStore } from '../store/useCartStore';
 import { useAuthStore } from '../store/useAuthStore';
 import { formatCurrency } from '../lib/utils';
 import { supabase } from '../supabase';
-import { Bitcoin, Copy, CheckCircle } from 'lucide-react';
+import { CheckCircle, Loader2 } from 'lucide-react';
 
 export default function Checkout() {
   const { items, getTotal, clearCart } = useCartStore();
@@ -18,54 +18,72 @@ export default function Checkout() {
     country: '',
     postalCode: ''
   });
-  const [txHash, setTxHash] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [copied, setCopied] = useState(false);
-
-  const btcAddress = "bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh"; // Mock address
 
   if (items.length === 0) {
     navigate('/cart');
     return null;
   }
 
-  const handleShippingSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setStep(2);
-  };
-
-  const copyToClipboard = () => {
-    navigator.clipboard.writeText(btcAddress);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
-
-  const handlePaymentSubmit = async (e: React.FormEvent) => {
+  const handleShippingSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) {
       alert("Please login to complete the order.");
       return;
     }
     
+    setStep(2); // Go to Payment (Processing) step
     setIsSubmitting(true);
+    
     try {
+      const totalAmount = getTotal();
+      
       const orderData = {
         user_id: user.id,
         items: items,
-        total_amount: getTotal(),
+        total_amount: totalAmount,
         status: 'pending',
         shipping_address: shipping,
-        crypto_tx_hash: txHash
       };
       
-      const { error } = await supabase.from('orders').insert([orderData]);
+      // 1. Insert order to Supabase
+      const { data: orderResponse, error } = await supabase.from('orders').insert([orderData]).select().single();
       if (error) throw error;
       
+      const orderId = orderResponse.id;
+
+      // 2. Clear cart since order is generated
       clearCart();
-      setStep(3);
-    } catch (error) {
+
+      // 3. Create Plisio Invoice via our Scraper Service Backend
+      const returnUrl = `${window.location.origin}/orders`;
+      
+      const paymentRes = await fetch('http://localhost:4000/api/payment/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          amount: totalAmount,
+          order_id: orderId,
+          return_url: returnUrl
+        })
+      });
+
+      const paymentData = await paymentRes.json();
+
+      if (paymentRes.ok && paymentData.success && paymentData.invoice_url) {
+        // Redirect to Plisio payment gateway
+        window.location.href = paymentData.invoice_url;
+      } else {
+        throw new Error(paymentData.error || "Failed to create invoice");
+      }
+
+    } catch (error: any) {
       console.error("Order submission failed:", error);
-      alert("Failed to submit order. Please try again.");
+      const errorMsg = error.message || "An unknown error occurred";
+      alert(`Failed to process payment: ${errorMsg}. Your order was saved, but payment could not be initiated.`);
+      setStep(3); // Error or completion fallback
     } finally {
       setIsSubmitting(false);
     }
@@ -73,102 +91,80 @@ export default function Checkout() {
 
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <h1 className="text-3xl font-bold mb-8">Checkout</h1>
+      <h1 className="mb-8">Checkout</h1>
       
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex items-center justify-between mb-8 flex-wrap gap-2">
         <div className={`flex-1 text-center ${step >= 1 ? 'text-blue-600 font-bold' : 'text-gray-400'}`}>1. Shipping</div>
-        <div className="flex-1 h-1 bg-gray-200 mx-2"><div className={`h-full bg-blue-600 ${step >= 2 ? 'w-full' : 'w-0'} transition-all`}></div></div>
-        <div className={`flex-1 text-center ${step >= 2 ? 'text-blue-600 font-bold' : 'text-gray-400'}`}>2. Payment</div>
-        <div className="flex-1 h-1 bg-gray-200 mx-2"><div className={`h-full bg-blue-600 ${step >= 3 ? 'w-full' : 'w-0'} transition-all`}></div></div>
+        <div className="flex-1 h-1 bg-gray-200 mx-2 hidden sm:block"><div className={`h-full bg-blue-600 ${step >= 2 ? 'w-full' : 'w-0'} transition-all`}></div></div>
+        <div className={`flex-1 text-center ${step >= 2 ? 'text-blue-600 font-bold' : 'text-gray-400'}`}>2. Processing</div>
+        <div className="flex-1 h-1 bg-gray-200 mx-2 hidden sm:block"><div className={`h-full bg-blue-600 ${step >= 3 ? 'w-full' : 'w-0'} transition-all`}></div></div>
         <div className={`flex-1 text-center ${step >= 3 ? 'text-blue-600 font-bold' : 'text-gray-400'}`}>3. Confirmation</div>
       </div>
 
-      <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+      <div className="bg-white p-6 sm:p-10 rounded-[2rem] shadow-sm border border-gray-100">
         {step === 1 && (
-          <form onSubmit={handleShippingSubmit} className="space-y-4">
-            <h2 className="text-xl font-bold mb-4">Shipping Address</h2>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
-              <input required type="text" value={shipping.fullName} onChange={e => setShipping({...shipping, fullName: e.target.value})} className="w-full p-2 border border-gray-300 rounded-md" />
+          <form onSubmit={handleShippingSubmit} className="space-y-6">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-gray-900">Shipping Details</h2>
+              <span className="text-xl font-black text-blue-600">{formatCurrency(getTotal())}</span>
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Address</label>
-              <input required type="text" value={shipping.address} onChange={e => setShipping({...shipping, address: e.target.value})} className="w-full p-2 border border-gray-300 rounded-md" />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
+            
+            <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">City</label>
-                <input required type="text" value={shipping.city} onChange={e => setShipping({...shipping, city: e.target.value})} className="w-full p-2 border border-gray-300 rounded-md" />
+                <label className="block text-sm font-bold text-gray-700 mb-1">Full Name</label>
+                <input required type="text" value={shipping.fullName} onChange={e => setShipping({...shipping, fullName: e.target.value})} className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none transition-all font-medium" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Postal Code</label>
-                <input required type="text" value={shipping.postalCode} onChange={e => setShipping({...shipping, postalCode: e.target.value})} className="w-full p-2 border border-gray-300 rounded-md" />
+                <label className="block text-sm font-bold text-gray-700 mb-1">Street Address</label>
+                <input required type="text" value={shipping.address} onChange={e => setShipping({...shipping, address: e.target.value})} className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none transition-all font-medium" />
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-1">City</label>
+                  <input required type="text" value={shipping.city} onChange={e => setShipping({...shipping, city: e.target.value})} className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none transition-all font-medium" />
+                </div>
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-1">Postal Code</label>
+                  <input required type="text" value={shipping.postalCode} onChange={e => setShipping({...shipping, postalCode: e.target.value})} className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none transition-all font-medium" />
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-1">Country</label>
+                <input required type="text" value={shipping.country} onChange={e => setShipping({...shipping, country: e.target.value})} className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none transition-all font-medium" />
               </div>
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Country</label>
-              <input required type="text" value={shipping.country} onChange={e => setShipping({...shipping, country: e.target.value})} className="w-full p-2 border border-gray-300 rounded-md" />
+
+            <div className="pt-6">
+              <button type="submit" disabled={isSubmitting} className="w-full bg-blue-600 text-white py-4 rounded-2xl font-black text-lg hover:bg-blue-700 transition-all shadow-lg hover:shadow-blue-200 disabled:opacity-50">
+                Continue to Secure Payment
+              </button>
+              <p className="text-center text-xs text-gray-400 mt-4 font-bold uppercase tracking-widest">Powered by Plisio Crypto Gateway</p>
             </div>
-            <button type="submit" className="w-full bg-blue-600 text-white py-3 rounded-md font-bold hover:bg-blue-700 mt-6">
-              Continue to Payment
-            </button>
           </form>
         )}
 
         {step === 2 && (
-          <form onSubmit={handlePaymentSubmit} className="space-y-6">
-            <h2 className="text-xl font-bold mb-4">Crypto Payment</h2>
-            <div className="bg-gray-50 p-4 rounded-md border border-gray-200">
-              <div className="flex justify-between items-center mb-4">
-                <span className="text-gray-600">Total Amount:</span>
-                <span className="text-2xl font-bold">{formatCurrency(getTotal())}</span>
-              </div>
-              <p className="text-sm text-gray-500 mb-4">Please send the equivalent Bitcoin amount to the address below.</p>
-              
-              <div className="flex items-center space-x-2 bg-white p-3 border border-gray-300 rounded-md">
-                <Bitcoin className="text-orange-500 h-6 w-6 flex-shrink-0" />
-                <code className="text-sm flex-grow break-all">{btcAddress}</code>
-                <button type="button" onClick={copyToClipboard} className="text-gray-500 hover:text-blue-600 p-1">
-                  {copied ? <CheckCircle className="h-5 w-5 text-green-500" /> : <Copy className="h-5 w-5" />}
-                </button>
-              </div>
-            </div>
-
+          <div className="text-center py-16 space-y-6">
+            <Loader2 className="w-16 h-16 text-blue-600 animate-spin mx-auto" />
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Transaction Hash (TXID)</label>
-              <input 
-                required 
-                type="text" 
-                placeholder="Enter your transaction hash after sending"
-                value={txHash} 
-                onChange={e => setTxHash(e.target.value)} 
-                className="w-full p-2 border border-gray-300 rounded-md" 
-              />
-              <p className="text-xs text-gray-500 mt-1">We need this to verify your payment.</p>
+              <h2 className="text-2xl font-black text-gray-900 leading-tight">Securing Payment Gateway</h2>
+              <p className="text-gray-500 mt-2 font-medium">Generating your unique crypto invoice...</p>
             </div>
-
-            <div className="flex space-x-4">
-              <button type="button" onClick={() => setStep(1)} className="w-1/3 bg-gray-200 text-gray-800 py-3 rounded-md font-bold hover:bg-gray-300">
-                Back
-              </button>
-              <button type="submit" disabled={isSubmitting || !txHash} className="w-2/3 bg-blue-600 text-white py-3 rounded-md font-bold hover:bg-blue-700 disabled:bg-blue-400">
-                {isSubmitting ? 'Processing...' : 'Confirm Order'}
-              </button>
-            </div>
-          </form>
+            <p className="text-xs text-gray-400 max-w-sm mx-auto">You will be securely redirected to Plisio to complete your transaction in the cryptocurrency of your choice.</p>
+          </div>
         )}
 
         {step === 3 && (
-          <div className="text-center py-8">
-            <div className="mx-auto w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mb-4">
-              <CheckCircle className="h-8 w-8" />
-            </div>
-            <h2 className="text-2xl font-bold mb-2">Order Received!</h2>
-            <p className="text-gray-600 mb-6">Your order is pending payment verification. We'll email you once it ships.</p>
-            <button onClick={() => navigate('/orders')} className="bg-blue-600 text-white px-6 py-2 rounded-md font-medium hover:bg-blue-700">
-              View My Orders
-            </button>
-          </div>
+           <div className="text-center py-16">
+             <div className="mx-auto w-20 h-20 bg-gray-100 text-gray-400 rounded-full flex items-center justify-center mb-6">
+               <CheckCircle className="h-10 w-10" />
+             </div>
+             <h2 className="text-2xl font-black mb-2 text-gray-900">Order Saved Locally</h2>
+             <p className="text-gray-500 mb-8 max-w-md mx-auto">There was an issue initializing the payment gateway, but your order has been saved. You can try paying it later from your dashboard.</p>
+             <button onClick={() => navigate('/orders')} className="bg-gray-900 text-white px-8 py-4 rounded-2xl font-bold hover:bg-black transition-colors w-full sm:w-auto">
+               View My Orders
+             </button>
+           </div>
         )}
       </div>
     </div>

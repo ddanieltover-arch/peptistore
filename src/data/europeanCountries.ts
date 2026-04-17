@@ -1,0 +1,40 @@
+export const europeanLocations = [
+  { country: 'United Kingdom', city: 'London' },
+  { country: 'United Kingdom', city: 'Manchester' },
+  { country: 'United Kingdom', city: 'Birmingham' },
+  { country: 'Germany', city: 'Berlin' },
+  { country: 'Germany', city: 'Munich' },
+  { country: 'France', city: 'Paris' },
+  { country: 'France', city: 'Lyon' },
+  { country: 'Spain', city: 'Madrid' },
+  { country: 'Spain', city: 'Barcelona' },
+  { country: 'Italy', city: 'Rome' },
+  { country: 'Italy', city: 'Milan' },
+  { country: 'Netherlands', city: 'Amsterdam' },
+  { country: 'Netherlands', city: 'Rotterdam' },
+  { country: 'Sweden', city: 'Stockholm' },
+  { country: 'Norway', city: 'Oslo' },
+  { country: 'Denmark', city: 'Copenhagen' },
+  { country: 'Switzerland', city: 'Zurich' },
+  { country: 'Switzerland', city: 'Geneva' },
+  { country: 'Austria', city: 'Vienna' },
+  { country: 'Belgium', city: 'Brussels' },
+  { country: 'Ireland', city: 'Dublin' },
+  { country: 'Poland', city: 'Warsaw' },
+  { country: 'Portugal', city: 'Lisbon' },
+  { country: 'Finland', city: 'Helsinki' },
+  { country: 'Czech Republic', city: 'Prague' }
+];
+
+export const sampleProducts = [
+  'BPC-157 5mg',
+  'TB-500 10mg',
+  'Tirzepatide 10mg',
+  'Semaglutide 5mg',
+  'Retatrutide 5mg',
+  'Melanotan 2 10mg',
+  'IGF-1 LR3 1mg',
+  'CJC-1295 / Ipamorelin Blend',
+  'MK-677 30ml',
+  'Bacteriostatic Water 30ml'
+];

@@ -1,6 +1,7 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import Layout from './components/Layout';
+import ScrollToTop from './components/ScrollToTop';
 import Home from './pages/Home';
 import Shop from './pages/Shop';
 import Cart from './pages/Cart';
@@ -15,9 +16,15 @@ import Wishlist from './pages/Wishlist';
 import Search from './pages/Search';
 import Categories from './pages/Categories';
 import Login from './pages/Login';
+import FAQ from './pages/FAQ';
+import Shipping from './pages/Shipping';
+import Contact from './pages/Contact';
+import Terms from './pages/Terms';
+import Privacy from './pages/Privacy';
 import { useAuthStore } from './store/useAuthStore';
 import { useWishlistStore } from './store/useWishlistStore';
 import { supabase } from './supabase';
+import { AnimatePresence } from 'motion/react';
 
 export default function App() {
   const { setUser, fetchProfile, setAuthReady } = useAuthStore();
@@ -58,7 +65,17 @@ export default function App() {
 
   return (
     <BrowserRouter>
-      <Routes>
+      <ScrollToTop />
+      <AppRoutes />
+    </BrowserRouter>
+  );
+}
+
+function AppRoutes() {
+  const location = useLocation();
+  return (
+    <AnimatePresence mode="wait">
+      <Routes location={location} key={location.pathname}>
         <Route path="/" element={<Layout />}>
           <Route index element={<Home />} />
           <Route path="shop" element={<Shop />} />
@@ -74,8 +91,13 @@ export default function App() {
           <Route path="search" element={<Search />} />
           <Route path="categories" element={<Categories />} />
           <Route path="login" element={<Login />} />
+          <Route path="faq" element={<FAQ />} />
+          <Route path="shipping" element={<Shipping />} />
+          <Route path="contact" element={<Contact />} />
+          <Route path="terms" element={<Terms />} />
+          <Route path="privacy" element={<Privacy />} />
         </Route>
       </Routes>
-    </BrowserRouter>
+    </AnimatePresence>
   );
 }

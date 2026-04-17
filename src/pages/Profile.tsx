@@ -28,14 +28,14 @@ export default function Profile() {
             <div className="bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100 flex flex-col items-center text-center">
                <div className="h-24 w-24 rounded-full bg-blue-50 p-1 mb-4">
                  <div className="w-full h-full rounded-full overflow-hidden border-4 border-white shadow-xl bg-white flex items-center justify-center">
-                   {profile.photoURL ? (
-                     <img src={profile.photoURL} alt="" className="w-full h-full object-cover" />
+                   {profile.photo_url ? (
+                     <img src={profile.photo_url} alt="" className="w-full h-full object-cover" />
                    ) : (
                      <User className="h-12 w-12 text-blue-100" />
                    )}
                  </div>
                </div>
-               <h2 className="text-2xl font-black text-gray-900 leading-tight">{profile.displayName || 'Researcher'}</h2>
+               <h2 className="text-gray-900 leading-tight">{profile.display_name || 'Researcher'}</h2>
                <p className="text-blue-500 text-xs font-black uppercase tracking-widest mt-1">{profile.role}</p>
             </div>
 
@@ -72,7 +72,7 @@ export default function Profile() {
             >
                {/* Account Details */}
                <section className="bg-white p-10 rounded-[2.5rem] shadow-sm border border-gray-100">
-                  <h3 className="text-xl font-bold text-gray-900 mb-8 flex items-center gap-3">
+                  <h3 className="text-gray-900 mb-8 flex items-center gap-3">
                     <Shield className="h-6 w-6 text-blue-500" /> Account Security
                   </h3>
                   <div className="space-y-6">
@@ -88,7 +88,7 @@ export default function Profile() {
                         <div>
                            <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Member Since</p>
                            <p className="text-gray-900 font-bold">
-                             {profile.createdAt?.toDate ? profile.createdAt.toDate().toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : 'April 2026'}
+                             {profile.created_at ? new Date(profile.created_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : 'April 2026'}
                            </p>
                         </div>
                      </div>
@@ -123,7 +123,7 @@ export default function Profile() {
                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                   <div className="p-6 bg-blue-50 rounded-3xl border border-blue-100">
                      <p className="text-[10px] font-black text-blue-500 uppercase tracking-widest mb-1">Total Spent</p>
-                     <p className="text-3xl font-black text-blue-900">€0.00</p>
+                     <p className="text-3xl font-black text-blue-900">£0.00</p>
                   </div>
                   <div className="p-6 bg-green-50 rounded-3xl border border-green-100">
                      <p className="text-[10px] font-black text-green-500 uppercase tracking-widest mb-1">Reward Points</p>

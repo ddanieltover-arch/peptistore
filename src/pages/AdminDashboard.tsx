@@ -26,6 +26,55 @@ export default function AdminDashboard() {
   const [imageUrl, setImageUrl] = useState('');
   const [isSeeding, setIsSeeding] = useState(false);
 
+  const seedReferenceCatalog = async () => {
+    setIsSeeding(true);
+    addToast("Starting catalog synchronization...", "info");
+    try {
+      // Upsert products from reference data
+      const { error: pError } = await supabase.from('products').upsert(
+        referenceSeedProducts.map(p => ({
+          ...p,
+          rating: 5,
+          review_count: Math.floor(Math.random() * 50) + 10
+        }))
+      );
+      if (pError) throw pError;
+      addToast("Catalog synchronized successfully", "success");
+      fetchData();
+    } catch (err: any) {
+      console.error("Sync error:", err);
+      addToast(err.message || "Sync failed", "error");
+    } finally {
+      setIsSeeding(false);
+    }
+  };
+
+  const clearAndReseed = async () => {
+    if (!confirm("Are you ABSOLUTELY sure? This will delete all products.")) return;
+    setIsSeeding(true);
+    addToast("Wiping and re-seeding...", "info");
+    try {
+      const { error: dError } = await supabase.from('products').delete().neq('id', '00000000-0000-0000-0000-000000000000'); // Delete everything
+      if (dError) throw dError;
+      
+      const { error: iError } = await supabase.from('products').insert(
+        referenceSeedProducts.map(p => ({
+          ...p,
+          rating: 5,
+          review_count: Math.floor(Math.random() * 50) + 10
+        }))
+      );
+      if (iError) throw iError;
+      addToast("Wipe and re-seed complete", "success");
+      fetchData();
+    } catch (err: any) {
+      console.error("Reseed error:", err);
+      addToast(err.message || "Reseed failed", "error");
+    } finally {
+      setIsSeeding(false);
+    }
+  };
+
   useEffect(() => {
     fetchData();
   }, []);
@@ -110,7 +159,7 @@ export default function AdminDashboard() {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 gap-6">
         <div>
-          <h1 className="text-4xl font-black text-gray-900 tracking-tighter">Command Center</h1>
+          <h1>Command Center</h1>
           <p className="text-gray-500 font-medium">Manage your elite research inventory and logistics.</p>
         </div>
         
@@ -222,13 +271,13 @@ export default function AdminDashboard() {
               className="grid grid-cols-1 lg:grid-cols-3 gap-8"
             >
               <div className="bg-white p-8 rounded-[2rem] border border-gray-100 shadow-sm h-fit">
-                <h2 className="text-2xl font-black mb-6 text-gray-900">Add Inventory</h2>
+                <h2 className="mb-6 text-gray-900">Add Inventory</h2>
                 <form onSubmit={handleAddProduct} className="space-y-5">
                    {/* Form fields same as before but styled better */}
                    <input required type="text" placeholder="Product Title" value={title} onChange={e => setTitle(e.target.value)} className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none transition-all font-medium" />
                    <textarea required rows={4} placeholder="Description" value={description} onChange={e => setDescription(e.target.value)} className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none transition-all font-medium" />
                    <div className="grid grid-cols-2 gap-4">
-                      <input required type="number" step="0.01" placeholder="Price €" value={price} onChange={e => setPrice(e.target.value)} className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none transition-all font-medium" />
+                      <input required type="number" step="0.01" placeholder="Price £" value={price} onChange={e => setPrice(e.target.value)} className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none transition-all font-medium" />
                       <input required type="number" placeholder="Inventory" value={inventory} onChange={e => setInventory(e.target.value)} className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none transition-all font-medium" />
                    </div>
                    <input type="url" placeholder="Image URL (optional)" value={imageUrl} onChange={e => setImageUrl(e.target.value)} className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none transition-all font-medium" />

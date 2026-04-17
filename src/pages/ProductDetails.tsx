@@ -76,16 +76,25 @@ export default function ProductDetails() {
 
   const handleAddToCart = () => {
     if (product) {
+      let pricePerUnit = selectedVariant ? selectedVariant.display_price : product.price;
+      
+      // Apply Tier Discounts
+      if (quantity >= 5) pricePerUnit = pricePerUnit * 0.85; // 15% off
+      else if (quantity >= 3) pricePerUnit = pricePerUnit * 0.90; // 10% off
+
       addItem({
         productId: product.id,
         title: product.title,
-        price: selectedVariant ? selectedVariant.price : product.price,
+        price: pricePerUnit,
         quantity,
         imageUrl: product.images?.[0] || '',
-        specification: selectedVariant ? selectedVariant.name : undefined
+        specification: selectedVariant ? (selectedVariant.attributes?.attribute_pa_peptides || selectedVariant.display_name) : undefined
       });
-      addToast(`${product.title} added to cart!`);
-      // navigate('/cart'); // Option: Stay on page for more browsing (better for UX)
+      
+      // If user selected 3 or 5, we can show a special toast
+      if (quantity >= 5) addToast(`Bulk discount (15%) applied to ${product.title}!`);
+      else if (quantity >= 3) addToast(`Bulk discount (10%) applied to ${product.title}!`);
+      else addToast(`${product.title} added to cart!`);
     }
   };
 
@@ -130,7 +139,7 @@ export default function ProductDetails() {
     </div>
   );
 
-  const currentPrice = selectedVariant ? selectedVariant.price : product.price;
+  const currentPrice = selectedVariant ? selectedVariant.display_price : product.price;
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -209,7 +218,13 @@ export default function ProductDetails() {
             <span className="text-gray-500 text-sm">({reviews.length} reviews)</span>
           </div>
           
-          <div className="text-3xl font-bold text-gray-900 mb-6">{formatCurrency(currentPrice)}</div>
+          <div className="flex items-center gap-4 mb-6">
+            <div className="text-4xl font-black text-gray-900">{formatCurrency(currentPrice)}</div>
+            <div className="flex items-center gap-1.5 px-3 py-1 bg-green-50 rounded-full border border-green-100">
+               <ShieldCheck className="h-4 w-4 text-green-500" />
+               <span className="text-[10px] font-black text-green-700 uppercase tracking-widest">Price Verified</span>
+            </div>
+          </div>
           
           <p className="text-gray-600 mb-8 whitespace-pre-line">{product.description}</p>
 
@@ -218,19 +233,22 @@ export default function ProductDetails() {
             <div className="mb-8 p-4 bg-gray-50 rounded-xl border border-gray-100">
               <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-4">Specification</h3>
               <div className="flex flex-wrap gap-2">
-                {product.variants.map((v: any, i: number) => (
-                  <button
-                    key={i}
-                    onClick={() => setSelectedVariant(v)}
-                    className={`px-4 py-2 rounded-lg text-sm font-medium border-2 transition-all ${
-                      selectedVariant?.name === v.name
-                        ? 'border-blue-600 bg-blue-50 text-blue-700 shadow-sm'
-                        : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300'
-                    }`}
-                  >
-                    {v.name}
-                  </button>
-                ))}
+                {product.variants.map((v: any, i: number) => {
+                  const label = v.attributes?.attribute_pa_peptides || v.display_name;
+                  return (
+                    <button
+                      key={v.variation_id || i}
+                      onClick={() => setSelectedVariant(v)}
+                      className={`px-4 py-2 rounded-lg text-sm font-medium border-2 transition-all ${
+                        selectedVariant?.variation_id === v.variation_id
+                          ? 'border-blue-600 bg-blue-50 text-blue-700 shadow-sm'
+                          : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300'
+                      }`}
+                    >
+                      {label}
+                    </button>
+                  );
+                })}
               </div>
             </div>
           )}
@@ -249,19 +267,79 @@ export default function ProductDetails() {
             </div>
           )}
 
-          {/* Trust Signals (Phase 3 Prep) */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-            <div className="flex flex-col items-center p-4 bg-blue-50/50 rounded-2xl border border-blue-100 text-center">
-              <ShieldCheck className="h-6 w-6 text-blue-600 mb-2" />
-              <span className="text-[10px] font-bold text-blue-900 uppercase tracking-wider">HPLC Tested</span>
+          {/* Bundle Selection UI */}
+          <div className="mb-10">
+            <h3 className="text-xs font-bold text-gray-400 uppercase tracking-[0.2em] mb-6">
+              Choose Your Bundle
+            </h3>
+            <div className="grid grid-cols-3 gap-2 md:gap-4">
+              {[
+                { id: 'standard', qty: 1, range: '1-2 Units', label: 'STANDARD', discount: 0, tagColor: 'bg-gray-100 text-gray-600' },
+                { id: 'save', qty: 3, range: '3-5 Units', label: 'SAVE 5%', discount: 0.05, tagColor: 'bg-amber-100 text-amber-700' },
+                { id: 'value', qty: 6, range: '6+ Units', label: 'BEST VALUE', discount: 0.10, tagColor: 'bg-emerald-100 text-emerald-700' }
+              ].map((tier) => {
+                const unitPrice = currentPrice * (1 - tier.discount);
+                const isSelected = (tier.qty === 1 && quantity < 3) || 
+                                  (tier.qty === 3 && quantity >= 3 && quantity < 6) || 
+                                  (tier.qty === 6 && quantity >= 6);
+                
+                return (
+                  <button
+                    key={tier.id}
+                    onClick={() => setQuantity(tier.qty)}
+                    className={`relative p-3 md:p-6 rounded-2xl md:rounded-[2rem] border-2 transition-all duration-300 text-center group ${
+                      isSelected 
+                        ? 'border-blue-600 bg-blue-50/50 shadow-xl shadow-blue-500/10 md:scale-[1.02]' 
+                        : 'border-gray-100 bg-white hover:border-gray-300 hover:shadow-lg hover:shadow-gray-200/50'
+                    }`}
+                  >
+                    {isSelected && (
+                      <div className="absolute top-2 right-2 md:top-4 md:right-4 text-blue-600">
+                        <CheckCircle2 className="h-4 w-4 md:h-6 md:w-6 fill-white" />
+                      </div>
+                    )}
+
+                    <div className="flex flex-col items-center">
+                      <span className={`px-2 py-0.5 md:px-4 md:py-1 rounded-full text-[8px] md:text-[10px] font-black tracking-widest mb-2 md:mb-4 inline-block ${tier.tagColor}`}>
+                        {tier.label}
+                      </span>
+                      
+                      <span className="text-[10px] md:text-sm font-bold text-gray-500 mb-1 leading-tight">
+                        {tier.range}
+                      </span>
+                      
+                      <div className="flex flex-col md:flex-row items-center md:items-baseline md:gap-1 mb-2">
+                        <span className={`text-base md:text-2xl font-black ${isSelected ? 'text-blue-600' : 'text-gray-900'}`}>
+                          {formatCurrency(unitPrice)}
+                        </span>
+                        <span className="text-[8px] md:text-xs font-bold text-gray-400">/ unit</span>
+                      </div>
+
+                      <p className={`hidden sm:block text-[11px] font-bold ${tier.discount > 0 ? 'text-gray-500' : 'text-gray-400'}`}>
+                        {tier.discount > 0 
+                          ? `Total (×${tier.qty}): ${formatCurrency(unitPrice * tier.qty)}` 
+                          : 'No discount'}
+                      </p>
+                    </div>
+                  </button>
+                );
+              })}
             </div>
-            <div className="flex flex-col items-center p-4 bg-blue-50/50 rounded-2xl border border-blue-100 text-center">
-              <Truck className="h-6 w-6 text-blue-600 mb-2" />
-              <span className="text-[10px] font-bold text-blue-900 uppercase tracking-wider">Stealth Ship</span>
+          </div>
+
+          {/* Trust Signals */}
+          <div className="grid grid-cols-3 gap-2 md:gap-4 mb-8">
+            <div className="flex flex-col items-center p-2 md:p-4 bg-blue-50/50 rounded-2xl border border-blue-100 text-center">
+              <ShieldCheck className="h-4 w-4 md:h-6 md:w-6 text-blue-600 mb-2" />
+              <span className="text-[8px] md:text-[10px] font-bold text-blue-900 uppercase tracking-[0.15em] leading-tight">HPLC <br className="md:hidden" /> Tested</span>
             </div>
-            <div className="flex flex-col items-center p-4 bg-blue-50/50 rounded-2xl border border-blue-100 text-center">
-              <Zap className="h-6 w-6 text-blue-600 mb-2" />
-              <span className="text-[10px] font-bold text-blue-900 uppercase tracking-wider">Express Purtity</span>
+            <div className="flex flex-col items-center p-2 md:p-4 bg-blue-50/50 rounded-2xl border border-blue-100 text-center">
+              <Truck className="h-4 w-4 md:h-6 md:w-6 text-blue-600 mb-2" />
+              <span className="text-[8px] md:text-[10px] font-bold text-blue-900 uppercase tracking-[0.15em] leading-tight">Stealth <br className="md:hidden" /> Ship</span>
+            </div>
+            <div className="flex flex-col items-center p-2 md:p-4 bg-blue-50/50 rounded-2xl border border-blue-100 text-center">
+              <Zap className="h-4 w-4 md:h-6 md:w-6 text-blue-600 mb-2" />
+              <span className="text-[8px] md:text-[10px] font-bold text-blue-900 uppercase tracking-[0.15em] leading-tight">Express <br className="md:hidden" /> Purity</span>
             </div>
           </div>
 
@@ -284,10 +362,10 @@ export default function ProductDetails() {
       {recommended.length > 0 && (
         <div className="mb-20">
           <div className="flex items-center justify-between mb-8">
-            <h2 className="text-3xl font-black text-gray-900">Recommended for you</h2>
+            <h2>Recommended for you</h2>
             <Link to="/shop" className="text-blue-600 font-bold hover:underline">View all results</Link>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-10">
             {recommended.map(rec => (
               <Link key={rec.id} to={`/product/${rec.id}`} className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden group hover:shadow-xl transition-all duration-500">
                 <div className="h-48 bg-gray-100 overflow-hidden relative">
@@ -297,8 +375,12 @@ export default function ProductDetails() {
                   <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
                 </div>
                 <div className="p-6">
-                  <h3 className="font-bold text-gray-900 group-hover:text-blue-600 transition-colors truncate">{rec.title}</h3>
-                  <p className="text-blue-600 font-black text-xl mt-2">{formatCurrency(rec.price)}</p>
+                  <h3 className="group-hover:text-blue-600 transition-colors truncate">{rec.title}</h3>
+                  <p className={`text-blue-600 font-black ${rec.variants && rec.variants.length > 1 ? 'text-lg' : 'text-xl'} mt-2`}>
+                    {rec.variants && rec.variants.length > 1 
+                      ? `${formatCurrency(Math.min(...rec.variants.map((v: any) => v.display_price)))} – ${formatCurrency(Math.max(...rec.variants.map((v: any) => v.display_price)))}`
+                      : formatCurrency(rec.price)}
+                  </p>
                 </div>
               </Link>
             ))}
@@ -309,7 +391,7 @@ export default function ProductDetails() {
       {/* Recently Viewed (Phase 2) */}
       {recentlyViewed.length > 0 && (
         <div className="mb-12 pt-12 border-t border-gray-100">
-          <h2 className="text-xl font-bold text-gray-500 uppercase tracking-widest mb-8">Recently viewed</h2>
+          <h2 className="text-gray-500 uppercase tracking-widest mb-8">Recently viewed</h2>
           <div className="flex gap-6 overflow-x-auto pb-6 no-scrollbar">
             {recentlyViewed.map(rv => (
               <Link key={`rv-${rv.id}`} to={`/product/${rv.id}`} className="flex-shrink-0 w-48 group">
@@ -321,8 +403,12 @@ export default function ProductDetails() {
                   )
                 }
                 </div>
-                <h4 className="mt-3 text-xs font-bold text-gray-900 group-hover:text-blue-600 line-clamp-1">{rv.title}</h4>
-                <p className="text-gray-400 text-xs font-medium mt-1">{formatCurrency(rv.price)}</p>
+                <h4 className="mt-3 group-hover:text-blue-600 line-clamp-1">{rv.title}</h4>
+                <p className={`text-gray-400 ${rv.variants && rv.variants.length > 1 ? 'text-[10px]' : 'text-xs'} font-medium mt-1`}>
+                  {rv.variants && rv.variants.length > 1 
+                    ? `${formatCurrency(Math.min(...rv.variants.map((v: any) => v.display_price)))} – ${formatCurrency(Math.max(...rv.variants.map((v: any) => v.display_price)))}`
+                    : formatCurrency(rv.price)}
+                </p>
               </Link>
             ))}
           </div>

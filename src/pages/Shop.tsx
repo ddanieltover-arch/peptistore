@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { supabase } from '../supabase';
 import { Link } from 'react-router-dom';
 import { formatCurrency } from '../lib/utils';
-import { ShoppingCart, Heart, Filter, X, ChevronDown } from 'lucide-react';
+import { ShoppingCart, Heart, Filter, X, ChevronDown, ShieldCheck } from 'lucide-react';
 import { useCartStore } from '../store/useCartStore';
 import { useWishlistStore } from '../store/useWishlistStore';
 import { useAuthStore } from '../store/useAuthStore';
@@ -18,7 +18,7 @@ export default function Shop() {
   
   // Filters State
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [priceRange, setPriceRange] = useState<number>(300); // Max price default
+  const [priceRange, setPriceRange] = useState<number>(500); // Max price default
   const [sortBy, setSortBy] = useState<string>('newest');
   const [showMobileFilters, setShowMobileFilters] = useState(false);
 
@@ -83,7 +83,7 @@ export default function Shop() {
 
   const clearFilters = () => {
     setSelectedCategories([]);
-    setPriceRange(300);
+    setPriceRange(500);
     setSortBy('newest');
   };
 
@@ -98,7 +98,7 @@ export default function Shop() {
            <div className="h-40 bg-gray-100 animate-pulse rounded-2xl"></div>
            <div className="h-40 bg-gray-100 animate-pulse rounded-2xl"></div>
         </div>
-        <div className="lg:col-span-3 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+        <div className="lg:col-span-3 grid grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6">
           {[...Array(6)].map((_, i) => <ProductSkeleton key={i} />)}
         </div>
       </div>
@@ -109,7 +109,7 @@ export default function Shop() {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div>
-          <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight">Shop Peptides</h1>
+          <h1>Shop Peptides</h1>
           <p className="text-gray-500 mt-1">Showing {filteredProducts.length} high-purity research compounds</p>
         </div>
         
@@ -171,8 +171,8 @@ export default function Shop() {
               className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
             />
             <div className="flex justify-between text-[10px] text-gray-400 mt-2 font-bold uppercase">
-              <span>€0</span>
-              <span>€500+</span>
+              <span>£0</span>
+              <span>£500+</span>
             </div>
           </div>
 
@@ -288,7 +288,7 @@ export default function Shop() {
               </button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+            <div className="grid grid-cols-2 sm:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6">
               {filteredProducts.map((product, idx) => (
                 <motion.div 
                   layout
@@ -336,10 +336,17 @@ export default function Shop() {
 
                     <p className="text-gray-500 text-xs mb-6 line-clamp-2 leading-relaxed font-medium">{product.description}</p>
 
-                    <div className="flex items-center justify-between pt-4 border-t border-gray-50">
+                    <div className="flex items-center justify-between pt-2 mt-2 border-t border-gray-50">
                       <div>
-                        <span className="text-[10px] text-gray-400 font-bold uppercase block mb-0.5">Price starting at</span>
-                        <span className="text-2xl font-black text-gray-900">{formatCurrency(product.price)}</span>
+                        <div className="flex items-center gap-1 mb-1">
+                          <ShieldCheck className="h-3 w-3 text-green-500" />
+                          <span className="text-[10px] text-green-600 font-bold uppercase tracking-tight">Verified Price</span>
+                        </div>
+                        <span className="text-xl font-black text-gray-900">
+                          {product.variants && product.variants.length > 1 
+                            ? `${formatCurrency(Math.min(...product.variants.map((v: any) => v.display_price)))} – ${formatCurrency(Math.max(...product.variants.map((v: any) => v.display_price)))}`
+                            : formatCurrency(product.price)}
+                        </span>
                       </div>
                       <button 
                         onClick={() => {

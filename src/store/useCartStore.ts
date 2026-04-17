@@ -22,6 +22,10 @@ interface CartState {
   clearPromoCode: () => void;
   getTotal: () => number;
   getSubtotal: () => number;
+  isOpen: boolean;
+  openCart: () => void;
+  closeCart: () => void;
+  toggleCart: () => void;
 }
 
 export const useCartStore = create<CartState>()(
@@ -30,6 +34,10 @@ export const useCartStore = create<CartState>()(
       items: [],
       promoCode: null,
       discount: 0,
+      isOpen: false,
+      openCart: () => set({ isOpen: true }),
+      closeCart: () => set({ isOpen: false }),
+      toggleCart: () => set((state) => ({ isOpen: !state.isOpen })),
       addItem: (item) => {
         const items = get().items;
         const existingItem = items.find(
@@ -43,9 +51,10 @@ export const useCartStore = create<CartState>()(
                 ? { ...i, quantity: i.quantity + item.quantity }
                 : i
             ),
+            isOpen: true, // Auto open cart on add
           });
         } else {
-          set({ items: [...items, item] });
+          set({ items: [...items, item], isOpen: true }); // Auto open cart on add
         }
       },
       removeItem: (productId, specification) => {
@@ -84,6 +93,7 @@ export const useCartStore = create<CartState>()(
     }),
     {
       name: 'cart-storage',
+      partialize: (state) => ({ items: state.items, promoCode: state.promoCode, discount: state.discount }), // Don't persist UI state like isOpen
     }
   )
 );

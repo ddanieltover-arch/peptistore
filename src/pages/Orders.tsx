@@ -58,14 +58,14 @@ export default function Orders() {
             <div className="bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100 flex flex-col items-center text-center">
                <div className="h-24 w-24 rounded-full bg-blue-50 p-1 mb-4">
                  <div className="w-full h-full rounded-full overflow-hidden border-4 border-white shadow-xl bg-white flex items-center justify-center">
-                   {profile.photoURL ? (
-                     <img src={profile.photoURL} alt="" className="w-full h-full object-cover" />
+                   {profile.photo_url ? (
+                     <img src={profile.photo_url} alt="" className="w-full h-full object-cover" />
                    ) : (
                      <User className="h-12 w-12 text-blue-100" />
                    )}
                  </div>
                </div>
-               <h2 className="text-2xl font-black text-gray-900 leading-tight">{profile.displayName || 'Researcher'}</h2>
+               <h2 className="text-2xl font-black text-gray-900 leading-tight">{profile.display_name || 'Researcher'}</h2>
                <p className="text-blue-500 text-xs font-black uppercase tracking-widest mt-1">{profile.role}</p>
             </div>
 
@@ -96,7 +96,7 @@ export default function Orders() {
           {/* Main Content Area */}
           <main className="flex-grow space-y-8">
             <div className="flex justify-between items-center mb-4">
-               <h1 className="text-3xl font-black text-gray-900 tracking-tighter">Order History</h1>
+               <h1>Order History</h1>
                <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">{orders.length} Shipments</span>
             </div>
 
