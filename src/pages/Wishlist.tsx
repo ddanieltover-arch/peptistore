@@ -107,10 +107,42 @@ export default function Wishlist() {
                 ))}
               </div>
             ) : products.length === 0 ? (
-              <div className="text-center py-24 bg-white rounded-[2.5rem] border border-gray-100 shadow-sm">
-                 <Heart className="h-16 w-16 text-gray-200 mx-auto mb-4" />
-                 <p className="text-xl font-bold text-gray-900">Wishlist empty.</p>
-                 <Link to="/shop" className="text-blue-600 font-bold hover:underline mt-2 inline-block">Discover Peptides</Link>
+              <div className="space-y-12">
+                <div className="text-center py-24 bg-white rounded-[2.5rem] border border-gray-100 shadow-sm">
+                  <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <Heart className="h-10 w-10 text-gray-200" />
+                  </div>
+                  <h2 className="text-2xl font-black text-gray-900 leading-tight">Your wishlist is empty</h2>
+                  <p className="text-gray-500 mt-2 mb-8 max-w-sm mx-auto font-medium">Save your most-used research compounds here for quick access in future sessions.</p>
+                  <Link to="/shop" className="bg-blue-600 text-white px-10 py-4 rounded-2xl font-black text-sm hover:bg-gray-900 transition-all shadow-lg shadow-blue-100">
+                    Discover Compounds
+                  </Link>
+                </div>
+
+                {/* Recommendations for empty state */}
+                <section>
+                   <div className="flex items-center gap-3 mb-6">
+                      <div className="h-1 w-8 bg-blue-600 rounded-full" />
+                      <h2 className="text-xl font-black text-gray-900">Suggested for Research</h2>
+                   </div>
+                   <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+                      {[
+                        { id: '1', title: 'BPC-157 5mg', category: 'Recovery', price: 45.00, image: 'https://images.unsplash.com/photo-1584017911766-d451b3d0e843?w=300&h=300&fit=crop' },
+                        { id: '2', title: 'TB-500 2mg', category: 'Healing', price: 38.00, image: 'https://images.unsplash.com/photo-1583947582991-916c8742880a?w=300&h=300&fit=crop' },
+                        { id: '3', title: 'PT-141 10mg', category: 'Performance', price: 55.00, image: 'https://images.unsplash.com/photo-1583947215259-38e31be8751f?w=300&h=300&fit=crop' },
+                        { id: '4', title: 'CJC-1295 5mg', category: 'Growth', price: 42.00, image: 'https://images.unsplash.com/photo-1603398938378-e54eab446fec?w=300&h=300&fit=crop' }
+                      ].map((p) => (
+                        <div key={p.id} className="bg-white p-6 rounded-[2rem] border border-gray-100 group">
+                           <div className="aspect-square rounded-2xl bg-gray-50 mb-4 overflow-hidden">
+                              <img src={p.image} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" alt="" />
+                           </div>
+                           <p className="text-[10px] font-black text-blue-500 uppercase tracking-widest mb-1">{p.category}</p>
+                           <h4 className="font-black text-gray-900 leading-tight mb-2">{p.title}</h4>
+                           <p className="text-lg font-black text-gray-900">£{p.price.toFixed(2)}</p>
+                        </div>
+                      ))}
+                   </div>
+                </section>
               </div>
             ) : (
               <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8">

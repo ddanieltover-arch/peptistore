@@ -4,30 +4,42 @@ import { supabase } from '../supabase';
 import { LogIn, Mail, Lock, Loader2 } from 'lucide-react';
 
 export default function Login() {
+  const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
   const navigate = useNavigate();
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
+    setSuccess(null);
 
     try {
-      const { data, error: loginError } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (loginError) throw loginError;
-
-      if (data.user) {
-        navigate('/');
+      if (isSignUp) {
+        const { data, error: signUpError } = await supabase.auth.signUp({
+          email,
+          password,
+        });
+        if (signUpError) throw signUpError;
+        if (data.user) {
+          setSuccess('Account created! Please check your email for the confirmation link.');
+        }
+      } else {
+        const { data, error: loginError } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+        if (loginError) throw loginError;
+        if (data.user) {
+          navigate('/');
+        }
       }
     } catch (err: any) {
-      setError(err.message || 'Failed to sign in');
+      setError(err.message || (isSignUp ? 'Failed to create account' : 'Failed to sign in'));
     } finally {
       setLoading(false);
     }
@@ -48,20 +60,26 @@ export default function Login() {
       <div className="max-w-md w-full space-y-8 bg-white p-10 rounded-2xl shadow-xl border border-gray-100">
         <div className="text-center">
           <h2 className="mt-6 text-3xl font-extrabold text-gray-900 tracking-tight">
-            Welcome Back
+            {isSignUp ? 'Create an Account' : 'Welcome Back'}
           </h2>
           <p className="mt-2 text-sm text-gray-600">
-            Sign in to manage your research supplies
+            {isSignUp ? 'Join our research community today' : 'Sign in to manage your research supplies'}
           </p>
         </div>
 
         {error && (
-          <div className="bg-red-50 border-l-4 border-red-400 p-4 rounded-md">
-            <p className="text-sm text-red-700">{error}</p>
+          <div className="bg-red-50 border-l-4 border-red-400 p-4 rounded-md animate-in fade-in duration-300">
+            <p className="text-sm text-red-700 font-bold">{error}</p>
           </div>
         )}
 
-        <form className="mt-8 space-y-6" onSubmit={handleLogin}>
+        {success && (
+          <div className="bg-emerald-50 border-l-4 border-emerald-400 p-4 rounded-md animate-in fade-in duration-300">
+            <p className="text-sm text-emerald-700 font-bold">{success}</p>
+          </div>
+        )}
+
+        <form className="mt-8 space-y-6" onSubmit={handleAuth}>
           <div className="space-y-4">
             <div>
               <label htmlFor="email-address" className="block text-sm font-medium text-gray-700 mb-1">
@@ -96,7 +114,7 @@ export default function Login() {
                   id="password"
                   name="password"
                   type="password"
-                  autoComplete="current-password"
+                  autoComplete={isSignUp ? "new-password" : "current-password"}
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -107,25 +125,27 @@ export default function Login() {
             </div>
           </div>
 
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <input
-                id="remember-me"
-                name="remember-me"
-                type="checkbox"
-                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-              />
-              <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900">
-                Remember me
-              </label>
-            </div>
+          {!isSignUp && (
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <input
+                  id="remember-me"
+                  name="remember-me"
+                  type="checkbox"
+                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                />
+                <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900">
+                  Remember me
+                </label>
+              </div>
 
-            <div className="text-sm">
-              <Link to="/forgot-password" disable-nav="true" className="font-medium text-blue-600 hover:text-blue-500 transition-colors">
-                Forgot your password?
-              </Link>
+              <div className="text-sm">
+                <Link to="/forgot-password" disable-nav="true" className="font-medium text-blue-600 hover:text-blue-500 transition-colors">
+                  Forgot password?
+                </Link>
+              </div>
             </div>
-          </div>
+          )}
 
           <button
             type="submit"
@@ -137,11 +157,20 @@ export default function Login() {
             ) : (
               <>
                 <LogIn className="h-5 w-5 mr-2 group-hover:scale-110 transition-transform" />
-                Sign in
+                {isSignUp ? 'Create Account' : 'Sign In'}
               </>
             )}
           </button>
         </form>
+
+        <div className="text-center mt-4">
+          <button
+            onClick={() => setIsSignUp(!isSignUp)}
+            className="text-sm font-bold text-blue-600 hover:underline transition-all"
+          >
+            {isSignUp ? 'Already have an account? Sign In' : "Don't have an account? Sign Up"}
+          </button>
+        </div>
 
         <div className="mt-6">
           <div className="relative">

@@ -9,6 +9,7 @@ import { useWishlistStore } from '../store/useWishlistStore';
 import { useToastStore } from '../store/useToastStore';
 import { motion } from 'motion/react';
 import { DetailedProductSkeleton } from '../components/Skeleton';
+import { ProductBadge } from '../components/products/ProductBadge';
 
 export default function ProductDetails() {
   const { id } = useParams<{ id: string }>();
@@ -160,9 +161,9 @@ export default function ProductDetails() {
             )}
             
             <div className="absolute top-6 left-6 flex flex-col gap-2">
-               <span className="bg-blue-600 text-white text-[10px] font-black px-4 py-1 rounded-full uppercase tracking-widest shadow-lg">Premium Grade</span>
+               <ProductBadge type="elite" size="md" />
                {product.inventory < 50 && (
-                 <span className="bg-orange-500 text-white text-[10px] font-black px-4 py-1 rounded-full uppercase tracking-widest shadow-lg">Low Stock</span>
+                 <ProductBadge type="low_stock" size="md" />
                )}
             </div>
           </div>
@@ -269,19 +270,23 @@ export default function ProductDetails() {
 
           {/* Bundle Selection UI */}
           <div className="mb-10">
-            <h3 className="text-xs font-bold text-gray-400 uppercase tracking-[0.2em] mb-6">
-              Choose Your Bundle
-            </h3>
+            <div className="flex items-center gap-2 mb-6">
+              <ProductBadge type="verified" size="sm" />
+              <h3 className="text-xs font-black uppercase tracking-[0.2em] text-gray-400">
+                Choose Your Research Bundle
+              </h3>
+            </div>
             <div className="grid grid-cols-3 gap-2 md:gap-4">
               {[
                 { id: 'standard', qty: 1, range: '1-2 Units', label: 'STANDARD', discount: 0, tagColor: 'bg-gray-100 text-gray-600' },
-                { id: 'save', qty: 3, range: '3-5 Units', label: 'SAVE 5%', discount: 0.05, tagColor: 'bg-amber-100 text-amber-700' },
-                { id: 'value', qty: 6, range: '6+ Units', label: 'BEST VALUE', discount: 0.10, tagColor: 'bg-emerald-100 text-emerald-700' }
+                { id: 'save', qty: 3, range: '3-5 Units', label: 'SAVE 10%', discount: 0.10, tagColor: 'bg-amber-100 text-amber-700' },
+                { id: 'value', qty: 5, range: '6+ Units', label: 'BEST VALUE', discount: 0.15, tagColor: 'bg-emerald-100 text-emerald-700' }
               ].map((tier) => {
-                const unitPrice = currentPrice * (1 - tier.discount);
+                const basePrice = selectedVariant ? selectedVariant.display_price : product.price;
+                const unitPrice = basePrice * (1 - tier.discount);
                 const isSelected = (tier.qty === 1 && quantity < 3) || 
-                                  (tier.qty === 3 && quantity >= 3 && quantity < 6) || 
-                                  (tier.qty === 6 && quantity >= 6);
+                                  (tier.qty === 3 && quantity >= 3 && quantity < 5) || 
+                                  (tier.qty === 5 && quantity >= 5);
                 
                 return (
                   <button
@@ -346,21 +351,81 @@ export default function ProductDetails() {
           <div className="flex items-center space-x-4">
             <div className="flex items-center border border-gray-300 rounded-xl overflow-hidden shadow-sm">
               <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="px-4 py-3 text-gray-600 hover:bg-gray-100 transition-colors">-</button>
-              <span className="px-5 py-3 font-bold text-gray-900 border-x border-gray-300 bg-white">{quantity}</span>
+              <input 
+                type="number" 
+                min="1"
+                value={quantity}
+                onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
+                className="w-16 px-2 py-3 font-bold text-gray-900 border-x border-gray-300 bg-white text-center focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+              />
               <button onClick={() => setQuantity(quantity + 1)} className="px-4 py-3 text-gray-600 hover:bg-gray-100 transition-colors">+</button>
             </div>
             <button 
               onClick={handleAddToCart}
               className="flex-1 bg-blue-600 text-white py-4 px-6 rounded-xl font-bold hover:bg-blue-700 flex items-center justify-center transition-all shadow-lg hover:shadow-xl active:scale-95"
             >
-              <ShoppingCart className="mr-2 h-5 w-5" /> Add to Cart
+                 <ShoppingCart className="mr-2 h-5 w-5" /> Add to Cart
             </button>
           </div>
         </div>
       </div>
 
+      {/* Verified Researcher Reviews Section */}
+      <section className="mt-16 bg-white rounded-[2.5rem] border border-gray-100 p-8 md:p-12 shadow-sm">
+         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
+            <div>
+               <div className="flex items-center gap-2 mb-2">
+                  <div className="h-1 w-8 bg-blue-600 rounded-full" />
+                  <span className="text-xs font-black text-blue-600 uppercase tracking-widest">Scientific Community</span>
+               </div>
+               <h2 className="text-3xl font-black text-gray-900">Verified Researcher Reviews</h2>
+            </div>
+            <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-2xl border border-gray-100">
+               <div className="text-right">
+                  <p className="text-sm font-black text-gray-900">4.9 / 5.0</p>
+                  <p className="text-[10px] font-bold text-gray-400 uppercase">Community Rating</p>
+               </div>
+               <div className="h-10 w-[1px] bg-gray-200" />
+               <div className="flex text-yellow-400">
+                  {[...Array(5)].map((_, i) => <Star key={i} className="h-4 w-4 fill-current" />)}
+               </div>
+            </div>
+         </div>
+
+         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {[
+               {
+                  name: "Dr. Alexander V.",
+                  role: "Clinical Researcher",
+                  content: "The purity levels of this batch exceeded our laboratory requirements. We observed consistent results across all test groups. The vacuum sealing remained intact during transit.",
+                  date: "2 Days Ago"
+               },
+               {
+                  name: "Sarah M.",
+                  role: "Biotech Analyst",
+                  content: "Highly impressed with the structural integrity of the lyophilized powder. Reconstitution was immediate and clear. Will be using this as our primary reference material.",
+                  date: "1 Week Ago"
+               }
+            ].map((review, i) => (
+               <div key={i} className="space-y-4 p-6 rounded-[2rem] bg-gray-50 border border-gray-100 italic font-medium text-gray-700 relative">
+                  <span className="absolute -top-4 -left-2 text-6xl text-blue-100 font-serif">"</span>
+                  <p className="relative z-10 leading-relaxed">
+                     {review.content}
+                  </p>
+                  <div className="flex justify-between items-center pt-4 border-t border-gray-200/50 not-italic">
+                     <div>
+                        <p className="text-sm font-black text-gray-900">{review.name}</p>
+                        <p className="text-[10px] font-bold text-gray-400 uppercase">{review.role}</p>
+                     </div>
+                     <span className="text-[10px] font-black text-blue-600 uppercase bg-blue-50 px-3 py-1 rounded-full">{review.date}</span>
+                  </div>
+               </div>
+            ))}
+         </div>
+      </section>
+
       {recommended.length > 0 && (
-        <div className="mb-20">
+        <div className="mb-20 mt-16">
           <div className="flex items-center justify-between mb-8">
             <h2>Recommended for you</h2>
             <Link to="/shop" className="text-blue-600 font-bold hover:underline">View all results</Link>

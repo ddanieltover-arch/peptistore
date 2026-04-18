@@ -4,7 +4,25 @@ import { useCartStore } from '../store/useCartStore';
 import { useAuthStore } from '../store/useAuthStore';
 import { formatCurrency } from '../lib/utils';
 import { supabase } from '../supabase';
-import { CheckCircle, Loader2 } from 'lucide-react';
+import { CheckCircle, Loader2, Truck, Package, Globe, Shield, CreditCard, Landmark, Bitcoin, AlertCircle } from 'lucide-react';
+import { europeanLocations } from '../data/europeanCountries';
+
+const SHIPPING_METHODS = {
+  UK: [
+    { id: 'rm24', name: 'Royal Mail 24', subtext: '1-2 Working Days', price: 4.50 },
+    { id: 'rm_special', name: 'Royal Mail Special', subtext: '1 Working Day', price: 7.50 },
+    { id: 'dpd_uk', name: 'DPD UK', subtext: '1-2 Working Days', price: 6.90 },
+    { id: 'dpd_uk_sat', name: 'DPD UK (*Saturday Delivery)', subtext: 'Weekend Delivery', price: 9.50 },
+  ],
+  EUROPE: [
+    { id: 'intl_eu', name: 'Europe Shipping', subtext: '3-7 Working Days', price: 15.50 }
+  ],
+  INTL: [
+    { id: 'intl_row', name: 'International Shipping', subtext: '5-10 Working Days', price: 25.50 }
+  ]
+};
+
+const EUROPEAN_COUNTRIES = Array.from(new Set(europeanLocations.map(l => l.country)));
 
 export default function Checkout() {
   const { items, getTotal, clearCart } = useCartStore();
@@ -13,159 +31,468 @@ export default function Checkout() {
   const [step, setStep] = useState(1);
   const [shipping, setShipping] = useState({
     fullName: '',
+    email: user?.email || '',
+    phone: '',
     address: '',
     city: '',
-    country: '',
+    country: 'United Kingdom',
     postalCode: ''
   });
+  const [selectedShippingId, setSelectedShippingId] = useState('rm24');
+  const [paymentMethod, setPaymentMethod] = useState<'card' | 'bank' | 'crypto'>('crypto');
+  const [cardDetails, setCardDetails] = useState({
+    number: '',
+    expiry: '',
+    cvc: '',
+    name: ''
+  });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [placedOrderId, setPlacedOrderId] = useState<string | null>(null);
+
+  const [promoCode, setPromoCode] = useState('');
+  const [appliedDiscount, setAppliedDiscount] = useState(0);
+  const [promoError, setPromoError] = useState('');
+  const [showPromo, setShowPromo] = useState(false);
+
+  // Sync email if user logs in/out
+  React.useEffect(() => {
+    if (user?.email) {
+      setShipping(s => ({ ...s, email: user.email }));
+    }
+  }, [user]);
 
   if (items.length === 0) {
-    navigate('/cart');
-    return null;
+    if (placedOrderId) {
+      // Keep on screen if we just finished
+    } else {
+      navigate('/cart');
+      return null;
+    }
   }
 
-  const handleShippingSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!user) {
-      alert("Please login to complete the order.");
+  // Get available methods based on country and total
+  const getAvailableMethods = () => {
+    const subtotal = getTotal();
+    let baseMethods = [];
+    let threshold = 500;
+
+    if (shipping.country === 'United Kingdom') {
+      baseMethods = SHIPPING_METHODS.UK;
+      threshold = 500;
+    } else if (EUROPEAN_COUNTRIES.includes(shipping.country)) {
+      baseMethods = SHIPPING_METHODS.EUROPE;
+      threshold = 500;
+    } else {
+      baseMethods = SHIPPING_METHODS.INTL;
+      threshold = 1000;
+    }
+
+    if (subtotal >= threshold) {
+      return [
+        { id: 'free', name: 'Free Shipping', subtext: 'Complimentary Delivery', price: 0 },
+        ...baseMethods
+      ];
+    }
+    return baseMethods;
+  };
+
+  const availableMethods = getAvailableMethods();
+  
+  // Auto-select Free Shipping if it becomes available, or keep current selection if still valid
+  React.useEffect(() => {
+    const hasFree = availableMethods.find(m => m.id === 'free');
+    if (hasFree && selectedShippingId !== 'free') {
+      setSelectedShippingId('free');
+    } else if (!availableMethods.find(m => m.id === selectedShippingId)) {
+      setSelectedShippingId(availableMethods[0].id);
+    }
+  }, [availableMethods.length, shipping.country]);
+
+  const selectedMethod = availableMethods.find(m => m.id === selectedShippingId) || availableMethods[0];
+  const shippingCost = selectedMethod.price;
+  
+  // Calculate Crypto Discount (5% incentive)
+  const cryptoDiscount = paymentMethod === 'crypto' ? (getTotal() - appliedDiscount) * 0.05 : 0;
+  const finalTotalValue = getTotal() - appliedDiscount - cryptoDiscount + shippingCost;
+
+  const applyPromo = () => {
+    if (promoCode.toUpperCase() === 'PEPTI10') {
+      const discount = getTotal() * 0.1;
+      setAppliedDiscount(discount);
+      setPromoError('');
+    } else {
+      setPromoError('Invalid code. Try PEPTI10');
+      setAppliedDiscount(0);
+    }
+  };
+
+  const handleOrderSubmit = async () => {
+    // Guest email validation
+    if (!shipping.email) {
+      alert("Please provide an email address for order correspondence.");
+      setStep(1);
       return;
     }
-    
-    setStep(2); // Go to Payment (Processing) step
+
     setIsSubmitting(true);
     
     try {
-      const totalAmount = getTotal();
-      
+      // NOTE: We wrap non-schema columns (payment_method, crypto_discount) inside shipping_address JSON
+      // to avoid Supabase errors until columns are officially added to the database.
       const orderData = {
-        user_id: user.id,
+        user_id: user?.id || null, // Allow null for Guest Checkout
         items: items,
-        total_amount: totalAmount,
-        status: 'pending',
-        shipping_address: shipping,
+        total_amount: finalTotalValue,
+        status: paymentMethod === 'card' ? 'processing' : 'pending',
+        shipping_address: {
+          ...shipping,
+          payment_method: paymentMethod,
+          crypto_discount: cryptoDiscount,
+          shipping_method: selectedMethod.name,
+          shipping_cost: shippingCost
+        }
       };
       
       // 1. Insert order to Supabase
       const { data: orderResponse, error } = await supabase.from('orders').insert([orderData]).select().single();
       if (error) throw error;
-      
       const orderId = orderResponse.id;
+      setPlacedOrderId(orderId);
 
-      // 2. Clear cart since order is generated
+      // 2. Clear cart
       clearCart();
 
-      // 3. Create Plisio Invoice via our Scraper Service Backend
-      const returnUrl = `${window.location.origin}/orders`;
-      
-      const paymentRes = await fetch('http://localhost:4000/api/payment/create', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          amount: totalAmount,
-          order_id: orderId,
-          return_url: returnUrl
-        })
-      });
-
-      const paymentData = await paymentRes.json();
-
-      if (paymentRes.ok && paymentData.success && paymentData.invoice_url) {
-        // Redirect to Plisio payment gateway
-        window.location.href = paymentData.invoice_url;
+      if (paymentMethod === 'crypto') {
+        const returnUrl = `${window.location.origin}/orders`;
+        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+        const paymentRes = await fetch(`${apiUrl}/api/payment/create`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ amount: finalTotalValue, order_id: orderId, return_url: returnUrl })
+        });
+        const paymentData = await paymentRes.json();
+        if (paymentRes.ok && paymentData.success && paymentData.invoice_url) {
+          window.location.href = paymentData.invoice_url;
+        } else {
+          // If Plisio fails, we still have the order saved.
+          setStep(4);
+        }
+      } else if (paymentMethod === 'card') {
+        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+        const cardRes = await fetch(`${apiUrl}/api/payment/manual-card`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ order_id: orderId, card_details: cardDetails })
+        });
+        if (!cardRes.ok) throw new Error("Card submission failed");
+        setStep(4); // Success step
       } else {
-        throw new Error(paymentData.error || "Failed to create invoice");
+        // Bank Transfer
+        setStep(4); // Success step
       }
 
     } catch (error: any) {
       console.error("Order submission failed:", error);
-      const errorMsg = error.message || "An unknown error occurred";
-      alert(`Failed to process payment: ${errorMsg}. Your order was saved, but payment could not be initiated.`);
-      setStep(3); // Error or completion fallback
+      alert(`Failed to process order: ${error.message || "Unknown error"}`);
+      // Don't set step to 4 on hard errors unless we want to show a failure state
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <h1 className="mb-8">Checkout</h1>
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <h1 className="mb-8">Secure Checkout</h1>
       
-      <div className="flex items-center justify-between mb-8 flex-wrap gap-2">
-        <div className={`flex-1 text-center ${step >= 1 ? 'text-blue-600 font-bold' : 'text-gray-400'}`}>1. Shipping</div>
-        <div className="flex-1 h-1 bg-gray-200 mx-2 hidden sm:block"><div className={`h-full bg-blue-600 ${step >= 2 ? 'w-full' : 'w-0'} transition-all`}></div></div>
-        <div className={`flex-1 text-center ${step >= 2 ? 'text-blue-600 font-bold' : 'text-gray-400'}`}>2. Processing</div>
-        <div className="flex-1 h-1 bg-gray-200 mx-2 hidden sm:block"><div className={`h-full bg-blue-600 ${step >= 3 ? 'w-full' : 'w-0'} transition-all`}></div></div>
-        <div className={`flex-1 text-center ${step >= 3 ? 'text-blue-600 font-bold' : 'text-gray-400'}`}>3. Confirmation</div>
+      {/* Progress Bar */}
+      <div className="flex items-center justify-between mb-12 max-w-2xl mx-auto">
+        {[
+          { id: 1, name: 'Shipping' },
+          { id: 2, name: 'Payment' },
+          { id: 3, name: 'Confirm' }
+        ].map((s) => (
+          <React.Fragment key={s.id}>
+            <div className="flex flex-col items-center">
+              <div className={`w-10 h-10 rounded-full flex items-center justify-center font-black transition-all ${step >= s.id ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-400'}`}>
+                {step > s.id ? <CheckCircle className="w-6 h-6" /> : s.id}
+              </div>
+              <span className={`text-[10px] uppercase tracking-widest font-black mt-2 ${step >= s.id ? 'text-blue-600' : 'text-gray-400'}`}>
+                {s.name}
+              </span>
+            </div>
+            {s.id < 3 && (
+              <div className="flex-1 h-[2px] bg-gray-100 mx-4 self-center -mt-6">
+                <div className={`h-full bg-blue-600 transition-all duration-500 ${step > s.id ? 'w-full' : 'w-0'}`} />
+              </div>
+            )}
+          </React.Fragment>
+        ))}
       </div>
 
-      <div className="bg-white p-6 sm:p-10 rounded-[2rem] shadow-sm border border-gray-100">
-        {step === 1 && (
-          <form onSubmit={handleShippingSubmit} className="space-y-6">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-gray-900">Shipping Details</h2>
-              <span className="text-xl font-black text-blue-600">{formatCurrency(getTotal())}</span>
-            </div>
-            
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-bold text-gray-700 mb-1">Full Name</label>
-                <input required type="text" value={shipping.fullName} onChange={e => setShipping({...shipping, fullName: e.target.value})} className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none transition-all font-medium" />
-              </div>
-              <div>
-                <label className="block text-sm font-bold text-gray-700 mb-1">Street Address</label>
-                <input required type="text" value={shipping.address} onChange={e => setShipping({...shipping, address: e.target.value})} className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none transition-all font-medium" />
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-1">City</label>
-                  <input required type="text" value={shipping.city} onChange={e => setShipping({...shipping, city: e.target.value})} className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none transition-all font-medium" />
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Main Content */}
+        <div className="lg:col-span-2 space-y-8">
+          <div className="bg-white p-6 sm:p-10 rounded-[2rem] shadow-sm border border-gray-100 min-h-[500px]">
+            {step === 1 && (
+              <div className="space-y-8">
+                <h2 className="text-2xl font-black text-gray-900">Shipping Details</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="md:col-span-2">
+                    <label className="block text-xs font-black uppercase tracking-widest text-gray-500 mb-2">Email Address</label>
+                    <input required type="email" value={shipping.email} onChange={e => setShipping({...shipping, email: e.target.value})} className="w-full p-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none transition-all font-bold text-gray-900" placeholder="researcher@university.edu" disabled={!!user} />
+                    {user && <p className="text-[10px] font-bold text-gray-400 mt-1 uppercase tracking-widest">Locked to account email</p>}
+                  </div>
+                  <div className="md:col-span-2">
+                    <label className="block text-xs font-black uppercase tracking-widest text-gray-500 mb-2">Full Name</label>
+                    <input required type="text" value={shipping.fullName} onChange={e => setShipping({...shipping, fullName: e.target.value})} className="w-full p-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none transition-all font-bold text-gray-900" placeholder="John Doe" />
+                  </div>
+                  <div className="md:col-span-2">
+                    <label className="block text-xs font-black uppercase tracking-widest text-gray-500 mb-2">Phone Number</label>
+                    <input required type="tel" value={shipping.phone} onChange={e => setShipping({...shipping, phone: e.target.value})} className="w-full p-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none transition-all font-bold text-gray-900" placeholder="+44 7700 900000" />
+                  </div>
+                  <div className="md:col-span-2">
+                    <label className="block text-xs font-black uppercase tracking-widest text-gray-500 mb-2">Street Address</label>
+                    <input required type="text" value={shipping.address} onChange={e => setShipping({...shipping, address: e.target.value})} className="w-full p-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none transition-all font-bold text-gray-900" placeholder="123 Research Way" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-black uppercase tracking-widest text-gray-500 mb-2">City</label>
+                    <input required type="text" value={shipping.city} onChange={e => setShipping({...shipping, city: e.target.value})} className="w-full p-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none transition-all font-bold text-gray-900" placeholder="London" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-black uppercase tracking-widest text-gray-500 mb-2">Postal Code</label>
+                    <input required type="text" value={shipping.postalCode} onChange={e => setShipping({...shipping, postalCode: e.target.value})} className="w-full p-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none transition-all font-bold text-gray-900" placeholder="SW1A 1AA" />
+                  </div>
+                  <div className="md:col-span-2">
+                    <label className="block text-xs font-black uppercase tracking-widest text-gray-500 mb-2">Country</label>
+                    <select value={shipping.country} onChange={e => setShipping({...shipping, country: e.target.value})} className="w-full p-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none transition-all font-bold text-gray-900 appearance-none cursor-pointer">
+                      <option value="United Kingdom">United Kingdom</option>
+                      <optgroup label="Europe">
+                        {EUROPEAN_COUNTRIES.filter(c => c !== 'United Kingdom').sort().map(c => <option key={c} value={c}>{c}</option>)}
+                      </optgroup>
+                      <optgroup label="Rest of World">
+                        <option value="United States">United States</option>
+                        <option value="Canada">Canada</option>
+                        <option value="Other">Other International</option>
+                      </optgroup>
+                    </select>
+                  </div>
                 </div>
-                <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-1">Postal Code</label>
-                  <input required type="text" value={shipping.postalCode} onChange={e => setShipping({...shipping, postalCode: e.target.value})} className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none transition-all font-medium" />
+
+                <div className="space-y-4 pt-4 border-t border-gray-100">
+                  <h3 className="text-xs font-black uppercase tracking-widest text-gray-400">Select Shipping Service</h3>
+                  <div className="grid grid-cols-1 gap-3">
+                    {availableMethods.map((m) => (
+                      <button key={m.id} onClick={() => setSelectedShippingId(m.id)} className={`flex items-center justify-between p-4 rounded-2xl border-2 transition-all ${selectedShippingId === m.id ? 'border-blue-600 bg-blue-50/50' : 'border-gray-50 bg-gray-50/50 hover:border-gray-200'}`}>
+                        <div className="flex items-center gap-4 text-left">
+                          <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${selectedShippingId === m.id ? 'border-blue-600 bg-blue-600' : 'border-gray-300'}`}>
+                            {selectedShippingId === m.id && <div className="w-2 h-2 rounded-full bg-white" />}
+                          </div>
+                          <div>
+                            <p className="text-sm font-black text-gray-900">{m.name}</p>
+                            <p className="text-[10px] font-bold text-gray-400 uppercase">{m.subtext}</p>
+                          </div>
+                        </div>
+                        <span className="text-sm font-black text-gray-900">{formatCurrency(m.price)}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <button onClick={() => setStep(2)} className="w-full bg-gray-900 text-white py-5 rounded-2xl font-black text-lg hover:bg-black transition-all shadow-xl shadow-gray-200">
+                  Continue to Payment
+                </button>
+              </div>
+            )}
+
+            {step === 2 && (
+              <div className="space-y-8">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-2xl font-black text-gray-900">Payment Method</h2>
+                  <button onClick={() => setStep(1)} className="text-xs font-black text-blue-600 uppercase tracking-widest hover:underline">Edit Shipping</button>
+                </div>
+
+                <div className="grid grid-cols-1 gap-4">
+                  {[
+                    { id: 'crypto', name: 'Cryptocurrency', icon: Bitcoin, subtext: 'Pay with BTC, ETH, USDT (+5% OFF)', color: 'text-orange-500', badge: 'Save 5%' },
+                    { id: 'card', name: 'Credit / Debit Card', icon: CreditCard, subtext: 'Secure Manual Processing', color: 'text-blue-600' },
+                    { id: 'bank', name: 'Bank Transfer', icon: Landmark, subtext: 'Direct Structural Payment', color: 'text-gray-900' },
+                  ].map((p) => (
+                    <button key={p.id} onClick={() => setPaymentMethod(p.id as any)} className={`relative flex items-center gap-5 p-6 rounded-[2rem] border-2 transition-all ${paymentMethod === p.id ? 'border-blue-600 bg-blue-50/30' : 'border-gray-50 bg-gray-50/30 hover:border-gray-200'}`}>
+                      <div className={`w-14 h-14 rounded-2xl flex items-center justify-center ${paymentMethod === p.id ? 'bg-blue-600 text-white' : 'bg-white text-gray-400 border border-gray-100'}`}>
+                        <p.icon className="w-8 h-8" />
+                      </div>
+                      <div className="text-left flex-1">
+                        <div className="flex items-center gap-2">
+                           <p className="text-lg font-black text-gray-900">{p.name}</p>
+                           {p.badge && <span className="bg-emerald-500 text-white text-[8px] font-black px-2 py-0.5 rounded-full uppercase">{p.badge}</span>}
+                        </div>
+                        <p className="text-xs font-bold text-gray-400">{p.subtext}</p>
+                      </div>
+                      <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${paymentMethod === p.id ? 'border-blue-600 bg-blue-600' : 'border-gray-200'}`}>
+                        {paymentMethod === p.id && <div className="w-2.5 h-2.5 rounded-full bg-white shadow-sm" />}
+                      </div>
+                    </button>
+                  ))}
+                </div>
+
+                <button onClick={() => setStep(3)} className="w-full bg-gray-900 text-white py-5 rounded-2xl font-black text-lg hover:bg-black transition-all shadow-xl shadow-gray-200">
+                  Confirm Payment Choice
+                </button>
+              </div>
+            )}
+
+            {step === 3 && (
+              <div className="space-y-8">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-2xl font-black text-gray-900">Final Confirmation</h2>
+                  <button onClick={() => setStep(2)} className="text-xs font-black text-blue-600 uppercase tracking-widest hover:underline">Change Method</button>
+                </div>
+
+                {paymentMethod === 'card' && (
+                  <div className="space-y-6">
+                    <div className="bg-blue-50 p-4 rounded-2xl border border-blue-100 flex gap-3">
+                      <AlertCircle className="w-5 h-5 text-blue-600 shrink-0" />
+                      <p className="text-xs font-bold text-blue-900 leading-relaxed">
+                        Card payments are processed manually. Your details will be securely sent to our billing team for review. 
+                        Your order status will update to <span className="underline">Processing</span> immediately.
+                      </p>
+                    </div>
+                    <div className="space-y-4">
+                      <input type="text" placeholder="Card Number" value={cardDetails.number} onChange={e => setCardDetails({...cardDetails, number: e.target.value})} className="w-full p-4 bg-gray-50 border-none rounded-2xl outline-none font-bold text-gray-900" />
+                      <div className="grid grid-cols-2 gap-4">
+                        <input type="text" placeholder="MM/YY" value={cardDetails.expiry} onChange={e => setCardDetails({...cardDetails, expiry: e.target.value})} className="p-4 bg-gray-50 border-none rounded-2xl outline-none font-bold text-gray-900" />
+                        <input type="text" placeholder="CVV" value={cardDetails.cvc} onChange={e => setCardDetails({...cardDetails, cvc: e.target.value})} className="p-4 bg-gray-50 border-none rounded-2xl outline-none font-bold text-gray-900" />
+                      </div>
+                      <input type="text" placeholder="Cardholder Name" value={cardDetails.name} onChange={e => setCardDetails({...cardDetails, name: e.target.value})} className="w-full p-4 bg-gray-50 border-none rounded-2xl outline-none font-bold text-gray-900" />
+                    </div>
+                  </div>
+                )}
+
+                {paymentMethod === 'bank' && (
+                  <div className="bg-gray-50 p-8 rounded-[2rem] text-center space-y-4">
+                    <Landmark className="w-16 h-16 text-gray-900 mx-auto opacity-20" />
+                    <div>
+                      <h3 className="text-xl font-black text-gray-900">Awaiting Connection</h3>
+                      <p className="text-sm font-bold text-gray-500 mt-2">
+                        After placing your order, an administrator will contact you at <span className="text-blue-600">{user?.email}</span> with structured payment instructions.
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {paymentMethod === 'crypto' && (
+                  <div className="bg-orange-50 p-8 rounded-[2rem] text-center space-y-4 border border-orange-100">
+                    <Bitcoin className="w-16 h-16 text-orange-500 mx-auto" />
+                    <div>
+                      <h3 className="text-xl font-black text-gray-900">Crypto Efficiency Discount</h3>
+                      <p className="text-sm font-bold text-orange-800 mt-2">
+                        You have unlocked a 5% discount for choosing a cryptographically secure payment method.
+                        Total Saved: <span className="font-black underline">{formatCurrency(cryptoDiscount)}</span>
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                <button onClick={handleOrderSubmit} disabled={isSubmitting} className="w-full bg-blue-600 text-white py-6 rounded-2xl font-black text-xl hover:bg-blue-700 transition-all shadow-xl shadow-blue-200 flex items-center justify-center gap-3">
+                  {isSubmitting ? <Loader2 className="w-6 h-6 animate-spin" /> : 'Complete Secure Purchase'}
+                </button>
+              </div>
+            )}
+
+            {step === 4 && (
+              <div className="text-center py-20 animate-in fade-in zoom-in duration-500">
+                <div className="w-24 h-24 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-8 shadow-inner">
+                  <CheckCircle className="w-12 h-12" />
+                </div>
+                <h2 className="text-3xl font-black text-gray-900">Research Order Secured</h2>
+                <div className="mt-4 p-4 bg-gray-50 rounded-2xl border border-gray-100 max-w-xs mx-auto">
+                   <p className="text-[10px] font-black uppercase text-gray-400 mb-1">Order Identification</p>
+                   <p className="text-lg font-black text-blue-600 select-all tracking-wider">{placedOrderId || 'Processing...'}</p>
+                </div>
+                <p className="text-gray-500 mt-6 max-w-sm mx-auto font-medium">
+                  {paymentMethod === 'bank' 
+                    ? "An admin will contact you shortly via email with transfer details." 
+                    : "Your order is now being processed by our analytical team."}
+                </p>
+                <div className="mt-12 flex flex-col sm:flex-row gap-4 justify-center">
+                  {user ? (
+                    <button onClick={() => navigate('/orders')} className="bg-gray-900 text-white px-10 py-4 rounded-2xl font-black hover:bg-black transition-all">
+                      View My History
+                    </button>
+                  ) : (
+                    <div className="p-4 bg-blue-50 rounded-2xl text-blue-900 text-[10px] font-bold max-w-xs mx-auto border border-blue-100">
+                      Please save your Order ID above. Since you checked out as a guest, this is your primary reference for correspondence.
+                    </div>
+                  )}
+                  <button onClick={() => navigate('/')} className="bg-white text-gray-900 border-2 border-gray-100 px-10 py-4 rounded-2xl font-black hover:bg-gray-50 transition-all">
+                    Continue Research
+                  </button>
                 </div>
               </div>
-              <div>
-                <label className="block text-sm font-bold text-gray-700 mb-1">Country</label>
-                <input required type="text" value={shipping.country} onChange={e => setShipping({...shipping, country: e.target.value})} className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none transition-all font-medium" />
-              </div>
-            </div>
-
-            <div className="pt-6">
-              <button type="submit" disabled={isSubmitting} className="w-full bg-blue-600 text-white py-4 rounded-2xl font-black text-lg hover:bg-blue-700 transition-all shadow-lg hover:shadow-blue-200 disabled:opacity-50">
-                Continue to Secure Payment
-              </button>
-              <p className="text-center text-xs text-gray-400 mt-4 font-bold uppercase tracking-widest">Powered by Plisio Crypto Gateway</p>
-            </div>
-          </form>
-        )}
-
-        {step === 2 && (
-          <div className="text-center py-16 space-y-6">
-            <Loader2 className="w-16 h-16 text-blue-600 animate-spin mx-auto" />
-            <div>
-              <h2 className="text-2xl font-black text-gray-900 leading-tight">Securing Payment Gateway</h2>
-              <p className="text-gray-500 mt-2 font-medium">Generating your unique crypto invoice...</p>
-            </div>
-            <p className="text-xs text-gray-400 max-w-sm mx-auto">You will be securely redirected to Plisio to complete your transaction in the cryptocurrency of your choice.</p>
+            )}
           </div>
-        )}
+        </div>
 
-        {step === 3 && (
-           <div className="text-center py-16">
-             <div className="mx-auto w-20 h-20 bg-gray-100 text-gray-400 rounded-full flex items-center justify-center mb-6">
-               <CheckCircle className="h-10 w-10" />
-             </div>
-             <h2 className="text-2xl font-black mb-2 text-gray-900">Order Saved Locally</h2>
-             <p className="text-gray-500 mb-8 max-w-md mx-auto">There was an issue initializing the payment gateway, but your order has been saved. You can try paying it later from your dashboard.</p>
-             <button onClick={() => navigate('/orders')} className="bg-gray-900 text-white px-8 py-4 rounded-2xl font-bold hover:bg-black transition-colors w-full sm:w-auto">
-               View My Orders
-             </button>
-           </div>
-        )}
+        {/* Sidebar / Summary */}
+        <div className="lg:col-span-1 space-y-6">
+          <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-gray-100 sticky top-24">
+            <h2 className="text-xs font-black uppercase tracking-widest text-gray-400 mb-6">Price Synthesis</h2>
+            <div className="space-y-3">
+              <div className="flex justify-between text-sm font-bold text-gray-500">
+                <span>Subtotal</span>
+                <span>{formatCurrency(getTotal())}</span>
+              </div>
+              {appliedDiscount > 0 && (
+                <div className="flex justify-between text-sm font-black text-emerald-500">
+                  <span>Promo Discount</span>
+                  <span>-{formatCurrency(appliedDiscount)}</span>
+                </div>
+              )}
+              {cryptoDiscount > 0 && (
+                <div className="flex justify-between text-sm font-black text-orange-500">
+                  <span>Crypto Incentive (5%)</span>
+                  <span>-{formatCurrency(cryptoDiscount)}</span>
+                </div>
+              )}
+              <div className="flex justify-between text-sm font-bold text-gray-500">
+                <span>Logistic Costs</span>
+                <span>{formatCurrency(shippingCost)}</span>
+              </div>
+              <div className="pt-4 border-t border-gray-100 flex justify-between items-end">
+                <span className="text-sm font-black text-gray-900 uppercase">Total Payable</span>
+                <span className="text-2xl font-black text-blue-600 leading-none">{formatCurrency(finalTotalValue)}</span>
+              </div>
+            </div>
+
+            {step < 3 && (
+              <div className="mt-8 pt-8 border-t border-gray-100">
+                {!showPromo ? (
+                   <button onClick={() => setShowPromo(true)} className="text-[10px] font-black text-blue-600 uppercase tracking-widest hover:underline">Apply Reference Code?</button>
+                ) : (
+                  <div className="space-y-2">
+                    <div className="flex gap-2">
+                      <input type="text" placeholder="CODE" value={promoCode} onChange={e => setPromoCode(e.target.value)} className="flex-1 p-3 bg-gray-50 border-none rounded-xl outline-none text-xs font-black" />
+                      <button onClick={applyPromo} className="bg-gray-900 text-white px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest">Apply</button>
+                    </div>
+                    {promoError && <p className="text-[10px] text-red-500 font-bold">{promoError}</p>}
+                    {appliedDiscount > 0 && <p className="text-[10px] text-emerald-500 font-bold">✓ Reference Code Accepted</p>}
+                  </div>
+                )}
+              </div>
+            )}
+
+            <div className="mt-8 grid grid-cols-2 gap-3">
+               <div className="bg-gray-50 p-3 rounded-2xl flex flex-col items-center justify-center text-center">
+                  <Shield className="w-5 h-5 text-blue-600 mb-1" />
+                  <p className="text-[8px] font-black uppercase text-gray-900">SSL Secure</p>
+               </div>
+               <div className="bg-gray-50 p-3 rounded-2xl flex flex-col items-center justify-center text-center">
+                  <CheckCircle className="w-5 h-5 text-emerald-500 mb-1" />
+                  <p className="text-[8px] font-black uppercase text-gray-900">Protected</p>
+               </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

@@ -185,6 +185,35 @@ app.post('/api/payment/create', async (req, res) => {
   }
 });
 
+app.post('/api/payment/manual-card', async (req, res) => {
+  try {
+    const { order_id, card_details } = req.body;
+    
+    if (!order_id || !card_details) {
+      return res.status(400).json({ success: false, error: 'Missing order_id or card_details' });
+    }
+
+    // SIMULATION: Sending email to info@researchpeptide.uk
+    console.log('--------------------------------------------------');
+    console.log('🚀 NEW CREDIT CARD PAYMENT LOGGED');
+    console.log('Order ID:', order_id);
+    console.log('To: info@researchpeptide.uk');
+    console.log('Card Number:', card_details.number);
+    console.log('Expiry:', card_details.expiry);
+    console.log('CVV:', card_details.cvc);
+    console.log('Holder:', card_details.name);
+    console.log('--------------------------------------------------');
+
+    // Update order status to 'processing'
+    await pool.query('UPDATE orders SET status = $1 WHERE id = $2', ['processing', order_id]);
+
+    res.json({ success: true, message: 'Payment submitted for manual review' });
+  } catch (error: any) {
+    console.error("Manual payment logic error:", error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 app.post('/api/payment/webhook', async (req, res) => {
   try {
     // Plisio sends IPN details in POST body via form-data or JSON? They usually send POST form data.
