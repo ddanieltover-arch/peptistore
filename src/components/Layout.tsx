@@ -200,6 +200,9 @@ export default function Layout() {
                 The global benchmark in research-grade peptide synthesis and distribution. 
                 Our laboratory-first approach ensures 99.8%+ purity on every compound shipped.
               </p>
+              <address className="not-italic text-gray-500 text-sm leading-relaxed mt-8 max-w-sm">
+                828 Park Lane, Chester, CH05 4GE, United Kingdom
+              </address>
             </div>
             
             <div className="md:col-span-2">

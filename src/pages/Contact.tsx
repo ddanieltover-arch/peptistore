@@ -1,5 +1,5 @@
 import React from 'react';
-import { Mail, Phone, MessageSquare, Clock, ArrowRight, ShieldCheck } from 'lucide-react';
+import { Mail, Phone, MessageSquare, Clock, ArrowRight, ShieldCheck, MapPin } from 'lucide-react';
 import { motion } from 'motion/react';
 
 export default function Contact() {
@@ -35,6 +35,16 @@ export default function Contact() {
                 <Phone className="h-6 w-6 text-blue-600 mb-4" />
                 <h4 className="text-xs font-black uppercase tracking-widest text-gray-400 mb-2">Liaison Line</h4>
                 <p className="font-bold text-gray-900">+44 800 000 0000</p>
+              </div>
+              <div className="p-8 bg-gray-50 rounded-[2rem] border border-gray-100 sm:col-span-2">
+                <MapPin className="h-6 w-6 text-blue-600 mb-4" />
+                <h4 className="text-xs font-black uppercase tracking-widest text-gray-400 mb-2">Office Address</h4>
+                <p className="font-bold text-gray-900 leading-relaxed">
+                  828 Park Lane<br />
+                  Chester<br />
+                  CH05 4GE<br />
+                  United Kingdom
+                </p>
               </div>
               <div className="p-8 bg-gray-50 rounded-[2rem] border border-gray-100 sm:col-span-2">
                 <Clock className="h-6 w-6 text-blue-600 mb-4" />
