@@ -42,8 +42,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     const dryRun = ('dryRun' in a && a.dryRun) || ('dryRun' in b && b.dryRun);
     return res.status(200).json({ success: true, dryRun });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('contact handler:', error);
-    return res.status(500).json({ success: false, error: error?.message || 'Server error' });
+    const msg =
+      error instanceof Error ? error.message : typeof error === 'string' ? error : JSON.stringify(error);
+    return res.status(500).json({
+      success: false,
+      error: msg || 'Contact email handler failed — check Vercel function logs and RESEND_* env vars.'
+    });
   }
 }

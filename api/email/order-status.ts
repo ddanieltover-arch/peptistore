@@ -19,8 +19,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     const result = await handleOrderStatus(order_id, status);
     return res.status(200).json({ success: true, result });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('order-status handler:', error);
-    return res.status(500).json({ success: false, error: error?.message || 'Server error' });
+    const msg =
+      error instanceof Error ? error.message : typeof error === 'string' ? error : JSON.stringify(error);
+    return res.status(500).json({ success: false, error: msg || 'order-status failed' });
   }
 }

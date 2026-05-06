@@ -1,10 +1,25 @@
-import { Resend } from 'resend';
+/** Send via Resend HTTP API — avoids relying on the resend npm package inside Vercel's serverless bundle. */
 
 function getFrom() {
   return process.env.RESEND_FROM || process.env.EMAIL_FROM || '';
 }
 
+const RESEND_BASE = () => process.env.RESEND_BASE_URL || 'https://api.resend.com';
+
 export type TransactionalSendResult = { sent: true } | { sent: false; dryRun: true };
+
+type ResendErrorBody = {
+  message?: string;
+  name?: string;
+  errors?: unknown;
+};
+
+function formatResendFailure(status: number, body: unknown, rawText: string): string {
+  const b = body as ResendErrorBody;
+  if (typeof b?.message === 'string') return `${status}: ${b.message}`;
+  if (typeof rawText === 'string' && rawText.length > 0 && rawText.length < 600) return `${status}: ${rawText}`;
+  return `${status}: Resend request failed`;
+}
 
 export async function sendTransactionalEmail(params: {
   to: string;
@@ -26,24 +41,38 @@ export async function sendTransactionalEmail(params: {
     throw new Error('RESEND_API_KEY and RESEND_FROM (or EMAIL_FROM) must be set for live sends');
   }
 
-  const resend = new Resend(apiKey);
-  const { error } = await resend.emails.send({
+  const payload: Record<string, unknown> = {
     from,
     to: params.to,
     subject: params.subject,
     html: params.html,
-    text: params.text,
-    replyTo: params.replyTo
+    text: params.text
+  };
+
+  if (params.replyTo) {
+    payload.reply_to = params.replyTo;
+  }
+
+  const response = await fetch(`${RESEND_BASE()}/emails`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(payload)
   });
 
-  if (error) {
-    const msg =
-      typeof error === 'object' && error !== null && 'message' in error && typeof (error as { message: unknown }).message === 'string'
-        ? (error as { message: string }).message
-        : typeof error === 'string'
-          ? error
-          : JSON.stringify(error);
-    throw new Error(msg);
+  const rawText = await response.text();
+  let parsed: unknown = {};
+  try {
+    parsed = rawText ? JSON.parse(rawText) : {};
+  } catch {
+    parsed = {};
   }
+
+  if (!response.ok) {
+    throw new Error(`Resend ${formatResendFailure(response.status, parsed, rawText)}`);
+  }
+
   return { sent: true as const };
 }

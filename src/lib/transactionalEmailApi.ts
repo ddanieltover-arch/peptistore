@@ -12,8 +12,15 @@ function parseErrorBody(text: string, status: number): string {
   try {
     const j = JSON.parse(text);
     if (typeof j.error === 'string') return j.error;
-    if (j?.error && typeof j.error.message === 'string') return j.error.message;
+    if (j?.error && typeof j.error === 'object' && j.error !== null) {
+      const inner = j.error as { message?: string; description?: string; code?: string };
+      const parts = [inner.message, inner.description, inner.code].filter(Boolean);
+      if (parts.length > 0) return parts.join(' — ');
+    }
     if (typeof j.message === 'string') return j.message;
+    if (Array.isArray((j as { errors?: unknown }).errors) && (j as { errors?: { message?: string }[] }).errors?.[0]?.message) {
+      return String((j as { errors?: { message?: string }[] }).errors![0].message);
+    }
   } catch {
     /* plain text body */
   }
