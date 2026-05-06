@@ -5,9 +5,6 @@ import { ScrapeQueueWorker } from './queue/worker.js';
 import multer from 'multer';
 import * as xlsx from 'xlsx';
 import { parse } from 'csv-parse/sync';
-import { sendContactEmails, sendOrderCreatedEmails, sendOrderStatusEmail } from './email/emailService.js';
-
-const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 const app = express();
 const port = process.env.PORT || 4000;
@@ -29,9 +26,6 @@ app.get('/', (req, res) => {
           <li><code>GET /api/products</code> - View scraped product catalog</li>
           <li><code>GET /api/scrape/history</code> - View scrape job history</li>
           <li><code>POST /api/scrape/start</code> - Trigger a new scrape</li>
-          <li><code>POST /api/email/order-created</code> - Send admin+customer order confirmation emails</li>
-          <li><code>POST /api/email/order-status</code> - Send customer order status email</li>
-          <li><code>POST /api/email/contact</code> - Send contact submission emails</li>
         </ul>
       </div>
       <p style="margin-top: 20px; font-size: 14px; color: #64748b;">Developed by Antigravity Agent</p>
@@ -140,50 +134,6 @@ app.get('/api/products', async (req, res) => {
     const { rows } = await pool.query('SELECT * FROM scrape_products ORDER BY created_at DESC');
     res.json(rows);
   } catch (error: any) {
-    res.status(500).json({ success: false, error: error.message });
-  }
-});
-
-// --- Transactional Email API ---
-
-app.post('/api/email/order-created', async (req, res) => {
-  try {
-    const { order_id } = req.body;
-    if (!order_id) return res.status(400).json({ success: false, error: 'Missing order_id' });
-    if (!UUID_RE.test(order_id)) return res.status(400).json({ success: false, error: 'Invalid order_id' });
-    const result = await sendOrderCreatedEmails(order_id);
-    res.json({ success: true, result });
-  } catch (error: any) {
-    console.error('order-created email error:', error);
-    res.status(500).json({ success: false, error: error.message });
-  }
-});
-
-app.post('/api/email/order-status', async (req, res) => {
-  try {
-    const { order_id, status } = req.body;
-    if (!order_id || !status) {
-      return res.status(400).json({ success: false, error: 'Missing order_id or status' });
-    }
-    if (!UUID_RE.test(order_id)) return res.status(400).json({ success: false, error: 'Invalid order_id' });
-    const result = await sendOrderStatusEmail(order_id, status);
-    res.json({ success: true, result });
-  } catch (error: any) {
-    console.error('order-status email error:', error);
-    res.status(500).json({ success: false, error: error.message });
-  }
-});
-
-app.post('/api/email/contact', async (req, res) => {
-  try {
-    const { fullName, email, subject, message } = req.body;
-    if (!fullName || !email || !subject || !message) {
-      return res.status(400).json({ success: false, error: 'Missing required contact fields' });
-    }
-    await sendContactEmails({ fullName, email, subject, message });
-    res.json({ success: true });
-  } catch (error: any) {
-    console.error('contact email error:', error);
     res.status(500).json({ success: false, error: error.message });
   }
 });

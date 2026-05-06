@@ -6,6 +6,7 @@ import { formatCurrency } from '../lib/utils';
 import { supabase } from '../supabase';
 import { CheckCircle, Loader2, Truck, Package, Globe, Shield, CreditCard, Landmark, Bitcoin, AlertCircle } from 'lucide-react';
 import { europeanLocations } from '../data/europeanCountries';
+import { postOrderCreatedEmail } from '../lib/transactionalEmailApi';
 
 const SHIPPING_METHODS = {
   UK: [
@@ -180,14 +181,12 @@ export default function Checkout() {
       createdOrderId = orderId;
       setPlacedOrderId(orderId);
 
-      // Backend SMTP email trigger (best-effort, non-blocking).
-      fetch('/api/email/order-created', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ order_id: orderId })
-      }).catch(() => {
-        // no-op
-      });
+      try {
+        await postOrderCreatedEmail(orderId);
+      } catch (emailError) {
+        console.error('Order email trigger failed', emailError);
+        setCheckoutMessage('Order placed, but email dispatch failed. Please contact support with your order ID.');
+      }
 
       // Supabase-only payment flow (no external API URL dependency).
       if (paymentMethod === 'crypto') {

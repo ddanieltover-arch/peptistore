@@ -21,6 +21,20 @@ interface AuthState {
   fetchProfile: (uid: string, email: string, displayName: string | null, photoURL: string | null) => Promise<void>;
 }
 
+const adminEmails = (import.meta.env.VITE_ADMIN_EMAILS || 'peptistore3@gmail.com')
+  .split(',')
+  .map((e) => e.trim().toLowerCase())
+  .filter(Boolean);
+
+export function isConfiguredAdminEmail(email: string | undefined | null) {
+  if (!email) return false;
+  return adminEmails.includes(email.toLowerCase());
+}
+
+function isAdminEmail(email: string | undefined | null) {
+  return isConfiguredAdminEmail(email);
+}
+
 export const useAuthStore = create<AuthState>((set) => ({
   user: null,
   profile: null,
@@ -44,7 +58,7 @@ export const useAuthStore = create<AuthState>((set) => ({
           email,
           display_name: displayName,
           photo_url: photoURL,
-          role: email === 'peptistore3@gmail.com' ? 'admin' : 'customer'
+          role: isAdminEmail(email) ? ('admin' as const) : ('customer' as const)
         };
         const { data: inserted, error: insertError } = await supabase
           .from('users')

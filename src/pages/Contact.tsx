@@ -1,8 +1,11 @@
 import React from 'react';
 import { Mail, Phone, MessageSquare, Clock, ArrowRight, ShieldCheck, MapPin } from 'lucide-react';
 import { motion } from 'motion/react';
+import { useToastStore } from '../store/useToastStore';
+import { postContactEmail } from '../lib/transactionalEmailApi';
 
 export default function Contact() {
+  const addToast = useToastStore((state) => state.addToast);
   const [fullName, setFullName] = React.useState('');
   const [email, setEmail] = React.useState('');
   const [subject, setSubject] = React.useState('General Research Inquiry');
@@ -15,19 +18,16 @@ export default function Contact() {
     setIsSubmitting(true);
     setSubmitState('idle');
     try {
-      const response = await fetch('/api/email/contact', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ fullName, email, subject, message })
-      });
-      if (!response.ok) throw new Error('Failed to submit');
+      await postContactEmail({ fullName, email, subject, message });
       setSubmitState('success');
+      addToast('Dispatch sent successfully. We will reply shortly.', 'success');
       setFullName('');
       setEmail('');
       setSubject('General Research Inquiry');
       setMessage('');
     } catch {
       setSubmitState('error');
+      addToast('Dispatch failed. Please try again in a moment.', 'error');
     } finally {
       setIsSubmitting(false);
     }
