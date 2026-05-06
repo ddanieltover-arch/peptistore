@@ -24,7 +24,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const adminTemplate = renderContactSubmittedAdminEmail(payload);
     const customerTemplate = renderContactSubmittedCustomerEmail(payload);
 
-    const [a, b] = await Promise.all([
+    // Send emails separately so one failure doesn't block the other (though usually both fail if config is missing)
+    const results = await Promise.allSettled([
       sendTransactionalEmail({
         to: getAdminRecipient(),
         subject: adminTemplate.subject,
@@ -40,8 +41,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       })
     ]);
 
-    const dryRun = ('dryRun' in a && a.dryRun) || ('dryRun' in b && b.dryRun);
-    return res.status(200).json({ success: true, dryRun });
+    const failures = results.filter((r) => r.status === 'rejected');
+    if (failures.length === results.length) {
+      // Both failed - likely a configuration issue
+      throw (failures[0] as PromiseRejectedResult).reason;
+    }
+
+    const successes = results.filter((r) => r.status === 'fulfilled') as PromiseFulfilledResult<any>[];
+    const dryRun = successes.some((s) => s.value.dryRun);
+    
+    return res.status(200).json({ 
+      success: true, 
+      dryRun,
+      partialFailure: failures.length > 0 
+    });
   } catch (error: unknown) {
     console.error('contact handler:', error);
     const msg =

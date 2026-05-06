@@ -63,7 +63,7 @@ export async function handleOrderCreated(orderId: string) {
   const adminTemplate = renderOrderCreatedAdminEmail(payload);
   const customerTemplate = renderOrderCreatedCustomerEmail(payload);
 
-  const [a, b] = await Promise.all([
+  const results = await Promise.allSettled([
     sendTransactionalEmail({
       to: getAdminRecipient(),
       subject: adminTemplate.subject,
@@ -78,15 +78,22 @@ export async function handleOrderCreated(orderId: string) {
     })
   ]);
 
-  if (('dryRun' in a && a.dryRun) || ('dryRun' in b && b.dryRun)) {
-    return { dryRun: true as const };
+  const failures = results.filter((r) => r.status === 'rejected');
+  if (failures.length === results.length) {
+    throw (failures[0] as PromiseRejectedResult).reason;
   }
-  if (!a.sent || !b.sent) {
-    throw new Error('Unexpected send state');
+
+  const successes = results.filter((r) => r.status === 'fulfilled') as PromiseFulfilledResult<any>[];
+  const dryRun = successes.some((s) => s.value.dryRun);
+  if (dryRun) {
+    return { dryRun: true as const };
   }
 
   await markOrderEvent(orderId, shipping, 'order_created');
-  return { sent: true as const };
+  return { 
+    sent: true as const, 
+    partialFailure: failures.length > 0 
+  };
 }
 
 export async function handleOrderStatus(orderId: string, status: string) {

@@ -33,12 +33,19 @@ export async function sendTransactionalEmail(params: {
   const from = getFrom();
 
   if (dryRun) {
-    console.log('[resend dry-run]', { to: params.to, subject: params.subject });
+    console.log('[resend dry-run]', {
+      to: params.to,
+      subject: params.subject,
+      from,
+      hasApiKey: !!apiKey
+    });
     return { sent: false as const, dryRun: true as const };
   }
 
   if (!apiKey || !from) {
-    throw new Error('RESEND_API_KEY and RESEND_FROM (or EMAIL_FROM) must be set for live sends');
+    const missing = [!apiKey && 'RESEND_API_KEY', !from && 'RESEND_FROM'].filter(Boolean).join(' and ');
+    console.error(`Email sending failed: ${missing} is not configured.`);
+    throw new Error(`${missing} must be set in Environment Variables (Vercel Dashboard or .env)`);
   }
 
   const payload: Record<string, unknown> = {
