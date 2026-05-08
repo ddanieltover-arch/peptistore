@@ -11,7 +11,7 @@ declare global {
 
 /**
  * Smartsupp loader with brand color support and custom trigger.
- * Docs: https://docs.smartsupp.com/chat-box/configuration/
+ * This component hides the default Smartsupp bubble to use a custom branded one.
  */
 export default function SmartsuppChat() {
   const key = (import.meta.env.VITE_SMARTSUPP_KEY as string | undefined)?.trim();
@@ -26,10 +26,12 @@ export default function SmartsuppChat() {
     window._smartsupp = window._smartsupp || {};
     window._smartsupp.key = key;
     window._smartsupp.color = brandColor;
+    
     // Hide default bubble as we provide our own custom button
     window._smartsupp.hideWidget = true;
+    window._smartsupp.hideMobileWidget = true;
 
-    // Official loader pattern: keep a queue function available before script loads.
+    // Official loader pattern
     if (!window.smartsupp) {
       const queue = ((...args: unknown[]) => {
         (queue._ = queue._ || []).push(args);
@@ -46,24 +48,44 @@ export default function SmartsuppChat() {
     script.type = 'text/javascript';
     script.charset = 'utf-8';
     script.async = true;
-    // Including key in URL is recommended for faster initialization and better CDN caching
     script.src = `https://www.smartsuppchat.com/loader.js?key=${key}`;
     
     script.onload = () => {
       window.__smartsuppLoaded = true;
-      // Force show the widget interface but keep the bubble hidden
       if (window.smartsupp) {
-        window.smartsupp('widget:hide'); // Ensure bubble is hidden
+        // Double down on hiding the default widget bubble
+        window.smartsupp('widget:hide');
+        window.smartsupp('chat:hide');
       }
     };
     
     document.head.appendChild(script);
+
+    // Injection of CSS to hide the default bubble iframe specifically
+    // while allowing the chat window to appear when triggered.
+    const styleId = 'smartsupp-hide-default-bubble';
+    if (!document.getElementById(styleId)) {
+      const style = document.createElement('style');
+      style.id = styleId;
+      style.textContent = `
+        /* Hide the default Smartsupp bubble iframe and container */
+        #smartsupp-widget-container iframe[id*="bubble"],
+        .smartsupp-widget-bubble,
+        #smartsupp-widget-bubble {
+          display: none !important;
+          visibility: hidden !important;
+          opacity: 0 !important;
+          pointer-events: none !important;
+        }
+      `;
+      document.head.appendChild(style);
+    }
   }, [key]);
 
   const openChat = () => {
     try {
       if (window.smartsupp) {
-        // Show the chat box and then open it
+        // Show and open the chat
         window.smartsupp('chat:show');
         window.smartsupp('chat:open');
       }
@@ -90,5 +112,6 @@ export default function SmartsuppChat() {
     </button>
   );
 }
+
 
 
