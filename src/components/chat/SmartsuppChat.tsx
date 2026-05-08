@@ -27,8 +27,16 @@ export default function SmartsuppChat() {
     window._smartsupp.color = brandColor;
     window._smartsupp.offsetY = isMobile ? mobileOffsetY : 0;
 
+    // Official loader pattern: keep a queue function available before script loads.
+    if (!window.smartsupp) {
+      const queue = ((...args: unknown[]) => {
+        (queue._ = queue._ || []).push(args);
+      }) as ((...args: unknown[]) => void) & { _: unknown[] };
+      queue._ = [];
+      window.smartsupp = queue;
+    }
+
     if (window.__smartsuppLoaded) return;
-    window.__smartsuppLoaded = true;
 
     const existing = document.getElementById('smartsupp-loader');
     if (existing) return;
@@ -39,6 +47,12 @@ export default function SmartsuppChat() {
     script.charset = 'utf-8';
     script.async = true;
     script.src = 'https://www.smartsuppchat.com/loader.js?';
+    script.onload = () => {
+      window.__smartsuppLoaded = true;
+    };
+    script.onerror = () => {
+      window.__smartsuppLoaded = false;
+    };
     document.head.appendChild(script);
   }, []);
 
