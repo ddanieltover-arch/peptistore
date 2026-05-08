@@ -1,0 +1,14 @@
+User-agent: *
+Allow: /
+
+# Explicitly allow common AI/chat crawlers
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+Sitemap: https://www.researchpeptide.uk/sitemap.xml
