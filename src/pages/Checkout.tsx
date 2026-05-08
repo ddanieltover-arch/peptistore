@@ -6,7 +6,7 @@ import { formatCurrency } from '../lib/utils';
 import { supabase } from '../supabase';
 import { CheckCircle, Loader2, Truck, Package, Globe, Shield, CreditCard, Landmark, Bitcoin, AlertCircle } from 'lucide-react';
 import { europeanLocations } from '../data/europeanCountries';
-import { postOrderCreatedEmail } from '../lib/transactionalEmailApi';
+import { postOrderCreatedEmail, postPsilioCreateInvoice } from '../lib/transactionalEmailApi';
 import { CheckoutSkeleton } from '../components/Skeleton';
 import { PRIMARY_PROMO_CODE, PROMO_DISCOUNT_PERCENT, isValidPromoCode } from '../lib/promoCodes';
 
@@ -43,12 +43,7 @@ export default function Checkout() {
   });
   const [selectedShippingId, setSelectedShippingId] = useState('rm24');
   const [paymentMethod, setPaymentMethod] = useState<'card' | 'bank' | 'crypto'>('crypto');
-  const [cardDetails, setCardDetails] = useState({
-    number: '',
-    expiry: '',
-    cvc: '',
-    name: ''
-  });
+  const [billingCallbackNote, setBillingCallbackNote] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [placedOrderId, setPlacedOrderId] = useState<string | null>(null);
   const [checkoutMessage, setCheckoutMessage] = useState('');
@@ -182,18 +177,12 @@ export default function Checkout() {
   const validatePaymentStep = () => {
     const errors: Record<string, string> = {};
     if (!paymentMethod) errors.paymentMethod = 'Please select a payment method.';
-    if (paymentMethod === 'card') {
-      if (!cardDetails.number.trim()) errors.cardNumber = 'Card number is required.';
-      if (!cardDetails.expiry.trim()) errors.cardExpiry = 'Expiry is required.';
-      if (!cardDetails.cvc.trim()) errors.cardCvc = 'CVV is required.';
-      if (!cardDetails.name.trim()) errors.cardName = 'Cardholder name is required.';
+    if (paymentMethod === 'card' && billingCallbackNote.trim().length > 600) {
+      errors.billingCallbackNote = 'Billing callback note must be 600 characters or less.';
     }
     setPaymentErrors(errors);
     if (Object.keys(errors).length > 0) {
-      if (errors.cardNumber) focusField('checkout-card-number');
-      else if (errors.cardExpiry) focusField('checkout-card-expiry');
-      else if (errors.cardCvc) focusField('checkout-card-cvc');
-      else if (errors.cardName) focusField('checkout-card-name');
+      if (errors.billingCallbackNote) focusField('checkout-billing-callback-note');
       return false;
     }
     return true;
@@ -242,6 +231,7 @@ export default function Checkout() {
         shipping_address: {
           ...shipping,
           payment_method: paymentMethod,
+          billing_callback_note: paymentMethod === 'card' ? billingCallbackNote.trim() : '',
           crypto_discount: cryptoDiscount,
           shipping_method: selectedMethod.name,
           shipping_cost: shippingCost
@@ -263,11 +253,26 @@ export default function Checkout() {
         emailDispatchFailed = true;
       }
 
-      // Supabase-only payment flow (no external API URL dependency).
       if (emailDispatchFailed) {
         setCheckoutMessage('Order placed, but one or more transactional emails failed. Please contact support with your order ID.');
       } else if (paymentMethod === 'crypto') {
-        setCheckoutMessage('Order created successfully. Admin and customer emails were sent. Crypto payment instructions will follow by email.');
+        try {
+          const result = await postPsilioCreateInvoice({
+            order_id: orderId,
+            amount: finalTotalValue,
+            currency: 'GBP',
+            email: shipping.email,
+            name: shipping.fullName
+          });
+          clearCart();
+          window.location.assign(result.paymentUrl);
+          return;
+        } catch (psilioError: any) {
+          console.error('Psilio redirect failed:', psilioError);
+          setCheckoutMessage(
+            `Order created, but automatic crypto redirect failed. ${psilioError?.message || 'Please contact support with your order ID.'}`
+          );
+        }
       } else if (paymentMethod === 'card') {
         setCheckoutMessage('Order created successfully. Admin and customer emails were sent. Card payment is queued for manual billing review.');
       } else {
@@ -454,36 +459,33 @@ export default function Checkout() {
 
                 {paymentMethod === 'card' && (
                   <fieldset className="space-y-6 border-0 min-w-0 p-0">
-                    <legend className="sr-only">Card payment details</legend>
+                    <legend className="sr-only">Card payment callback note</legend>
                     <div className="bg-blue-50 p-4 rounded-2xl border border-blue-100 flex gap-3">
                       <AlertCircle className="w-5 h-5 text-blue-600 shrink-0" aria-hidden />
                       <p className="text-xs font-bold text-blue-900 leading-relaxed">
-                        Card payments are processed manually. Your details will be securely sent to our billing team for review. 
-                        Your order status will update to <span className="underline">Processing</span> immediately.
+                        Card payments are processed manually. Add a billing callback note (best call time / reference) and place the order.
+                        Status updates to <span className="underline">Processing</span> immediately.
                       </p>
                     </div>
-                    <div className="space-y-4">
-                      <div>
-                        <label htmlFor="checkout-card-number" className="sr-only">Card number</label>
-                        <input id="checkout-card-number" type="text" placeholder="Card Number" value={cardDetails.number} onChange={e => setCardDetails({...cardDetails, number: e.target.value})} className="w-full p-4 bg-gray-50 border-none rounded-2xl outline-none font-bold text-gray-900" autoComplete="cc-number" />
-                        {paymentErrors.cardNumber && <p className="mt-1 text-xs font-semibold text-red-600">{paymentErrors.cardNumber}</p>}
-                      </div>
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <label htmlFor="checkout-card-expiry" className="sr-only">Expiry (MM/YY)</label>
-                          <input id="checkout-card-expiry" type="text" placeholder="MM/YY" value={cardDetails.expiry} onChange={e => setCardDetails({...cardDetails, expiry: e.target.value})} className="p-4 bg-gray-50 border-none rounded-2xl outline-none font-bold text-gray-900 w-full" autoComplete="cc-exp" />
-                          {paymentErrors.cardExpiry && <p className="mt-1 text-xs font-semibold text-red-600">{paymentErrors.cardExpiry}</p>}
-                        </div>
-                        <div>
-                          <label htmlFor="checkout-card-cvc" className="sr-only">Security code (CVV)</label>
-                          <input id="checkout-card-cvc" type="text" placeholder="CVV" value={cardDetails.cvc} onChange={e => setCardDetails({...cardDetails, cvc: e.target.value})} className="p-4 bg-gray-50 border-none rounded-2xl outline-none font-bold text-gray-900 w-full" autoComplete="cc-csc" />
-                          {paymentErrors.cardCvc && <p className="mt-1 text-xs font-semibold text-red-600">{paymentErrors.cardCvc}</p>}
-                        </div>
-                      </div>
-                      <div>
-                        <label htmlFor="checkout-card-name" className="sr-only">Cardholder name</label>
-                        <input id="checkout-card-name" type="text" placeholder="Cardholder Name" value={cardDetails.name} onChange={e => setCardDetails({...cardDetails, name: e.target.value})} className="w-full p-4 bg-gray-50 border-none rounded-2xl outline-none font-bold text-gray-900" autoComplete="cc-name" />
-                        {paymentErrors.cardName && <p className="mt-1 text-xs font-semibold text-red-600">{paymentErrors.cardName}</p>}
+                    <div>
+                      <label htmlFor="checkout-billing-callback-note" className="block text-xs font-black uppercase tracking-widest text-gray-500 mb-2">
+                        Billing Callback Note (Optional)
+                      </label>
+                      <textarea
+                        id="checkout-billing-callback-note"
+                        placeholder="Example: Call me weekdays after 5pm UK time. Reference: Lab project A12."
+                        value={billingCallbackNote}
+                        onChange={e => setBillingCallbackNote(e.target.value)}
+                        className="w-full p-4 bg-gray-50 border-none rounded-2xl outline-none font-semibold text-gray-900 min-h-[120px]"
+                        maxLength={600}
+                      />
+                      <div className="mt-1 flex items-center justify-between">
+                        {paymentErrors.billingCallbackNote ? (
+                          <p className="text-xs font-semibold text-red-600">{paymentErrors.billingCallbackNote}</p>
+                        ) : (
+                          <span className="text-[10px] font-semibold text-gray-400">Shared with billing admin on order email.</span>
+                        )}
+                        <span className="text-[10px] font-semibold text-gray-400">{billingCallbackNote.length}/600</span>
                       </div>
                     </div>
                   </fieldset>

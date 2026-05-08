@@ -13,6 +13,14 @@ export function stripHtml(input: string) {
     .trim();
 }
 
+function paymentMethodLabel(method: string | undefined) {
+  const value = String(method || '').toLowerCase().trim();
+  if (value === 'crypto' || value === 'cryptocurrency') return 'Cryptocurrency';
+  if (value === 'card' || value === 'credit_card' || value === 'credit-card') return 'Credit / Debit Card';
+  if (value === 'bank' || value === 'bank_transfer' || value === 'bank-transfer') return 'Bank Transfer';
+  return method ? method : 'Unknown';
+}
+
 function renderBrandLayout(params: { title: string; preheader: string; bodyHtml: string }) {
   const brandName = process.env.EMAIL_BRAND_NAME || 'Research Peptides UK';
   const supportAddress = process.env.EMAIL_SUPPORT_ADDRESS || 'info@researchpeptide.uk';
@@ -141,7 +149,7 @@ export function renderOrderCreatedCustomerEmail(payload: OrderEmailPayload): Ema
       </tr>
       <tr>
         <td style="font-size:13px;color:#64748b;padding:4px 0;">Payment Method</td>
-        <td style="font-size:13px;color:#0f172a;text-align:right;padding:4px 0;font-weight:700;text-transform:capitalize;">${safeHtml(payload.paymentMethod)}</td>
+        <td style="font-size:13px;color:#0f172a;text-align:right;padding:4px 0;font-weight:700;">${safeHtml(paymentMethodLabel(payload.paymentMethod))}</td>
       </tr>
       <tr>
         <td style="font-size:15px;color:#0f172a;padding:8px 0;font-weight:800;border-top:1px solid #e2e8f0;">Total</td>
@@ -207,6 +215,10 @@ export function renderOrderCreatedAdminEmail(payload: OrderEmailPayload): EmailR
         <td style="font-size:13px;color:#0f172a;text-align:right;padding:4px 0;font-weight:700;text-transform:capitalize;">${safeHtml(payload.status)}</td>
       </tr>
       <tr>
+        <td style="font-size:13px;color:#64748b;padding:4px 0;">Payment Method</td>
+        <td style="font-size:13px;color:#0f172a;text-align:right;padding:4px 0;font-weight:700;">${safeHtml(paymentMethodLabel(payload.paymentMethod))}</td>
+      </tr>
+      <tr>
         <td style="font-size:13px;color:#64748b;padding:4px 0;">Total</td>
         <td style="font-size:13px;color:#1d4ed8;text-align:right;padding:4px 0;font-weight:800;">${formatCurrency(payload.totalAmount)}</td>
       </tr>
@@ -261,6 +273,10 @@ export function renderOrderStatusCustomerEmail(payload: OrderEmailPayload): Emai
       <tr>
         <td style="font-size:13px;color:#64748b;padding:4px 0;">Current Status</td>
         <td style="font-size:13px;color:#0f172a;text-align:right;padding:4px 0;font-weight:700;text-transform:capitalize;">${safeHtml(payload.status)}</td>
+      </tr>
+      <tr>
+        <td style="font-size:13px;color:#64748b;padding:4px 0;">Payment Method</td>
+        <td style="font-size:13px;color:#0f172a;text-align:right;padding:4px 0;font-weight:700;">${safeHtml(paymentMethodLabel(payload.paymentMethod))}</td>
       </tr>
       <tr>
         <td style="font-size:13px;color:#64748b;padding:4px 0;">Total</td>
