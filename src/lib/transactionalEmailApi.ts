@@ -85,3 +85,12 @@ export async function postContactEmail(payload: {
   });
   return readJsonResponse<{ success: boolean; dryRun?: boolean }>(response);
 }
+
+export async function postNewsletterSubscribe(payload: { email: string }) {
+  const response = await fetch('/api/email/newsletter-subscribe', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+    body: JSON.stringify(payload)
+  });
+  return readJsonResponse<{ success: boolean; dryRun?: boolean }>(response);
+}

@@ -68,6 +68,12 @@ export type OrderEmailPayload = {
   status: string;
   customerEmail: string;
   customerName: string;
+  customerPhone?: string;
+  shippingAddressLine1?: string;
+  shippingCity?: string;
+  shippingPostalCode?: string;
+  shippingCountry?: string;
+  customerNotes?: string;
   totalAmount: number;
   shippingCost: number;
   paymentMethod: string;
@@ -79,6 +85,10 @@ export type ContactEmailPayload = {
   email: string;
   subject: string;
   message: string;
+};
+
+export type NewsletterSubscribePayload = {
+  email: string;
 };
 
 export type EmailRenderResult = {
@@ -111,6 +121,19 @@ export function renderOrderCreatedCustomerEmail(payload: OrderEmailPayload): Ema
     <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin-bottom:18px;">
       ${itemRows}
     </table>
+    <div style="margin-bottom:18px;padding:14px;border:1px solid #e2e8f0;border-radius:12px;background:#f8fafc;">
+      <p style="margin:0 0 8px;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#475569;font-weight:800;">Shipping Details</p>
+      <p style="margin:0;font-size:13px;color:#334155;line-height:1.8;">
+        <strong>Name:</strong> ${safeHtml(payload.customerName || 'Researcher')}<br />
+        <strong>Email:</strong> ${safeHtml(payload.customerEmail || '')}<br />
+        <strong>Phone:</strong> ${safeHtml(payload.customerPhone || '')}<br />
+        <strong>Address:</strong> ${safeHtml(payload.shippingAddressLine1 || '')}<br />
+        <strong>City:</strong> ${safeHtml(payload.shippingCity || '')}<br />
+        <strong>Postal Code:</strong> ${safeHtml(payload.shippingPostalCode || '')}<br />
+        <strong>Country:</strong> ${safeHtml(payload.shippingCountry || '')}
+      </p>
+      ${payload.customerNotes ? `<p style="margin:10px 0 0;font-size:13px;color:#334155;line-height:1.7;"><strong>Notes:</strong> ${safeHtml(payload.customerNotes)}</p>` : ''}
+    </div>
     <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
       <tr>
         <td style="font-size:13px;color:#64748b;padding:4px 0;">Shipping</td>
@@ -162,6 +185,19 @@ export function renderOrderCreatedAdminEmail(payload: OrderEmailPayload): EmailR
     <p style="margin:0 0 12px;font-size:13px;color:#334155;">
       Customer: <strong>${safeHtml(payload.customerName || 'Guest')}</strong> (${safeHtml(payload.customerEmail)})
     </p>
+    <div style="margin:0 0 16px;padding:14px;border:1px solid #e2e8f0;border-radius:12px;background:#f8fafc;">
+      <p style="margin:0 0 8px;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#475569;font-weight:800;">Shipping & Contact</p>
+      <p style="margin:0;font-size:13px;color:#334155;line-height:1.8;">
+        <strong>Name:</strong> ${safeHtml(payload.customerName || 'Guest')}<br />
+        <strong>Email:</strong> ${safeHtml(payload.customerEmail || '')}<br />
+        <strong>Phone:</strong> ${safeHtml(payload.customerPhone || '')}<br />
+        <strong>Address:</strong> ${safeHtml(payload.shippingAddressLine1 || '')}<br />
+        <strong>City:</strong> ${safeHtml(payload.shippingCity || '')}<br />
+        <strong>Postal Code:</strong> ${safeHtml(payload.shippingPostalCode || '')}<br />
+        <strong>Country:</strong> ${safeHtml(payload.shippingCountry || '')}
+      </p>
+      ${payload.customerNotes ? `<p style="margin:10px 0 0;font-size:13px;color:#334155;line-height:1.7;"><strong>Notes:</strong> ${safeHtml(payload.customerNotes)}</p>` : ''}
+    </div>
     <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin-bottom:18px;">
       ${itemRows}
     </table>
@@ -207,6 +243,19 @@ export function renderOrderStatusCustomerEmail(payload: OrderEmailPayload): Emai
     <div style="padding:16px;border:1px solid #dbeafe;background:#eff6ff;border-radius:12px;margin-bottom:18px;">
       <p style="margin:0 0 8px;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#2563eb;font-weight:800;">Order ID</p>
       <p style="margin:0;font-size:18px;color:#1e3a8a;font-weight:800;">${safeHtml(payload.orderId)}</p>
+    </div>
+    <div style="margin-bottom:18px;padding:14px;border:1px solid #e2e8f0;border-radius:12px;background:#f8fafc;">
+      <p style="margin:0 0 8px;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#475569;font-weight:800;">Shipping Details</p>
+      <p style="margin:0;font-size:13px;color:#334155;line-height:1.8;">
+        <strong>Name:</strong> ${safeHtml(payload.customerName || 'Researcher')}<br />
+        <strong>Email:</strong> ${safeHtml(payload.customerEmail || '')}<br />
+        <strong>Phone:</strong> ${safeHtml(payload.customerPhone || '')}<br />
+        <strong>Address:</strong> ${safeHtml(payload.shippingAddressLine1 || '')}<br />
+        <strong>City:</strong> ${safeHtml(payload.shippingCity || '')}<br />
+        <strong>Postal Code:</strong> ${safeHtml(payload.shippingPostalCode || '')}<br />
+        <strong>Country:</strong> ${safeHtml(payload.shippingCountry || '')}
+      </p>
+      ${payload.customerNotes ? `<p style="margin:10px 0 0;font-size:13px;color:#334155;line-height:1.7;"><strong>Notes:</strong> ${safeHtml(payload.customerNotes)}</p>` : ''}
     </div>
     <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
       <tr>
@@ -289,6 +338,61 @@ export function renderContactSubmittedCustomerEmail(payload: ContactEmailPayload
 
   return {
     subject: 'We Received Your Message',
+    html,
+    text: stripHtml(bodyHtml)
+  };
+}
+
+export function renderNewsletterSubscribeAdminEmail(
+  payload: NewsletterSubscribePayload
+): EmailRenderResult {
+  const bodyHtml = `
+    <p style="margin:0 0 14px;font-size:14px;color:#334155;line-height:1.7;">
+      A new newsletter subscription was received from the website footer.
+    </p>
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
+      <tr>
+        <td style="font-size:13px;color:#64748b;padding:6px 0;">Subscriber Email</td>
+        <td style="font-size:13px;color:#0f172a;text-align:right;padding:6px 0;font-weight:700;">${safeHtml(payload.email)}</td>
+      </tr>
+    </table>`;
+
+  const html = renderBrandLayout({
+    title: 'New Newsletter Subscription',
+    preheader: `New newsletter subscriber: ${payload.email}`,
+    bodyHtml
+  });
+
+  return {
+    subject: 'Newsletter Subscription • New Lead',
+    html,
+    text: stripHtml(bodyHtml)
+  };
+}
+
+export function renderNewsletterSubscribeCustomerEmail(
+  payload: NewsletterSubscribePayload
+): EmailRenderResult {
+  const brandName = process.env.EMAIL_BRAND_NAME || 'Research Peptides UK';
+  const bodyHtml = `
+    <p style="margin:0 0 12px;font-size:14px;color:#334155;">Hi Researcher,</p>
+    <p style="margin:0 0 16px;font-size:14px;color:#334155;line-height:1.7;">
+      Thanks for subscribing to the ${safeHtml(brandName)} newsletter.
+      You will receive updates on supply chains, stability reports, and newly synthesized compounds.
+    </p>
+    <div style="padding:16px;border:1px solid #dbeafe;background:#eff6ff;border-radius:12px;">
+      <p style="margin:0 0 6px;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#2563eb;font-weight:800;">Subscribed Email</p>
+      <p style="margin:0;font-size:14px;color:#1e3a8a;font-weight:700;">${safeHtml(payload.email)}</p>
+    </div>`;
+
+  const html = renderBrandLayout({
+    title: 'Newsletter Subscription Confirmed',
+    preheader: `You are now subscribed to ${brandName} updates`,
+    bodyHtml
+  });
+
+  return {
+    subject: 'Subscription Confirmed',
     html,
     text: stripHtml(bodyHtml)
   };

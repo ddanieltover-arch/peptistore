@@ -17,6 +17,7 @@ import CartDrawer from './cart/CartDrawer';
 import Omnisearch from './search/Omnisearch';
 import SmartsuppChat from './chat/SmartsuppChat';
 import logo from '../assets/logo.webp';
+import { postNewsletterSubscribe } from '../lib/transactionalEmailApi';
 
 export default function Layout() {
   const { user, profile } = useAuthStore();
@@ -25,6 +26,10 @@ export default function Layout() {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
   const [accountMenuOpen, setAccountMenuOpen] = useState(false);
   const [showBackToTop, setShowBackToTop] = useState(false);
+  const [newsletterEmail, setNewsletterEmail] = useState('');
+  const [newsletterSubmitting, setNewsletterSubmitting] = useState(false);
+  const [newsletterMessage, setNewsletterMessage] = useState<string | null>(null);
+  const [newsletterError, setNewsletterError] = useState<string | null>(null);
   const accountMenuRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const location = useLocation();
@@ -86,6 +91,34 @@ export default function Layout() {
 
   const handleBackToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleNewsletterSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (newsletterSubmitting) return;
+
+    const email = newsletterEmail.trim();
+    if (!email) {
+      setNewsletterError('Enter an email address to subscribe.');
+      setNewsletterMessage(null);
+      return;
+    }
+
+    setNewsletterSubmitting(true);
+    setNewsletterError(null);
+    setNewsletterMessage(null);
+
+    try {
+      await postNewsletterSubscribe({ email });
+      setNewsletterMessage('Subscription confirmed. Check your inbox for confirmation.');
+      setNewsletterEmail('');
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : 'Could not subscribe right now. Please try again.';
+      setNewsletterError(message);
+    } finally {
+      setNewsletterSubmitting(false);
+    }
   };
 
   return (
@@ -339,7 +372,10 @@ export default function Layout() {
               <p className="text-gray-400 text-sm mb-6 leading-relaxed">
                 Receive prioritized updates on supply chains, stability reports, and newly synthesized compounds.
               </p>
-              <div className="flex flex-wrap gap-2 bg-white/5 backdrop-blur-md rounded-2xl p-1 border border-white/10 ring-1 ring-white/5 focus-within:ring-blue-500/50 transition-all">
+              <form
+                className="flex flex-wrap gap-2 bg-white/5 backdrop-blur-md rounded-2xl p-1 border border-white/10 ring-1 ring-white/5 focus-within:ring-blue-500/50 transition-all"
+                onSubmit={handleNewsletterSubmit}
+              >
                 <label htmlFor="footer-newsletter-email" className="sr-only">
                   Email for researcher newsletter
                 </label>
@@ -348,13 +384,30 @@ export default function Layout() {
                   type="email" 
                   placeholder="Official Email Address"
                   autoComplete="email"
+                  value={newsletterEmail}
+                  onChange={(e) => setNewsletterEmail(e.target.value)}
+                  disabled={newsletterSubmitting}
+                  required
                   className="min-w-0 flex-1 px-4 py-3 bg-transparent text-white placeholder:text-gray-500 focus:outline-none text-sm font-medium" 
                 />
-                <button type="button" className="bg-blue-600 px-6 py-3 rounded-xl hover:bg-blue-700 font-bold text-sm tracking-wide transition-all whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950">
-                  Subscribe
+                <button
+                  type="submit"
+                  disabled={newsletterSubmitting}
+                  className="bg-blue-600 px-6 py-3 rounded-xl hover:bg-blue-700 disabled:opacity-70 disabled:cursor-not-allowed font-bold text-sm tracking-wide transition-all whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+                >
+                  {newsletterSubmitting ? 'Subscribing...' : 'Subscribe'}
                 </button>
-              </div>
-              <p className="mt-2 text-[10px] text-gray-500 font-medium">Preview only — wire to your email provider when ready.</p>
+              </form>
+              {newsletterMessage ? (
+                <p className="mt-2 text-[11px] text-emerald-300 font-medium" role="status" aria-live="polite">
+                  {newsletterMessage}
+                </p>
+              ) : null}
+              {newsletterError ? (
+                <p className="mt-2 text-[11px] text-red-300 font-medium" role="alert">
+                  {newsletterError}
+                </p>
+              ) : null}
             </div>
           </div>
         </div>

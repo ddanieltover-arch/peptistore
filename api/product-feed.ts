@@ -7,7 +7,7 @@ type ProductRow = {
   images: string[] | null;
   categories: string[] | null;
   inventory: number | null;
-  updated_at: string | null;
+  created_at: string | null;
 };
 
 function xmlEscape(value: unknown): string {
@@ -48,7 +48,7 @@ async function fetchProducts(): Promise<ProductRow[]> {
   if (!url || !key) throw new Error('SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY is not configured');
 
   const query =
-    'select=id,slug,title,description,price,images,categories,inventory,updated_at&order=updated_at.desc.nullslast';
+    'select=id,slug,title,description,price,images,categories,inventory,created_at&order=created_at.desc.nullslast';
   const res = await fetch(`${url}/rest/v1/products?${query}`, {
     headers: {
       apikey: key,
@@ -76,7 +76,7 @@ function buildFeedXml(origin: string, products: ProductRow[]): string {
       const description = p.description || 'Research-use product listing.';
       const image = p.images?.[0] || '';
       const price = Number(p.price || 0);
-      const updated = p.updated_at ? new Date(p.updated_at).toUTCString() : now;
+      const updated = p.created_at ? new Date(p.created_at).toUTCString() : now;
       const availability = (p.inventory || 0) > 0 ? 'in stock' : 'out of stock';
       const productType = p.categories?.join(' > ') || 'Research products';
 
