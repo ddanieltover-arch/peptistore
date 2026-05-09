@@ -10,9 +10,9 @@ import { useAuthStore } from '../store/useAuthStore';
 import { ProductSkeleton } from '../components/Skeleton';
 import { useWizardStore } from '../store/useWizardStore';
 import heroBg from '../assets/hero_bg.png';
-import vialsHero from '../assets/vials_hero.png';
-import heroImage from '../assets/hero_peptides.png';
-import scientistLab from '../assets/scientist_lab.png';
+import brandLabCatalogDisplay from '../assets/brand/brand-lab-catalog-display.webp';
+import brandLabAnalystFocus from '../assets/brand/brand-lab-analyst-focus.webp';
+import brandStorefrontDusk from '../assets/brand/brand-storefront-dusk.webp';
 import { CatalogTrustStrip } from '../components/products/CatalogTrustStrip';
 import { ProductCardRating } from '../components/products/ProductCardRating';
 import { ProductImagePlaceholder } from '../components/products/ProductImagePlaceholder';
@@ -103,8 +103,8 @@ export default function Home() {
                   initial={{ opacity: 0, x: 40 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.8, delay: 0.3, ease: "easeOut" }}
-                  src={vialsHero}
-                  alt="Premium Research Peptide Vials"
+                  src={brandLabCatalogDisplay}
+                  alt="Research Peptides laboratory with catalogued research compounds"
                   className="w-full max-w-md object-contain drop-shadow-[0_20px_40px_rgba(37,99,235,0.15)]"
                 />
               </div>
@@ -345,7 +345,7 @@ export default function Home() {
             <div className="relative">
               {/* Reduced height aspect ratio: aspect-video or aspect-[16/10] */}
               <div className="aspect-video lg:aspect-[4/3] bg-gray-800 rounded-[3rem] overflow-hidden border border-white/5 relative group">
-                <img src={heroImage} alt="Premium peptide research laboratory setting" className="w-full h-full object-cover opacity-60 group-hover:scale-105 transition-transform duration-1000" />
+                <img src={brandLabAnalystFocus} alt="Scientists at work in a peptide research laboratory" className="w-full h-full object-cover opacity-60 group-hover:scale-105 transition-transform duration-1000" />
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="text-center p-8 bg-black/40 backdrop-blur-xl border border-white/10 rounded-[2rem] w-3/4 mx-auto">
                     <Star className="h-10 w-10 text-blue-500 mx-auto mb-4 fill-current" />
@@ -381,8 +381,8 @@ export default function Home() {
             >
                <div className="relative z-10 rounded-[4rem] overflow-hidden shadow-2xl shadow-blue-900/10 border-[12px] border-white group">
                   <img 
-                    src={scientistLab} 
-                    alt="Purity and Precision" 
+                    src={brandStorefrontDusk} 
+                    alt="Research Peptides UK storefront — purity, precision, performance" 
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" 
                   />
                   <div className="absolute inset-0 bg-gradient-to-tr from-blue-900/20 via-transparent to-transparent" />

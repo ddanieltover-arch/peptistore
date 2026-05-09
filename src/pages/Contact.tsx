@@ -3,6 +3,7 @@ import { Mail, Phone, MessageSquare, Clock, ArrowRight, ShieldCheck, MapPin } fr
 import { motion } from 'motion/react';
 import { useToastStore } from '../store/useToastStore';
 import { postContactEmail } from '../lib/transactionalEmailApi';
+import brandReceptionLobby from '../assets/brand/brand-reception-lobby.webp';
 
 export default function Contact() {
   const addToast = useToastStore((state) => state.addToast);
@@ -40,6 +41,18 @@ export default function Contact() {
   return (
     <div className="bg-white min-h-screen pt-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-12 rounded-[2.5rem] overflow-hidden border border-gray-100 shadow-xl shadow-blue-900/10"
+        >
+          <img
+            src={brandReceptionLobby}
+            alt="Research Peptides reception and corporate headquarters lobby"
+            className="w-full h-52 sm:h-64 md:h-80 object-cover"
+          />
+        </motion.div>
+
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
           
           {/* Left: Contact Info */}

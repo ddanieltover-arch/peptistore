@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'motion/react';
 import { Microscope, ShieldAlert } from 'lucide-react';
+import brandReceptionSuite from '../assets/brand/brand-reception-suite.webp';
 
 type ResearchCard = {
   category: string;
@@ -49,6 +50,19 @@ export default function PeptideResearch() {
           <p className="text-gray-500 mt-4 font-medium italic max-w-3xl mx-auto">
             Curated research briefs and mechanistic overviews to support protocol planning and scientific discussion.
           </p>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="mb-10 rounded-[2rem] overflow-hidden border border-gray-100 shadow-lg"
+        >
+          <img
+            src={brandReceptionSuite}
+            alt="Research Peptides — peptide science, elevated results"
+            className="w-full h-48 sm:h-56 md:h-64 object-cover"
+          />
         </motion.div>
 
         <section className="bg-amber-50 border border-amber-100 rounded-3xl p-6 mb-8 flex items-start gap-3">

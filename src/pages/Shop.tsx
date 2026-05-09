@@ -20,6 +20,7 @@ import { ProductCardPriceBlock } from '../components/products/ProductCardPriceBl
 import { productPath } from '../lib/productUrl';
 import { ProductBadge } from '../components/products/ProductBadge';
 import { getPrimaryProductBadge } from '../lib/productBadges';
+import brandLabOperationsWide from '../assets/brand/brand-lab-operations-wide.webp';
 
 export default function Shop() {
   const [allProducts, setAllProducts] = useState<any[]>([]);
@@ -160,6 +161,22 @@ export default function Shop() {
           </div>
         </div>
       </div>
+
+      <motion.figure
+        initial={{ opacity: 0, y: 10 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        className="mb-10 rounded-[2rem] overflow-hidden border border-gray-100 shadow-lg"
+      >
+        <img
+          src={brandLabOperationsWide}
+          alt="Research Peptides operations laboratory — purity, precision, performance"
+          className="w-full h-40 sm:h-48 md:h-56 object-cover"
+        />
+        <figcaption className="sr-only">
+          Branded research facility supporting catalog quality and documentation standards.
+        </figcaption>
+      </motion.figure>
 
       <CatalogTrustStrip />
 

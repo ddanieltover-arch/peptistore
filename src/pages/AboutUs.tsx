@@ -1,11 +1,25 @@
 import React from 'react';
 import { motion } from 'motion/react';
 import { Building2, BadgeCheck, Microscope, Mail, Phone } from 'lucide-react';
+import brandStorefrontFrosted from '../assets/brand/brand-storefront-frosted.webp';
+import brandStorefrontNight from '../assets/brand/brand-storefront-night.webp';
 
 export default function AboutUs() {
   return (
     <div className="bg-white min-h-screen pt-12 pb-24">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <motion.div
+          initial={{ opacity: 0, y: 14 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-12 rounded-[2rem] overflow-hidden border border-gray-100 shadow-xl shadow-gray-200/40"
+        >
+          <img
+            src={brandStorefrontFrosted}
+            alt="Research Peptides storefront with laboratory interior"
+            className="w-full h-48 sm:h-64 md:h-80 object-cover"
+          />
+        </motion.div>
+
         <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-14">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-600 rounded-full text-xs font-black uppercase tracking-widest mb-6">
             <Building2 className="h-4 w-4" />
@@ -34,6 +48,19 @@ export default function AboutUs() {
             </p>
           </div>
         </div>
+
+        <motion.section
+          initial={{ opacity: 0, y: 12 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="mb-12 rounded-3xl overflow-hidden border border-gray-100 shadow-lg"
+        >
+          <img
+            src={brandStorefrontNight}
+            alt="Research Peptides location at night — researchpeptide.uk"
+            className="w-full h-56 md:h-72 object-cover"
+          />
+        </motion.section>
 
         <section className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
           <div className="bg-gray-50 border border-gray-100 rounded-3xl p-8">
