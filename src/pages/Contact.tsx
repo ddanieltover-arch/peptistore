@@ -1,5 +1,5 @@
 import React from 'react';
-import { Mail, Phone, MessageSquare, Clock, ArrowRight, ShieldCheck, MapPin } from 'lucide-react';
+import { Mail, MessageSquare, Clock, ArrowRight, ShieldCheck, MapPin } from 'lucide-react';
 import { motion } from 'motion/react';
 import { useToastStore } from '../store/useToastStore';
 import { postContactEmail } from '../lib/transactionalEmailApi';
@@ -73,15 +73,10 @@ export default function Contact() {
             </motion.div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
-              <div className="p-8 bg-gray-50 rounded-[2rem] border border-gray-100">
+              <div className="p-8 bg-gray-50 rounded-[2rem] border border-gray-100 sm:col-span-2">
                 <Mail className="h-6 w-6 text-blue-600 mb-4" />
                 <h4 className="text-xs font-black uppercase tracking-widest text-gray-400 mb-2">Email Protocols</h4>
                 <p className="font-bold text-gray-900 break-words">info@researchpeptide.uk</p>
-              </div>
-              <div className="p-8 bg-gray-50 rounded-[2rem] border border-gray-100">
-                <Phone className="h-6 w-6 text-blue-600 mb-4" />
-                <h4 className="text-xs font-black uppercase tracking-widest text-gray-400 mb-2">Liaison Line</h4>
-                <p className="font-bold text-gray-900">+44 7508 227474</p>
               </div>
               <div className="p-8 bg-gray-50 rounded-[2rem] border border-gray-100 sm:col-span-2">
                 <MapPin className="h-6 w-6 text-blue-600 mb-4" />

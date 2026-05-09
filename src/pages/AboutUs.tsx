@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { Building2, BadgeCheck, Microscope, Mail, Phone } from 'lucide-react';
+import { Building2, BadgeCheck, Microscope, Mail } from 'lucide-react';
 import brandStorefrontFrosted from '../assets/brand/brand-storefront-frosted.webp';
 import brandStorefrontNight from '../assets/brand/brand-storefront-night.webp';
 
@@ -77,10 +77,6 @@ export default function AboutUs() {
               <p className="flex items-center gap-2">
                 <Mail className="h-4 w-4 text-blue-600" />
                 info@researchpeptide.uk
-              </p>
-              <p className="flex items-center gap-2">
-                <Phone className="h-4 w-4 text-blue-600" />
-                +44 7508 227474
               </p>
             </div>
           </div>

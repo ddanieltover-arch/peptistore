@@ -344,8 +344,7 @@ export default function Layout() {
                 Our laboratory-first approach ensures 99.8%+ purity on every compound shipped.
               </p>
               <address className="not-italic text-gray-500 text-sm leading-relaxed mt-8 max-w-sm">
-                Contact: info@researchpeptide.uk<br />
-                UK Support: +44 7508 227474
+                Contact: info@researchpeptide.uk
               </address>
             </div>
             
