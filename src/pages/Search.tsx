@@ -29,6 +29,11 @@ export default function Search() {
   const { user } = useAuthStore();
   const addToast = useToastStore(state => state.addToast);
   const selectedCategory = searchParams.get('category') || '';
+  const queryParam = searchParams.get('q') || '';
+
+  useEffect(() => {
+    setSearchTerm(queryParam);
+  }, [queryParam]);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -115,7 +120,14 @@ export default function Search() {
                    className="block w-full pl-20 pr-10 py-6 border-none ring-1 ring-gray-100 rounded-[2.5rem] bg-gray-50/50 placeholder-gray-400 focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:bg-white text-xl font-bold shadow-2xl shadow-blue-900/5 transition-all"
                    placeholder="Enter research compound ID..."
                    value={searchTerm}
-                   onChange={(e) => setSearchTerm(e.target.value)}
+                   onChange={(e) => {
+                    const next = e.target.value;
+                    setSearchTerm(next);
+                    const params = new URLSearchParams(searchParams);
+                    if (next.trim()) params.set('q', next);
+                    else params.delete('q');
+                    setSearchParams(params, { replace: true });
+                  }}
                  />
                </div>
             </div>

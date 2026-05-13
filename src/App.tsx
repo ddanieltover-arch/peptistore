@@ -2,6 +2,8 @@ import React from 'react';
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import Layout from './components/Layout';
 import ScrollToTop from './components/ScrollToTop';
+import Seo from './components/Seo';
+import Analytics from './components/Analytics';
 import Home from './pages/Home';
 import Shop from './pages/Shop';
 import Cart from './pages/Cart';
@@ -81,8 +83,11 @@ export default function App() {
 function AppRoutes() {
   const location = useLocation();
   return (
-    <AnimatePresence mode="wait">
-      <Routes location={location} key={location.pathname}>
+    <>
+      <Seo />
+      <Analytics />
+      <AnimatePresence mode="wait">
+        <Routes location={location} key={location.pathname}>
         <Route path="/" element={<Layout />}>
           <Route index element={<Home />} />
           <Route path="shop" element={<Shop />} />
@@ -113,6 +118,7 @@ function AppRoutes() {
           <Route path="refund-returns" element={<RefundReturns />} />
         </Route>
       </Routes>
-    </AnimatePresence>
+      </AnimatePresence>
+    </>
   );
 }

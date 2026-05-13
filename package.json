@@ -9,13 +9,16 @@
   "scripts": {
     "dev": "vite --port=5173 --host=0.0.0.0",
     "build": "vite build",
+    "build:seo": "vite build && tsx scripts/generate-seo-assets.ts --dist",
     "preview": "vite preview",
     "clean": "rm -rf dist",
     "lint": "tsc --noEmit",
     "db:test": "tsx server/scripts/test-db.ts",
     "db:migrate": "tsx server/scripts/migrate.ts",
     "db:import:powder": "tsx server/scripts/import-peptide-powder-catalog.ts",
-    "optimize:brand-images": "tsx scripts/optimize-brand-images.ts"
+    "optimize:brand-images": "tsx scripts/optimize-brand-images.ts",
+    "seo:generate": "tsx scripts/generate-seo-assets.ts",
+    "seo:validate": "tsx scripts/validate-seo.ts"
   },
   "dependencies": {
     "@google/genai": "^1.29.0",

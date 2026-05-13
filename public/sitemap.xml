@@ -1,21 +1,23 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://www.researchpeptide.uk/</loc>
-  </url>
-  <url>
-    <loc>https://www.researchpeptide.uk/shop</loc>
-  </url>
-  <url>
-    <loc>https://www.researchpeptide.uk/contact</loc>
-  </url>
-  <url>
-    <loc>https://www.researchpeptide.uk/faq</loc>
-  </url>
-  <url>
-    <loc>https://www.researchpeptide.uk/mira-source.html</loc>
-  </url>
-  <url>
-    <loc>https://www.researchpeptide.uk/product-feed.xml</loc>
-  </url>
+<?xml version='1.0' encoding='UTF-8'?>
+<urlset xmlns='http://www.sitemaps.org/schemas/sitemap/0.9'>
+  <url><loc>https://www.researchpeptide.uk/</loc><lastmod>2026-05-12</lastmod><changefreq>weekly</changefreq><priority>1.0</priority></url>
+  <url><loc>https://www.researchpeptide.uk/shop</loc><lastmod>2026-05-12</lastmod><changefreq>daily</changefreq><priority>0.95</priority></url>
+  <url><loc>https://www.researchpeptide.uk/categories</loc><lastmod>2026-05-12</lastmod><changefreq>weekly</changefreq><priority>0.85</priority></url>
+  <url><loc>https://www.researchpeptide.uk/blog</loc><lastmod>2026-05-12</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.researchpeptide.uk/faq</loc><lastmod>2026-05-12</lastmod><changefreq>monthly</changefreq><priority>0.75</priority></url>
+  <url><loc>https://www.researchpeptide.uk/shipping</loc><lastmod>2026-05-12</lastmod><changefreq>monthly</changefreq><priority>0.65</priority></url>
+  <url><loc>https://www.researchpeptide.uk/contact</loc><lastmod>2026-05-12</lastmod><changefreq>monthly</changefreq><priority>0.65</priority></url>
+  <url><loc>https://www.researchpeptide.uk/about-us</loc><lastmod>2026-05-12</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.researchpeptide.uk/peptide-guide</loc><lastmod>2026-05-12</lastmod><changefreq>monthly</changefreq><priority>0.85</priority></url>
+  <url><loc>https://www.researchpeptide.uk/peptide-calculator</loc><lastmod>2026-05-12</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.researchpeptide.uk/coas</loc><lastmod>2026-05-12</lastmod><changefreq>monthly</changefreq><priority>0.75</priority></url>
+  <url><loc>https://www.researchpeptide.uk/peptide-information</loc><lastmod>2026-05-12</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.researchpeptide.uk/peptide-research</loc><lastmod>2026-05-12</lastmod><changefreq>monthly</changefreq><priority>0.85</priority></url>
+  <url><loc>https://www.researchpeptide.uk/terms</loc><lastmod>2026-05-12</lastmod><changefreq>yearly</changefreq><priority>0.35</priority></url>
+  <url><loc>https://www.researchpeptide.uk/privacy</loc><lastmod>2026-05-12</lastmod><changefreq>yearly</changefreq><priority>0.35</priority></url>
+  <url><loc>https://www.researchpeptide.uk/refund-returns</loc><lastmod>2026-05-12</lastmod><changefreq>yearly</changefreq><priority>0.35</priority></url>
+  <url><loc>https://www.researchpeptide.uk/product/semaglutide-peptide-uk</loc><lastmod>2026-05-12</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.researchpeptide.uk/product/ghrp-2-peptide</loc><lastmod>2026-05-12</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.researchpeptide.uk/product/kpv-peptide</loc><lastmod>2026-05-12</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.researchpeptide.uk/product/igf-1-peptide</loc><lastmod>2026-05-12</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
 </urlset>

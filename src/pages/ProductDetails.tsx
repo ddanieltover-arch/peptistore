@@ -12,6 +12,8 @@ import { DetailedProductSkeleton } from '../components/Skeleton';
 import { ProductBadge } from '../components/products/ProductBadge';
 import { ProductImagePlaceholder } from '../components/products/ProductImagePlaceholder';
 import { productPath } from '../lib/productUrl';
+import Seo from '../components/Seo';
+import { buildProductJsonLd, excerpt } from '../lib/seo';
 
 export default function ProductDetails() {
   const { slug, id } = useParams<{ slug?: string; id?: string }>();
@@ -169,8 +171,19 @@ export default function ProductDetails() {
         ? variantCompare
         : null;
 
+  const seoDescription = excerpt(String(product.title || 'Research peptide') + ' research peptide for laboratory research use. ' + String(product.description || ''), 155);
+
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <>
+      <Seo
+        title={(product.title || 'Research peptide') + ' | Research Peptides UK'}
+        description={seoDescription}
+        path={productPath(product)}
+        image={product.images?.[0]}
+        type='product'
+        jsonLd={buildProductJsonLd(product, reviews)}
+      />
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-16">
         <div className="space-y-4">
           <div className="bg-white rounded-3xl aspect-square overflow-hidden flex items-center justify-center border border-gray-100 shadow-sm relative group">
@@ -532,6 +545,7 @@ export default function ProductDetails() {
           </div>
         </div>
       )}
-    </div>
+      </div>
+    </>
   );
 }

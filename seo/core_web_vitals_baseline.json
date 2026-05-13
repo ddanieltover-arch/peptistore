@@ -1,0 +1,1 @@
+{"generatedAt":"2026-05-12","status":"Requires Lighthouse/PageSpeed against live preview","targets":{"LCP":"<=2.5s","INP":"<=200ms","CLS":"<0.1"}}

@@ -3,6 +3,8 @@ import { useParams, Link } from 'react-router-dom';
 import { supabase } from '../supabase';
 import { BookOpen, ArrowLeft, Clock, Share2, Tag, Calendar } from 'lucide-react';
 import { motion } from 'motion/react';
+import Seo from '../components/Seo';
+import { buildArticleJsonLd, excerpt } from '../lib/seo';
 
 export default function BlogPost() {
   const { id } = useParams<{ id: string }>();
@@ -53,8 +55,19 @@ export default function BlogPost() {
     );
   }
 
+  const seoDescription = excerpt(post.content || post.title, 155);
+
   return (
-    <article className="bg-white min-h-screen pb-32">
+    <>
+      <Seo
+        title={(post.title || 'Peptide research article') + ' | Research Peptides UK'}
+        description={seoDescription}
+        path={'/blog/' + (post.slug || post.id)}
+        image={post.image_url}
+        type='article'
+        jsonLd={buildArticleJsonLd(post)}
+      />
+      <article className="bg-white min-h-screen pb-32">
       {/* Article Header */}
       <header className="max-w-4xl mx-auto px-4 sm:px-6 pt-16 pb-12">
         <Link to="/blog" className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-blue-600 transition-colors mb-12">
@@ -131,6 +144,7 @@ export default function BlogPost() {
            </Link>
         </footer>
       </main>
-    </article>
+      </article>
+    </>
   );
 }
