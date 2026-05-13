@@ -1,11 +1,16 @@
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
-import path from 'path';
-import {defineConfig, loadEnv} from 'vite';
+import path from 'node:path';
+import os from 'node:os';
+import { fileURLToPath } from 'node:url';
+import { defineConfig, loadEnv } from 'vite';
 
-export default defineConfig(({mode}) => {
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, '.', '');
   return {
+    cacheDir: path.join(os.tmpdir(), 'peptistore-vite-cache'),
     plugins: [react(), tailwindcss()],
     optimizeDeps: {
       // Avoid scanning scratch/*.html files that include external Shopify theme imports.

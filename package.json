@@ -7,7 +7,7 @@
     "node": "20.x"
   },
   "scripts": {
-    "dev": "vite --port=5173 --host=0.0.0.0",
+    "dev": "vite --port=5173 --host=0.0.0.0 --configLoader native",
     "build": "vite build",
     "build:seo": "vite build && tsx scripts/generate-seo-assets.ts --dist",
     "preview": "vite preview",

@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Layout from './components/Layout';
 import ScrollToTop from './components/ScrollToTop';
 import Seo from './components/Seo';
@@ -33,7 +33,6 @@ import PeptideResearch from './pages/PeptideResearch';
 import { useAuthStore } from './store/useAuthStore';
 import { useWishlistStore } from './store/useWishlistStore';
 import { supabase } from './supabase';
-import { AnimatePresence } from 'motion/react';
 
 export default function App() {
   const { setUser, fetchProfile, setAuthReady } = useAuthStore();
@@ -81,13 +80,11 @@ export default function App() {
 }
 
 function AppRoutes() {
-  const location = useLocation();
   return (
     <>
       <Seo />
       <Analytics />
-      <AnimatePresence mode="wait">
-        <Routes location={location} key={location.pathname}>
+      <Routes>
         <Route path="/" element={<Layout />}>
           <Route index element={<Home />} />
           <Route path="shop" element={<Shop />} />
@@ -118,7 +115,6 @@ function AppRoutes() {
           <Route path="refund-returns" element={<RefundReturns />} />
         </Route>
       </Routes>
-      </AnimatePresence>
     </>
   );
 }
