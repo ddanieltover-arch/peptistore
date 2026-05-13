@@ -9,9 +9,57 @@ declare global {
   }
 }
 
+const STYLE_ID = 'smartsupp-hide-default-bubble';
+
+/** Hide Smartsupp's default floating launcher; custom button uses chat:show / chat:open. */
+function hideDefaultSmartsuppLauncher() {
+  const root = document.getElementById('smartsupp-widget-container');
+  if (!root) return;
+
+  const hide = (el: Element) => {
+    (el as HTMLElement).style.setProperty('display', 'none', 'important');
+    (el as HTMLElement).style.setProperty('visibility', 'hidden', 'important');
+    (el as HTMLElement).style.setProperty('pointer-events', 'none', 'important');
+  };
+
+  root.querySelectorAll('button, [role="button"], a').forEach((node) => {
+    const label = (node.getAttribute('aria-label') || '').toLowerCase();
+    const title = (node.getAttribute('title') || '').toLowerCase();
+    const test = `${label} ${title}`;
+    if (
+      test.includes('smartsupp') ||
+      (test.includes('open') && test.includes('chat')) ||
+      test === 'open live chat' ||
+      test.includes('chat with us')
+    ) {
+      hide(node);
+    }
+  });
+
+  root.querySelectorAll('iframe').forEach((iframe) => {
+    const id = (iframe.getAttribute('id') || '').toLowerCase();
+    const src = (iframe.getAttribute('src') || '').toLowerCase();
+    if (id.includes('bubble') || src.includes('bubble') || src.includes('launcher')) {
+      hide(iframe);
+    }
+  });
+
+  root.querySelectorAll('*').forEach((host) => {
+    const el = host as HTMLElement & { shadowRoot?: ShadowRoot };
+    if (!el.shadowRoot) return;
+    el.shadowRoot.querySelectorAll('button, [role="button"], a').forEach((node) => {
+      const label = (node.getAttribute('aria-label') || '').toLowerCase();
+      if (label.includes('smartsupp') || (label.includes('open') && label.includes('chat'))) {
+        (node as HTMLElement).style.setProperty('display', 'none', 'important');
+      }
+    });
+  });
+}
+
 /**
- * Smartsupp loader with brand color support and custom trigger.
- * This component hides the default Smartsupp bubble to use a custom branded one.
+ * Smartsupp loader with a custom trigger. The default floating bubble is hidden so only
+ * our branded button remains (official API has no widget:hide; hideBanner is legacy but
+ * still helps on some widget versions).
  */
 export default function SmartsuppChat() {
   const key = (import.meta.env.VITE_SMARTSUPP_KEY as string | undefined)?.trim();
@@ -21,17 +69,15 @@ export default function SmartsuppChat() {
 
     const brandColor =
       (import.meta.env.VITE_SMARTSUPP_COLOR as string | undefined)?.trim() || '#2563eb';
-    
-    // Initialize Smartsupp configuration
+
     window._smartsupp = window._smartsupp || {};
     window._smartsupp.key = key;
     window._smartsupp.color = brandColor;
-    
-    // Hide default bubble as we provide our own custom button
     window._smartsupp.hideWidget = true;
     window._smartsupp.hideMobileWidget = true;
+    // Legacy flag — still hides the default bubble on many installations (see Smartsupp customization docs).
+    window._smartsupp.hideBanner = true;
 
-    // Official loader pattern
     if (!window.smartsupp) {
       const queue = ((...args: unknown[]) => {
         (queue._ = queue._ || []).push(args);
@@ -40,59 +86,64 @@ export default function SmartsuppChat() {
       window.smartsupp = queue;
     }
 
-    // Prevent multiple script injections
-    if (document.getElementById('smartsupp-loader')) return;
+    if (document.getElementById('smartsupp-loader')) {
+      const t = window.setInterval(hideDefaultSmartsuppLauncher, 400);
+      const mo = new MutationObserver(hideDefaultSmartsuppLauncher);
+      mo.observe(document.body, { childList: true, subtree: true });
+      return () => {
+        window.clearInterval(t);
+        mo.disconnect();
+      };
+    }
 
     const script = document.createElement('script');
     script.id = 'smartsupp-loader';
     script.type = 'text/javascript';
     script.charset = 'utf-8';
     script.async = true;
-    script.src = `https://www.smartsuppchat.com/loader.js?key=${key}`;
-    
+    // Match official snippet: key only in _smartsupp, not in query string (avoids odd double-init behaviour).
+    script.src = 'https://www.smartsuppchat.com/loader.js?';
+
     script.onload = () => {
       window.__smartsuppLoaded = true;
-      if (window.smartsupp) {
-        // Double down on hiding the default widget bubble
-        window.smartsupp('widget:hide');
-        window.smartsupp('chat:hide');
-      }
+      hideDefaultSmartsuppLauncher();
     };
-    
+
     document.head.appendChild(script);
 
-    // Injection of CSS to hide the default bubble iframe specifically
-    // while allowing the chat window to appear when triggered.
-    const styleId = 'smartsupp-hide-default-bubble';
-    if (!document.getElementById(styleId)) {
+    if (!document.getElementById(STYLE_ID)) {
       const style = document.createElement('style');
-      style.id = styleId;
+      style.id = STYLE_ID;
       style.textContent = `
-        /* Hide the default Smartsupp bubble iframe and container */
         #smartsupp-widget-container iframe[id*="bubble"],
+        #smartsupp-widget-container iframe[id*="Bubble"],
+        #smartsupp-widget-container iframe[src*="bubble"],
+        #smartsupp-widget-container iframe[src*="Bubble"],
         .smartsupp-widget-bubble,
-        #smartsupp-widget-bubble,
-        /* Smartsupp v3 specific selectors */
-        #smartsupp-widget-container div[aria-label="Open Smartsupp chat"],
-        #smartsupp-widget-container button[aria-label="Open Smartsupp chat"],
-        .smartsupp-widget-v3 div[aria-label*="chat"],
-        [data-testid="widget-button"] {
+        #smartsupp-widget-bubble {
           display: none !important;
           visibility: hidden !important;
-          opacity: 0 !important;
-          pointer-events: none !important;
           width: 0 !important;
           height: 0 !important;
+          pointer-events: none !important;
         }
       `;
       document.head.appendChild(style);
     }
+
+    const interval = window.setInterval(hideDefaultSmartsuppLauncher, 400);
+    const observer = new MutationObserver(hideDefaultSmartsuppLauncher);
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    return () => {
+      window.clearInterval(interval);
+      observer.disconnect();
+    };
   }, [key]);
 
   const openChat = () => {
     try {
       if (window.smartsupp) {
-        // Show and open the chat
         window.smartsupp('chat:show');
         window.smartsupp('chat:open');
       }
@@ -113,12 +164,8 @@ export default function SmartsuppChat() {
     >
       <MessageCircle className="h-6 w-6 transition-transform group-hover:rotate-12" aria-hidden />
       <span className="sr-only">Live Chat</span>
-      
-      {/* Subtle notification dot to attract attention */}
+
       <span className="absolute top-0 right-0 block h-3 w-3 rounded-full bg-emerald-400 ring-2 ring-white animate-pulse" />
     </button>
   );
 }
-
-
-
