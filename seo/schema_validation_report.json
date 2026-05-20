@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-20T14:22:40.664Z",
+  "generatedAt": "2026-05-20T14:49:45.116Z",
   "status": "Generated locally; external Rich Results Test requires live URL access.",
   "schemasGenerated": [
     "Organization",
@@ -137,6 +137,30 @@
     }
   ],
   "sampleArticleSchemas": [
+    {
+      "@context": "https://schema.org",
+      "@type": "BlogPosting",
+      "@id": "https://www.researchpeptide.uk/blog/10546e55-2007-400b-abf7-7de3e70d83b5#article",
+      "headline": "BPC-157 + TB-500 Dual Action Blend: Scientific Background, Concentration Metrics, and Laboratory Protocols",
+      "description": "**RESEARCH USE ONLY** — This product is supplied strictly as a lyophilised solid for laboratory research, in vitro studies, and animal modelling. It is...",
+      "image": [
+        "https://www.researchpeptide.uk/og-image.png"
+      ],
+      "author": {
+        "@type": "Organization",
+        "name": "Research Peptides UK Editorial Board",
+        "url": "https://www.researchpeptide.uk"
+      },
+      "publisher": {
+        "@id": "https://www.researchpeptide.uk#organization"
+      },
+      "datePublished": "2026-05-20T14:49:47.861923+00:00",
+      "dateModified": "2026-05-20T14:49:47.861923+00:00",
+      "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "https://www.researchpeptide.uk/blog/10546e55-2007-400b-abf7-7de3e70d83b5"
+      }
+    },
     {
       "@context": "https://schema.org",
       "@type": "BlogPosting",

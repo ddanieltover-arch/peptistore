@@ -91,6 +91,20 @@ async function main() {
   const fetchedPosts = await supabaseRows<BlogRow>('blog_posts', 'id,title,content,image_url,created_at');
   const products = fetchedProducts.length ? fetchedProducts : fallbackProducts;
   const posts = fetchedPosts;
+
+  // Validate blog posts have internal and external links
+  posts.forEach((post) => {
+    const internalLinks = (post.content || '').match(/\[([^\]]+)\]\(\/([^\)]+)\)/g) || [];
+    const externalLinks = (post.content || '').match(/\[([^\]]+)\]\((https?:\/\/[^\)]+)\)/g) || [];
+    const trueExternalLinks = externalLinks.filter((link) => !link.includes('researchpeptide.uk') && !link.includes('localhost'));
+
+    if (internalLinks.length < 3) {
+      console.warn(`\x1b[33m[SEO WARNING] Blog post "${post.title}" (ID: ${post.id}) has only ${internalLinks.length} internal links. Recommended: 3-5 links.\x1b[0m`);
+    }
+    if (trueExternalLinks.length < 1) {
+      console.warn(`\x1b[33m[SEO WARNING] Blog post "${post.title}" (ID: ${post.id}) has no external authority links. Recommended: >=1 link.\x1b[0m`);
+    }
+  });
   write('public/robots.txt', robotsTxt());
   write('public/sitemap.xml', sitemapXml(products, posts));
   write('public/llms.txt', llmsTxt(products, posts));

@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-05-20T14:22:40.649Z",
+  "generatedAt": "2026-05-20T14:49:45.104Z",
   "target": "https://www.researchpeptide.uk",
   "stack": "Vite React SPA with SEO prerender/static generation",
-  "crawlInventoryCount": 166,
+  "crawlInventoryCount": 167,
   "highPriorityFindings": [
     "Route-level metadata and JSON-LD were missing before implementation.",
     "Static sitemap coverage was incomplete before regeneration.",
@@ -109,6 +109,6 @@
   ],
   "dynamicRoutes": {
     "products": 146,
-    "blogPosts": 4
+    "blogPosts": 5
   }
 }

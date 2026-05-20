@@ -67,6 +67,7 @@ Research Peptides UK supplies research-use-only peptide compounds, documentation
 - /product/semax: Semax (powder list)
 
 ## Research Articles
+- /blog/10546e55-2007-400b-abf7-7de3e70d83b5: BPC-157 + TB-500 Dual Action Blend: Scientific Background, Concentration Metrics, and Laboratory Protocols
 - /blog/386f14c2-d1f4-4a99-8cf5-fc1ef530538d: BPC-157 Acetate vs. BPC-157 Arginate: Stability, half-life, and Lab Protocols
 - /blog/1cc4a3f1-eafd-486f-8f52-192c58141a7e: IGF-1 Peptide in Clinical Workflows: Receptor Dynamics and Analytical Standards
 - /blog/f21bd3b3-48eb-4105-ab08-04b0c6e44e6b: Custom Peptide Synthesis in the UK: Navigating Quality and Laboratory Standards
