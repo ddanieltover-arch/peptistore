@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { supabase } from '../supabase';
 import { BookOpen, ArrowLeft, Clock, Share2, Tag, Calendar } from 'lucide-react';
 import { motion } from 'motion/react';
+import ReactMarkdown from 'react-markdown';
 import Seo from '../components/Seo';
 import { buildArticleJsonLd, excerpt } from '../lib/seo';
 
@@ -128,8 +129,28 @@ export default function BlogPost() {
           transition={{ duration: 1, delay: 0.4 }}
           className="prose prose-xl prose-blue max-w-none text-gray-600 font-medium leading-relaxed"
         >
-          <div className="whitespace-pre-wrap selection:bg-blue-100">
-             {post.content}
+          <div className="selection:bg-blue-100">
+             <ReactMarkdown
+               components={{
+                 a: ({ href, children, ...props }: any) => {
+                   const isInternal = href && (href.startsWith('/') || href.startsWith('#'));
+                   if (isInternal) {
+                     return (
+                       <Link to={href} {...props} className="text-blue-600 hover:text-blue-800 underline font-semibold">
+                         {children}
+                       </Link>
+                     );
+                   }
+                   return (
+                     <a href={href} target="_blank" rel="noopener noreferrer" {...props} className="text-blue-600 hover:text-blue-800 underline font-semibold">
+                       {children}
+                     </a>
+                   );
+                 }
+               }}
+             >
+               {post.content}
+             </ReactMarkdown>
           </div>
         </motion.div>
 

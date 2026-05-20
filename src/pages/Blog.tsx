@@ -95,8 +95,13 @@ export default function Blog() {
                      <span className="flex items-center gap-2"><User className="h-3 w-3" /> Editorial Team</span>
                    </div>
                    
-                   <h2 className="text-2xl font-black text-gray-900 mb-4 line-clamp-2 leading-tight group-hover:text-blue-600 transition-colors">
-                     {post.title}
+                   <h2 className="text-2xl font-black mb-4 line-clamp-2 leading-tight">
+                     <Link
+                       to={`/blog/${post.id}`}
+                       className="text-gray-900 group-hover:text-blue-600 transition-colors"
+                     >
+                       {post.title}
+                     </Link>
                    </h2>
                    
                    <p className="text-gray-500 font-medium leading-relaxed mb-8 line-clamp-3">

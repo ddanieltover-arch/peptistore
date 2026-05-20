@@ -1,6 +1,9 @@
-import { existsSync, mkdirSync, readFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { dirname, join } from 'node:path';
+import dotenv from 'dotenv';
+dotenv.config();
+
 import {
   BRAND_EMAIL,
   BRAND_NAME,
@@ -36,7 +39,7 @@ function product(slug: string, title: string, description: string, categories: s
   return { id: slug, slug, title, description, price: 0, images: [], categories, inventory: 1, created_at: today };
 }
 function ensureDir(path: string) { mkdirSync(path, { recursive: true }); }
-function write(path: string, content: string) { ensureDir(dirname(path)); const encoded = Buffer.from(content).toString('base64'); execFileSync('bash', ['-lc', 'printf %s ' + encoded + ' | base64 -d > ' + path]); }
+function write(path: string, content: string) { ensureDir(dirname(path)); writeFileSync(path, content, 'utf8'); }
 function csvCell(value: unknown) { const text = String(value ?? '').replace(/\r?\n/g, ' ').trim(); return text.includes(',') || text.includes(dq) ? dq + text.split(dq).join(dq + dq) + dq : text; }
 function csv(rows: unknown[][]) { return rows.map((row) => row.map(csvCell).join(',')).join('\n') + '\n'; }
 function xmlEscape(value: unknown) { return String(value ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/'/g, '&apos;'); }
@@ -85,7 +88,7 @@ function prerenderPage(path: string, title: string, description: string, h1: str
 
 async function main() {
   const fetchedProducts = await supabaseRows<ProductRow>('products', 'id,slug,title,description,price,images,categories,inventory,created_at');
-  const fetchedPosts = await supabaseRows<BlogRow>('blog_posts', 'id,slug,title,content,image_url,created_at,updated_at');
+  const fetchedPosts = await supabaseRows<BlogRow>('blog_posts', 'id,title,content,image_url,created_at');
   const products = fetchedProducts.length ? fetchedProducts : fallbackProducts;
   const posts = fetchedPosts;
   write('public/robots.txt', robotsTxt());

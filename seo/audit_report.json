@@ -1,1 +1,114 @@
-{"generatedAt":"2026-05-12","target":"https://www.researchpeptide.uk","stack":"Vite React SPA with SEO metadata and prerender generator","status":"baseline generated; credential-gated checks pending"}
+{
+  "generatedAt": "2026-05-20T14:22:40.649Z",
+  "target": "https://www.researchpeptide.uk",
+  "stack": "Vite React SPA with SEO prerender/static generation",
+  "crawlInventoryCount": 166,
+  "highPriorityFindings": [
+    "Route-level metadata and JSON-LD were missing before implementation.",
+    "Static sitemap coverage was incomplete before regeneration.",
+    "Dynamic product and blog pages require prerendered HTML snapshots for AI crawler reliability.",
+    "GSC, GA4, Ahrefs/SEMrush/DataForSEO and GBP validation require credentials."
+  ],
+  "publicRoutes": [
+    {
+      "path": "/",
+      "title": "Research Peptides UK | Research-Grade Peptides",
+      "indexable": true,
+      "primaryKeyword": "research peptides"
+    },
+    {
+      "path": "/shop",
+      "title": "Buy Research Peptides UK | Peptide Catalog",
+      "indexable": true,
+      "primaryKeyword": "peptides buy uk"
+    },
+    {
+      "path": "/categories",
+      "title": "Peptide Categories UK | Research Compound Groups",
+      "indexable": true,
+      "primaryKeyword": "uk research peptides"
+    },
+    {
+      "path": "/blog",
+      "title": "Peptide Research Blog UK | Scientific Insights",
+      "indexable": true,
+      "primaryKeyword": "peptide research uk"
+    },
+    {
+      "path": "/faq",
+      "title": "Research Peptides FAQ UK | Purity, Storage, Shipping",
+      "indexable": true,
+      "primaryKeyword": "research peptides faq"
+    },
+    {
+      "path": "/shipping",
+      "title": "Research Peptide Shipping UK | Delivery Protocols",
+      "indexable": true,
+      "primaryKeyword": "research peptide shipping uk"
+    },
+    {
+      "path": "/contact",
+      "title": "Contact Research Peptides UK | Technical Support",
+      "indexable": true,
+      "primaryKeyword": "research peptides uk contact"
+    },
+    {
+      "path": "/about-us",
+      "title": "About Research Peptides UK | Research-Only Supplier",
+      "indexable": true,
+      "primaryKeyword": "uk research peptides"
+    },
+    {
+      "path": "/peptide-guide",
+      "title": "Peptide Guide UK | Research Handling Basics",
+      "indexable": true,
+      "primaryKeyword": "peptide research uk"
+    },
+    {
+      "path": "/peptide-calculator",
+      "title": "Peptide Calculator | Research Reconstitution Tool",
+      "indexable": true,
+      "primaryKeyword": "peptide calculator"
+    },
+    {
+      "path": "/coas",
+      "title": "COA Library UK | Peptide Batch Verification",
+      "indexable": true,
+      "primaryKeyword": "peptide coa uk"
+    },
+    {
+      "path": "/peptide-information",
+      "title": "Peptide Information UK | Synthesis and Purity Basics",
+      "indexable": true,
+      "primaryKeyword": "peptide research uk"
+    },
+    {
+      "path": "/peptide-research",
+      "title": "Peptide Research UK | GLP, KPV and IGF Briefs",
+      "indexable": true,
+      "primaryKeyword": "peptide research uk"
+    },
+    {
+      "path": "/terms",
+      "title": "Terms and Conditions | Research Peptides UK",
+      "indexable": true,
+      "primaryKeyword": "research peptides terms"
+    },
+    {
+      "path": "/privacy",
+      "title": "Privacy Policy | Research Peptides UK",
+      "indexable": true,
+      "primaryKeyword": "research peptides privacy"
+    },
+    {
+      "path": "/refund-returns",
+      "title": "Refunds and Returns | Research Peptides UK",
+      "indexable": true,
+      "primaryKeyword": "research peptides returns"
+    }
+  ],
+  "dynamicRoutes": {
+    "products": 146,
+    "blogPosts": 4
+  }
+}

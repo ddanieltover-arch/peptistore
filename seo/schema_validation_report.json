@@ -1,1 +1,237 @@
-{"generatedAt":"2026-05-12","status":"Generated locally; external Rich Results Test requires live URL access","schemasGenerated":["Organization","WebSite","BreadcrumbList","Product","BlogPosting","FAQPage"]}
+{
+  "generatedAt": "2026-05-20T14:22:40.664Z",
+  "status": "Generated locally; external Rich Results Test requires live URL access.",
+  "schemasGenerated": [
+    "Organization",
+    "WebSite",
+    "BreadcrumbList",
+    "Product",
+    "BlogPosting",
+    "FAQPage"
+  ],
+  "sampleProductSchemas": [
+    {
+      "@context": "https://schema.org",
+      "@type": "Product",
+      "@id": "https://www.researchpeptide.uk/product/hyaluronic-acid#product",
+      "name": "Hyaluronic Acid",
+      "image": [
+        "https://researchpeptide.co.uk/wp-content/uploads/2026/01/Klow-Blend-ghk--scaled.jpg"
+      ],
+      "description": "Glycosaminoglycan hydrator reference.",
+      "sku": "4d28aa89-5704-4cc7-9824-e7b70709bf2d",
+      "brand": {
+        "@type": "Brand",
+        "name": "Research Peptides UK"
+      },
+      "category": "supplements, peptide-powder",
+      "url": "https://www.researchpeptide.uk/product/hyaluronic-acid",
+      "offers": {
+        "@type": "Offer",
+        "priceCurrency": "GBP",
+        "price": "145.69",
+        "availability": "https://schema.org/InStock",
+        "url": "https://www.researchpeptide.uk/product/hyaluronic-acid",
+        "itemCondition": "https://schema.org/NewCondition"
+      }
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "Product",
+      "@id": "https://www.researchpeptide.uk/product/sermorelin-acetate#product",
+      "name": "Sermorelin Acetate (powder list)",
+      "image": [
+        "https://researchpeptide.co.uk/wp-content/uploads/2026/01/sermorelin--scaled.jpg"
+      ],
+      "description": "GHRH fragment secretagogue analog.",
+      "sku": "1e8cdc69-ab02-42fc-a429-d4aed2f0ceb7",
+      "brand": {
+        "@type": "Brand",
+        "name": "Research Peptides UK"
+      },
+      "category": "peptides, peptide-powder",
+      "url": "https://www.researchpeptide.uk/product/sermorelin-acetate",
+      "offers": {
+        "@type": "Offer",
+        "priceCurrency": "GBP",
+        "price": "36.05",
+        "availability": "https://schema.org/InStock",
+        "url": "https://www.researchpeptide.uk/product/sermorelin-acetate",
+        "itemCondition": "https://schema.org/NewCondition"
+      }
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "Product",
+      "@id": "https://www.researchpeptide.uk/product/ss-31#product",
+      "name": "SS-31 (powder list)",
+      "image": [
+        "https://researchpeptide.co.uk/wp-content/uploads/2026/01/SS-31-copy-scaled.jpg"
+      ],
+      "description": "Mitochondrial-targeted tetrapeptide.",
+      "sku": "ffbc2b50-9c28-41da-99d5-c7d37936e7e9",
+      "brand": {
+        "@type": "Brand",
+        "name": "Research Peptides UK"
+      },
+      "category": "peptides, peptide-powder",
+      "url": "https://www.researchpeptide.uk/product/ss-31",
+      "offers": {
+        "@type": "Offer",
+        "priceCurrency": "GBP",
+        "price": "69.90",
+        "availability": "https://schema.org/InStock",
+        "url": "https://www.researchpeptide.uk/product/ss-31",
+        "itemCondition": "https://schema.org/NewCondition"
+      }
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "Product",
+      "@id": "https://www.researchpeptide.uk/product/tb500-thymosin-beta-4-acetate#product",
+      "name": "TB500 (Thymosin Beta-4 Acetate)",
+      "image": [
+        "https://researchpeptide.co.uk/wp-content/uploads/2026/01/tb500-scaled.jpg"
+      ],
+      "description": "Actin-binding thymosin fragment analog.",
+      "sku": "f6bb0f4d-45c9-4a1e-90a1-d0aef5932489",
+      "brand": {
+        "@type": "Brand",
+        "name": "Research Peptides UK"
+      },
+      "category": "peptides, peptide-powder",
+      "url": "https://www.researchpeptide.uk/product/tb500-thymosin-beta-4-acetate",
+      "offers": {
+        "@type": "Offer",
+        "priceCurrency": "GBP",
+        "price": "33.85",
+        "availability": "https://schema.org/InStock",
+        "url": "https://www.researchpeptide.uk/product/tb500-thymosin-beta-4-acetate",
+        "itemCondition": "https://schema.org/NewCondition"
+      }
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "Product",
+      "@id": "https://www.researchpeptide.uk/product/adamax#product",
+      "name": "Adamax",
+      "image": [
+        "https://researchpeptide.co.uk/wp-content/uploads/2026/01/Semax-scaled.jpg"
+      ],
+      "description": "Semax-derived research analog.",
+      "sku": "f4bd3603-1821-494a-ad80-1fd8581c380c",
+      "brand": {
+        "@type": "Brand",
+        "name": "Research Peptides UK"
+      },
+      "category": "peptides, peptide-powder",
+      "url": "https://www.researchpeptide.uk/product/adamax",
+      "offers": {
+        "@type": "Offer",
+        "priceCurrency": "GBP",
+        "price": "126.56",
+        "availability": "https://schema.org/InStock",
+        "url": "https://www.researchpeptide.uk/product/adamax",
+        "itemCondition": "https://schema.org/NewCondition"
+      }
+    }
+  ],
+  "sampleArticleSchemas": [
+    {
+      "@context": "https://schema.org",
+      "@type": "BlogPosting",
+      "@id": "https://www.researchpeptide.uk/blog/386f14c2-d1f4-4a99-8cf5-fc1ef530538d#article",
+      "headline": "BPC-157 Acetate vs. BPC-157 Arginate: Stability, half-life, and Lab Protocols",
+      "description": "INTRODUCTION: THE CORE DIFFERENCE Body Protection Compound-157 (BPC-157) is a synthetic pentadecapeptide derived from a naturally occurring protective p...",
+      "image": [
+        "https://images.unsplash.com/photo-1576086213369-97a306d36557?q=80&w=800&auto=format&fit=crop"
+      ],
+      "author": {
+        "@type": "Organization",
+        "name": "Research Peptides UK Editorial Board",
+        "url": "https://www.researchpeptide.uk"
+      },
+      "publisher": {
+        "@id": "https://www.researchpeptide.uk#organization"
+      },
+      "datePublished": "2026-05-20T14:17:36.771543+00:00",
+      "dateModified": "2026-05-20T14:17:36.771543+00:00",
+      "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "https://www.researchpeptide.uk/blog/386f14c2-d1f4-4a99-8cf5-fc1ef530538d"
+      }
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BlogPosting",
+      "@id": "https://www.researchpeptide.uk/blog/1cc4a3f1-eafd-486f-8f52-192c58141a7e#article",
+      "headline": "IGF-1 Peptide in Clinical Workflows: Receptor Dynamics and Analytical Standards",
+      "description": "INTRODUCTION: WHAT IS IGF-1? Insulin-like Growth Factor 1 (IGF-1), also known as somatomedin C, is a key endocrine and paracrine hormone that plays a fu...",
+      "image": [
+        "https://www.researchpeptide.uk/blog/igf-1-peptide.png"
+      ],
+      "author": {
+        "@type": "Organization",
+        "name": "Research Peptides UK Editorial Board",
+        "url": "https://www.researchpeptide.uk"
+      },
+      "publisher": {
+        "@id": "https://www.researchpeptide.uk#organization"
+      },
+      "datePublished": "2026-05-20T14:04:32.892531+00:00",
+      "dateModified": "2026-05-20T14:04:32.892531+00:00",
+      "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "https://www.researchpeptide.uk/blog/1cc4a3f1-eafd-486f-8f52-192c58141a7e"
+      }
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BlogPosting",
+      "@id": "https://www.researchpeptide.uk/blog/f21bd3b3-48eb-4105-ab08-04b0c6e44e6b#article",
+      "headline": "Custom Peptide Synthesis in the UK: Navigating Quality and Laboratory Standards",
+      "description": "INTRODUCTION: THE DEMAND FOR CUSTOM PEPTIDE SYNTHESIS While off-the-shelf peptide catalogs cover common research targets, specialized laboratory workflo...",
+      "image": [
+        "https://www.researchpeptide.uk/blog/custom-peptide-synthesis.png"
+      ],
+      "author": {
+        "@type": "Organization",
+        "name": "Research Peptides UK Editorial Board",
+        "url": "https://www.researchpeptide.uk"
+      },
+      "publisher": {
+        "@id": "https://www.researchpeptide.uk#organization"
+      },
+      "datePublished": "2026-05-20T14:04:32.892531+00:00",
+      "dateModified": "2026-05-20T14:04:32.892531+00:00",
+      "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "https://www.researchpeptide.uk/blog/f21bd3b3-48eb-4105-ab08-04b0c6e44e6b"
+      }
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BlogPosting",
+      "@id": "https://www.researchpeptide.uk/blog/c603f9c4-cf03-4c33-aac3-9102dcfce2f3#article",
+      "headline": "KPV Peptide Research Overview: Clinical Directions and Biological Stability",
+      "description": "INTRODUCTION: WHAT IS THE KPV PEPTIDE? KPV (Lysine-Proline-Valine) is a naturally occurring tripeptide that has emerged as a significant focus in molecu...",
+      "image": [
+        "https://www.researchpeptide.uk/blog/kpv-peptide.png"
+      ],
+      "author": {
+        "@type": "Organization",
+        "name": "Research Peptides UK Editorial Board",
+        "url": "https://www.researchpeptide.uk"
+      },
+      "publisher": {
+        "@id": "https://www.researchpeptide.uk#organization"
+      },
+      "datePublished": "2026-05-20T13:56:32.630815+00:00",
+      "dateModified": "2026-05-20T13:56:32.630815+00:00",
+      "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "https://www.researchpeptide.uk/blog/c603f9c4-cf03-4c33-aac3-9102dcfce2f3"
+      }
+    }
+  ]
+}

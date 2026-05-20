@@ -4,16 +4,22 @@
 Research Peptides UK supplies research-use-only peptide compounds, documentation references, and educational resources for qualified laboratory contexts. Products are not for human or veterinary use.
 
 ## Key Pages
-- /: Homepage and research peptide positioning
-- /shop: Research peptide catalog
-- /categories: Peptide category hub
-- /coas: Certificate of Analysis library
-- /peptide-guide: Research peptide handling guide
-- /peptide-information: Synthesis, solubility, purification and analytical education
-- /peptide-research: GLP, KPV, IGF and pathway research briefs
-- /faq: Purity, storage, shipping and payment FAQ
-- /about-us: Trust and research-only positioning
-- /terms: Research-only terms
+- /: Research Peptides UK for Laboratory Research - Buy research peptides in the UK for laboratory use, with batch documentation, discreet shipping, and research-only support.
+- /shop: Shop Peptides for Research Use - Browse research peptides for UK laboratories, including GLP, GHRP, KPV, IGF and specialist peptide categories for research use.
+- /categories: Research Peptide Categories - Explore peptide categories for UK research workflows, from GLP and GHRP peptides to KPV, IGF and specialist compounds.
+- /blog: Peptide Research Insights - Read peptide research insights covering synthesis, purity, storage, GLP pathways, IGF signalling and laboratory protocol planning.
+- /faq: Researcher FAQ - Get answers about research peptide purity, storage, UK shipping, discreet packaging, payment policy and research-use restrictions.
+- /shipping: Shipping and Delivery - Review UK and international peptide shipping protocols, tracked dispatch, discreet packaging and customs responsibilities.
+- /contact: Contact Research Peptides UK - Contact Research Peptides UK for COA requests, bulk procurement, product stability data, shipping questions and researcher support.
+- /about-us: About Research Peptides UK - Learn about Research Peptides UK, a research-only peptide supplier focused on documentation, quality controls and technical support.
+- /peptide-guide: Peptide Guide - Learn peptide basics for research settings, including synthesis, purification, storage, reconstitution and quality verification.
+- /peptide-calculator: Peptide Calculator - Use the peptide calculator for research planning estimates covering mass, diluent volume, concentration and target dose volume.
+- /coas: COA Library - Search peptide Certificate of Analysis references, purity records, batch IDs, test dates and lab verification notes.
+- /peptide-information: Peptide Information - Explore peptide chemistry information for research use, including synthesis, solubility, purification and analytical interpretation.
+- /peptide-research: Peptide Research - Read research briefs on GLP peptides, KPV peptide, IGF-1 peptide, mitochondrial peptides and experimental pathway topics.
+- /terms: Terms and Conditions - Read Research Peptides UK terms covering research-only use, buyer eligibility, compliance responsibilities and order policies.
+- /privacy: Privacy Policy - Review how Research Peptides UK handles researcher data, order information, security, retention and UK privacy rights.
+- /refund-returns: Refunds and Returns - Understand Research Peptides UK refund and returns policy for research compounds, shipping issues and batch concerns.
 
 ## Primary Topics
 - research peptides
@@ -28,5 +34,44 @@ Research Peptides UK supplies research-use-only peptide compounds, documentation
 - igf-1 peptide
 - oxford peptides
 
+## Product Examples
+- /product/hyaluronic-acid: Hyaluronic Acid
+- /product/sermorelin-acetate: Sermorelin Acetate (powder list)
+- /product/ss-31: SS-31 (powder list)
+- /product/tb500-thymosin-beta-4-acetate: TB500 (Thymosin Beta-4 Acetate)
+- /product/adamax: Adamax
+- /product/mt-2-melanotan-2-acetate: MT-2 (Melanotan 2 Acetate)
+- /product/tirzepatide: Tirzepatide (powder list)
+- /product/aicar: AICAR (powder list)
+- /product/ghk-cu: GHK-CU (powder list)
+- /product/pe-22-28: PE 22-28
+- /product/tesamorelin: Tesamorelin (powder list)
+- /product/gdf-8-myostatin: GDF-8 (Myostatin)
+- /product/hgh-fragment-176-191: HGH Fragment 176-191
+- /product/insulin-3ml: Insulin (3ml)
+- /product/dsip: DSIP
+- /product/ace-031: ACE-031
+- /product/nad: NAD+
+- /product/ipamorelin: Ipamorelin (powder list)
+- /product/thymosin-alpha-1: Thymosin Alpha-1 (powder list)
+- /product/hexarelin-acetate: Hexarelin Acetate (powder list)
+- /product/mots-c: MOTS-c
+- /product/epo: EPO
+- /product/gonadorelin-acetate: Gonadorelin Acetate
+- /product/glp-1-5mg-vial: GLP-1 (5mg/vial)
+- /product/5-amino-1mq: 5-Amino-1MQ
+- /product/foxo4-dri: FOXO4-DRI
+- /product/bpc-tb-blend-powder: BPC + TB Blend (Powder)
+- /product/slu-pp-332: SLU-PP-332 (powder list)
+- /product/oxytocin-acetate: Oxytocin Acetate (powder list)
+- /product/semax: Semax (powder list)
+
+## Research Articles
+- /blog/386f14c2-d1f4-4a99-8cf5-fc1ef530538d: BPC-157 Acetate vs. BPC-157 Arginate: Stability, half-life, and Lab Protocols
+- /blog/1cc4a3f1-eafd-486f-8f52-192c58141a7e: IGF-1 Peptide in Clinical Workflows: Receptor Dynamics and Analytical Standards
+- /blog/f21bd3b3-48eb-4105-ab08-04b0c6e44e6b: Custom Peptide Synthesis in the UK: Navigating Quality and Laboratory Standards
+- /blog/c603f9c4-cf03-4c33-aac3-9102dcfce2f3: KPV Peptide Research Overview: Clinical Directions and Biological Stability
+
 ## Contact
 - Email: info@researchpeptide.uk
+- Research-use-only policy: /terms
