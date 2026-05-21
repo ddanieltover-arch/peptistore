@@ -3,6 +3,7 @@ import { supabase } from '../supabase';
 import { Link } from 'react-router-dom';
 import { BookOpen, Sparkles, ArrowRight, Clock, User } from 'lucide-react';
 import { motion } from 'motion/react';
+import { resolveBlogImageUrl } from '../lib/blogImages';
 
 export default function Blog() {
   const [posts, setPosts] = useState<any[]>([]);
@@ -77,13 +78,11 @@ export default function Blog() {
                  className="group flex flex-col"
                >
                  <Link to={`/blog/${post.id}`} className="block relative aspect-[16/10] rounded-[2.5rem] overflow-hidden bg-gray-100 mb-8 shadow-xl shadow-gray-200/20">
-                   {post.image_url ? (
-                     <img src={post.image_url} alt={post.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" />
-                   ) : (
-                     <div className="w-full h-full flex items-center justify-center bg-blue-50 text-blue-200">
-                        <BookOpen className="h-12 w-12" />
-                     </div>
-                   )}
+                   <img
+                     src={resolveBlogImageUrl(post)}
+                     alt={post.title}
+                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000"
+                   />
                    <div className="absolute top-6 left-6 flex gap-2">
                       <span className="px-4 py-1.5 bg-white/90 backdrop-blur-md rounded-full text-[10px] font-black uppercase tracking-widest text-gray-900 shadow-sm">Research</span>
                    </div>

@@ -21,6 +21,8 @@ import { productPath } from '../lib/productUrl';
 import { ProductBadge } from '../components/products/ProductBadge';
 import { getPrimaryProductBadge } from '../lib/productBadges';
 import brandLabOperationsWide from '../assets/brand/brand-lab-operations-wide.webp';
+import { PathwayFilters } from '../components/products/PathwayFilters';
+import { PATHWAYS } from '../lib/scientificPathways';
 
 export default function Shop() {
   const [allProducts, setAllProducts] = useState<any[]>([]);
@@ -32,6 +34,7 @@ export default function Shop() {
   const [priceRange, setPriceRange] = useState<number>(500);
   const [sortBy, setSortBy] = useState<CatalogSortKey>('newest');
   const [showMobileFilters, setShowMobileFilters] = useState(false);
+  const [selectedPathway, setSelectedPathway] = useState<string | null>(null);
   const mobileFilterPanelRef = useRef<HTMLDivElement>(null);
 
   const addItem = useCartStore(state => state.addItem);
@@ -77,9 +80,19 @@ export default function Shop() {
       );
     }
 
+    if (selectedPathway) {
+      const pathway = PATHWAYS.find(p => p.id === selectedPathway);
+      if (pathway) {
+        result = result.filter(p => {
+          const searchableText = `${p.title} ${p.description || ''}`.toLowerCase();
+          return pathway.keywords.some(kw => searchableText.includes(kw.toLowerCase()));
+        });
+      }
+    }
+
     result = result.filter((p) => productEffectiveMaxPrice(p) <= priceRange);
     return sortProducts(result, sortBy);
-  }, [allProducts, selectedCategories, priceRange, sortBy]);
+  }, [allProducts, selectedCategories, selectedPathway, priceRange, sortBy]);
 
   const priceSliderMax = useMemo(() => catalogPriceSliderMax(allProducts), [allProducts]);
   const priceSliderStep = priceSliderMax > 2000 ? 50 : 10;
@@ -96,6 +109,7 @@ export default function Shop() {
 
   const clearFilters = () => {
     setSelectedCategories([]);
+    setSelectedPathway(null);
     setPriceRange(catalogPriceSliderMax(allProducts));
     setSortBy('newest');
   };
@@ -309,11 +323,23 @@ export default function Shop() {
           )}
         </AnimatePresence>
 
-        {/* Product Grid */}
+        {/* Product Grid & Active Filters */}
         <div className="lg:col-span-3">
+          {/* Scientific Pathway Filters */}
+          <PathwayFilters 
+            selectedPathway={selectedPathway} 
+            onSelectPathway={setSelectedPathway} 
+          />
+
           {/* Active Filter Chips */}
-          {(selectedCategories.length > 0 || priceRange < priceSliderMax) && (
+          {(selectedCategories.length > 0 || priceRange < priceSliderMax || selectedPathway) && (
             <div className="flex flex-wrap gap-2 mb-6">
+              {selectedPathway && (
+                <span className="inline-flex items-center px-3 py-1 rounded-full bg-blue-600 text-white text-xs font-bold shadow-sm">
+                  {PATHWAYS.find(p => p.id === selectedPathway)?.label}
+                  <button type="button" onClick={() => setSelectedPathway(null)} className="ml-2 hover:text-blue-200" aria-label="Remove pathway filter"><X className="h-3 w-3" /></button>
+                </span>
+              )}
               {selectedCategories.map(cat => (
                 <span key={`chip-${cat}`} className="inline-flex items-center px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-bold border border-blue-100">
                   {cat}

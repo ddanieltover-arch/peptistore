@@ -6,6 +6,7 @@ import { motion } from 'motion/react';
 import ReactMarkdown from 'react-markdown';
 import Seo from '../components/Seo';
 import { buildArticleJsonLd, excerpt } from '../lib/seo';
+import { resolveBlogImageUrl } from '../lib/blogImages';
 import { productPath } from '../lib/productUrl';
 import heroBg from '../assets/hero_bg.png';
 
@@ -78,6 +79,7 @@ export default function BlogPost() {
   }
 
   const seoDescription = excerpt(post.content || post.title, 155);
+  const heroImage = resolveBlogImageUrl(post);
 
   return (
     <>
@@ -85,9 +87,9 @@ export default function BlogPost() {
         title={(post.title || 'Peptide research article') + ' | Research Peptides UK'}
         description={seoDescription}
         path={'/blog/' + (post.slug || post.id)}
-        image={post.image_url}
+        image={heroImage}
         type='article'
-        jsonLd={buildArticleJsonLd(post)}
+        jsonLd={buildArticleJsonLd({ ...post, image_url: heroImage })}
       />
       
       <div className="bg-slate-50 min-h-screen pb-32">
@@ -123,18 +125,16 @@ export default function BlogPost() {
         </div>
 
         {/* Featured Image - overlapping banner slightly */}
-        {post.image_url && (
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-10 relative z-20">
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.98 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.8 }}
-              className="aspect-[21/9] rounded-[2.5rem] overflow-hidden shadow-2xl border-[6px] border-white"
-            >
-              <img src={post.image_url} alt={post.title} className="w-full h-full object-cover" />
-            </motion.div>
-          </div>
-        )}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-10 relative z-20">
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.98 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.8 }}
+            className="aspect-[21/9] rounded-[2.5rem] overflow-hidden shadow-2xl border-[6px] border-white"
+          >
+            <img src={heroImage} alt={post.title} className="w-full h-full object-cover" />
+          </motion.div>
+        </div>
 
         {/* Main Grid: Content (2/3) + Sidebar (1/3) */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">

@@ -14,6 +14,9 @@ import { ProductImagePlaceholder } from '../components/products/ProductImagePlac
 import { productPath } from '../lib/productUrl';
 import Seo from '../components/Seo';
 import { buildProductJsonLd, excerpt } from '../lib/seo';
+import { ResearchStackBuilder } from '../components/products/ResearchStackBuilder';
+import { InteractiveReconstitutionCalculator } from '../components/ui/InteractiveReconstitutionCalculator';
+import { ScientificTextRenderer, ScientificHoverCard } from '../components/ui/ScientificHoverCard';
 
 export default function ProductDetails() {
   const { slug, id } = useParams<{ slug?: string; id?: string }>();
@@ -173,6 +176,9 @@ export default function ProductDetails() {
 
   const seoDescription = excerpt(String(product.title || 'Research peptide') + ' research peptide for laboratory research use. ' + String(product.description || ''), 155);
 
+  const parsedMassMatch = product.title?.match(/(\d+)mg/i);
+  const initialMass = parsedMassMatch ? Number(parsedMassMatch[1]) : 10;
+
   return (
     <>
       <Seo
@@ -231,7 +237,9 @@ export default function ProductDetails() {
 
         <div>
           <div className="flex justify-between items-start">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">{product.title}</h1>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+              <ScientificTextRenderer text={product.title} />
+            </h1>
             <div className="flex space-x-2 relative">
               <button 
                 type="button"
@@ -285,7 +293,9 @@ export default function ProductDetails() {
             </div>
           </div>
           
-          <p className="text-gray-600 mb-8 whitespace-pre-line">{product.description}</p>
+          <div className="text-gray-600 mb-8 whitespace-pre-line">
+            <ScientificTextRenderer text={product.description} />
+          </div>
 
           {/* New Variant Selector Section */}
           {product.variants && product.variants.length > 0 && (
@@ -433,6 +443,18 @@ export default function ProductDetails() {
             </button>
           </div>
         </div>
+      </div>
+
+      {/* Dynamic Research Stack Bundle Builder */}
+      <ResearchStackBuilder 
+        baseProduct={product} 
+        basePrice={currentPrice} 
+        recommendedProducts={recommended} 
+      />
+
+      {/* Interactive Reconstitution Calculator */}
+      <div className="mt-12">
+        <InteractiveReconstitutionCalculator initialMassMg={initialMass} />
       </div>
 
       {/* Verified Researcher Reviews Section */}
