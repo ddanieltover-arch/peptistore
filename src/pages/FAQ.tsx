@@ -3,6 +3,7 @@ import { HelpCircle, ChevronDown, FlaskConical, Truck, CreditCard } from 'lucide
 import { motion, AnimatePresence } from 'motion/react';
 import Seo from '../components/Seo';
 import { buildFaqPageJsonLd } from '../lib/seo';
+import { GeoAnswerCapsule } from '../components/seo/GeoAnswerCapsule';
 
 export const faqs = [
   { category: 'Product & Safety', icon: FlaskConical, questions: [
@@ -32,7 +33,7 @@ export default function FAQ() {
   return (
     <>
       <Seo path='/faq' jsonLd={faqJsonLd} />
-      <div className='bg-white min-h-screen pt-12 pb-24'>
+      <main className='bg-white min-h-screen pt-12 pb-24'>
         <div className='max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16'>
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className='text-center mb-16'>
             <div className='inline-flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-600 rounded-full text-xs font-black uppercase tracking-widest mb-6'>
@@ -43,11 +44,7 @@ export default function FAQ() {
             <p className='text-gray-500 mt-4 font-medium italic'>Standard protocols and common inquiries for Research Peptides UK researchers.</p>
           </motion.div>
 
-          <section id='answer' aria-label='Quick Answer' className='mb-10 rounded-3xl border border-blue-100 bg-blue-50/70 p-6 text-sm leading-relaxed text-blue-950'>
-            <p>
-              <strong>Quick Answer:</strong> Research Peptides UK supplies laboratory research peptides only. This FAQ explains purity verification, storage expectations, UK delivery timelines, international shipping, discreet packaging, payment options, and returns policy so researchers can evaluate catalog fit before ordering.
-            </p>
-          </section>
+          <GeoAnswerCapsule className='mb-10' />
 
           <div className='space-y-12'>
             {faqs.map((group, groupIdx) => (
@@ -90,7 +87,7 @@ export default function FAQ() {
             <a href='/contact' className='inline-flex items-center gap-2 bg-blue-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-blue-700 transition-all uppercase tracking-widest text-xs'>Liaison Office</a>
           </div>
         </div>
-      </div>
+      </main>
     </>
   );
 }

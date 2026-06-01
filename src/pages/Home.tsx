@@ -20,6 +20,7 @@ import { ProductCardPriceBlock } from '../components/products/ProductCardPriceBl
 import { productPath } from '../lib/productUrl';
 import { ProductBadge } from '../components/products/ProductBadge';
 import { getPrimaryProductBadge } from '../lib/productBadges';
+import { GeoAnswerCapsule } from '../components/seo/GeoAnswerCapsule';
 
 export default function Home() {
   const [featured, setFeatured] = useState<any[]>([]);
@@ -40,7 +41,7 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="overflow-hidden">
+    <main className="overflow-hidden">
       {/* Hero Banner */}
       <section className="relative overflow-hidden bg-[#0A0F1E]">
         {/* Background: Artistic scientific pattern */}
@@ -68,7 +69,7 @@ export default function Home() {
                 <h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-white leading-[1.1] tracking-tight mb-6">
                   PREMIUM{' '}
                   <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-blue-600">
-                    PEPTIDES.
+                    RESEARCH PEPTIDES UK.
                   </span>
                 </h1>
 
@@ -112,6 +113,10 @@ export default function Home() {
           </motion.div>
         </div>
       </section>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12 mb-4">
+        <GeoAnswerCapsule />
+      </div>
 
       <CatalogTrustStrip />
 
@@ -449,6 +454,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-    </div>
+    </main>
   );
 }

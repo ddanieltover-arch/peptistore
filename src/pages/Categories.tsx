@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../supabase';
 import { Link } from 'react-router-dom';
+import Seo from '../components/Seo';
+import { DEFAULT_SITE_URL, absoluteUrl } from '../lib/seo';
 
 export default function Categories() {
   const [categories, setCategories] = useState<any[]>([]);
@@ -21,29 +23,51 @@ export default function Categories() {
   }, []);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <h1 className="text-3xl font-bold mb-8 text-center">Product Categories</h1>
-      
-      {loading ? (
-        <div className="text-center py-12 text-gray-500">Loading categories...</div>
-      ) : categories.length === 0 ? (
-        <div className="text-center py-12 bg-white rounded-lg shadow-sm border border-gray-100">
-          <p className="text-gray-600">No categories found.</p>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {categories.map(category => (
-            <Link 
-              key={category.id} 
-              to={`/search?category=${category.slug}`}
-              className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-blue-500 hover:shadow-md transition-all group"
-            >
-              <h2 className="text-xl font-bold text-gray-900 group-hover:text-blue-600 mb-2">{category.name}</h2>
-              <p className="text-gray-600">{category.description}</p>
-            </Link>
-          ))}
-        </div>
-      )}
-    </div>
+    <>
+      <Seo
+        path="/categories"
+        jsonLd={{
+          '@context': 'https://schema.org',
+          '@type': 'CollectionPage',
+          '@id': absoluteUrl('/categories', DEFAULT_SITE_URL) + '#collection',
+          name: 'Research Peptide Categories',
+          url: absoluteUrl('/categories', DEFAULT_SITE_URL),
+          about: ['research peptide categories', 'GLP peptides', 'GHRP peptides', 'KPV peptide', 'IGF peptide'],
+          mainEntity: {
+            '@type': 'ItemList',
+            itemListElement: categories.map((category, index) => ({
+              '@type': 'ListItem',
+              position: index + 1,
+              name: category.name,
+              url: absoluteUrl(`/search?category=${category.slug}`, DEFAULT_SITE_URL),
+            })),
+          },
+        }}
+      />
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <h1 className="text-3xl font-bold mb-8 text-center">Product Categories</h1>
+        
+        {loading ? (
+          <div className="text-center py-12 text-gray-500">Loading categories...</div>
+        ) : categories.length === 0 ? (
+          <div className="text-center py-12 bg-white rounded-lg shadow-sm border border-gray-100">
+            <p className="text-gray-600">No categories found.</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {categories.map(category => (
+              <Link 
+                key={category.id} 
+                to={`/search?category=${category.slug}`}
+                className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-blue-500 hover:shadow-md transition-all group"
+              >
+                <h2 className="text-xl font-bold text-gray-900 group-hover:text-blue-600 mb-2">{category.name}</h2>
+                <p className="text-gray-600">{category.description}</p>
+              </Link>
+            ))}
+          </div>
+        )}
+      </div>
+    </>
   );
 }

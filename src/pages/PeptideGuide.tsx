@@ -2,6 +2,7 @@ import React from 'react';
 import { motion } from 'motion/react';
 import { BookOpen, FlaskConical, ShieldCheck, Beaker } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { GeoAnswerCapsule } from '../components/seo/GeoAnswerCapsule';
 
 const guideTopics = [
   {
@@ -28,7 +29,7 @@ const guideTopics = [
 
 export default function PeptideGuide() {
   return (
-    <div className="bg-white min-h-screen pt-12 pb-24">
+    <main className="bg-white min-h-screen pt-12 pb-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-14">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-600 rounded-full text-xs font-black uppercase tracking-widest mb-6">
@@ -41,6 +42,8 @@ export default function PeptideGuide() {
             All materials are intended for research use workflows only.
           </p>
         </motion.div>
+
+        <GeoAnswerCapsule className="mb-14 text-left" />
 
         <section className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-14">
           {guideTopics.map((topic, idx) => (
@@ -79,6 +82,6 @@ export default function PeptideGuide() {
           </div>
         </section>
       </div>
-    </div>
+    </main>
   );
 }

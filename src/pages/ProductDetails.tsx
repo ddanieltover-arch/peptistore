@@ -17,6 +17,7 @@ import { buildProductJsonLd, excerpt } from '../lib/seo';
 import { ResearchStackBuilder } from '../components/products/ResearchStackBuilder';
 import { InteractiveReconstitutionCalculator } from '../components/ui/InteractiveReconstitutionCalculator';
 import { ScientificTextRenderer, ScientificHoverCard } from '../components/ui/ScientificHoverCard';
+import { GeoAnswerCapsule } from '../components/seo/GeoAnswerCapsule';
 
 export default function ProductDetails() {
   const { slug, id } = useParams<{ slug?: string; id?: string }>();
@@ -189,8 +190,10 @@ export default function ProductDetails() {
         type='product'
         jsonLd={buildProductJsonLd(product, reviews)}
       />
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-16">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <article>
+          <GeoAnswerCapsule answer={`This page details the research profile, documentation signals, and compliance context for ${product.title}. It is supplied exclusively for non-human laboratory workflows and scientific evaluation.`} />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-16">
         <div className="space-y-4">
           <div className="bg-white rounded-3xl aspect-square overflow-hidden flex items-center justify-center border border-gray-100 shadow-sm relative group">
             {product.images && product.images.length > 0 ? (
@@ -567,7 +570,8 @@ export default function ProductDetails() {
           </div>
         </div>
       )}
-      </div>
-    </>
+      </article>
+    </main>
+  </>
   );
 }

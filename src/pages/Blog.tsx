@@ -4,6 +4,12 @@ import { Link } from 'react-router-dom';
 import { BookOpen, Sparkles, ArrowRight, Clock, User } from 'lucide-react';
 import { motion } from 'motion/react';
 import { resolveBlogImageUrl } from '../lib/blogImages';
+import Seo from '../components/Seo';
+import { DEFAULT_SITE_URL, absoluteUrl, buildArticleJsonLd, slugify } from '../lib/seo';
+
+function blogPath(post: { id?: string; slug?: string | null; title?: string | null }) {
+  return `/blog/${post.slug || post.id || slugify(String(post.title || 'article'))}`;
+}
 
 export default function Blog() {
   const [posts, setPosts] = useState<any[]>([]);
@@ -24,7 +30,20 @@ export default function Blog() {
   }, []);
 
   return (
-    <div className="bg-white min-h-screen">
+    <>
+      <Seo
+        path="/blog"
+        jsonLd={{
+          '@context': 'https://schema.org',
+          '@type': 'CollectionPage',
+          '@id': absoluteUrl('/blog', DEFAULT_SITE_URL) + '#collection',
+          name: 'Peptide Research Blog UK',
+          url: absoluteUrl('/blog', DEFAULT_SITE_URL),
+          about: ['peptide research', 'research peptides', 'peptide synthesis', 'peptide purity'],
+          hasPart: posts.slice(0, 12).map((post) => buildArticleJsonLd(post)),
+        }}
+      />
+      <div className="bg-white min-h-screen">
       {/* Blog Hero */}
       <section className="bg-gray-50 border-b border-gray-100 pt-24 pb-20 relative overflow-hidden">
          <div className="absolute top-0 right-0 w-[40%] h-full bg-blue-600/5 -skew-x-12 translate-x-1/2" />
@@ -77,7 +96,7 @@ export default function Blog() {
                  transition={{ delay: idx * 0.1 }}
                  className="group flex flex-col"
                >
-                 <Link to={`/blog/${post.id}`} className="block relative aspect-[16/10] rounded-[2.5rem] overflow-hidden bg-gray-100 mb-8 shadow-xl shadow-gray-200/20">
+                 <Link to={blogPath(post)} className="block relative aspect-[16/10] rounded-[2.5rem] overflow-hidden bg-gray-100 mb-8 shadow-xl shadow-gray-200/20">
                    <img
                      src={resolveBlogImageUrl(post)}
                      alt={post.title}
@@ -96,7 +115,7 @@ export default function Blog() {
                    
                    <h2 className="text-2xl font-black mb-4 line-clamp-2 leading-tight">
                      <Link
-                       to={`/blog/${post.id}`}
+                       to={blogPath(post)}
                        className="text-gray-900 group-hover:text-blue-600 transition-colors"
                      >
                        {post.title}
@@ -109,7 +128,7 @@ export default function Blog() {
                    
                    <div className="mt-auto">
                      <Link 
-                       to={`/blog/${post.id}`} 
+                       to={blogPath(post)} 
                        className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-blue-600 group-hover:gap-4 transition-all"
                      >
                        Explore Article <ArrowRight className="h-3 w-3" />
@@ -121,6 +140,7 @@ export default function Blog() {
            </div>
          )}
       </main>
-    </div>
+      </div>
+    </>
   );
 }

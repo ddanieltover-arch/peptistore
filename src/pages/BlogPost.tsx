@@ -19,8 +19,14 @@ export default function BlogPost() {
   useEffect(() => {
     const fetchPost = async () => {
       try {
-        const { data } = await supabase.from('blog_posts').select('*').eq('id', id).single();
-        if (data) setPost(data);
+        const byId = await supabase.from('blog_posts').select('*').eq('id', id).maybeSingle();
+        if (byId.data) {
+          setPost(byId.data);
+          return;
+        }
+
+        const bySlug = await supabase.from('blog_posts').select('*').eq('slug', id).maybeSingle();
+        if (bySlug.data) setPost(bySlug.data);
       } catch (error) {
         console.error("Error fetching blog post:", error);
       } finally {

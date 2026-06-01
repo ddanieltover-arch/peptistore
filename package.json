@@ -8,8 +8,9 @@
   },
   "scripts": {
     "dev": "vite --port=5173 --host=0.0.0.0 --configLoader native",
-    "build": "vite build",
-    "build:seo": "vite build && tsx scripts/generate-seo-assets.ts --dist",
+    "build": "npm run build:app && npm run seo:generate -- --dist",
+    "build:app": "vite build",
+    "build:seo": "npm run build",
     "preview": "vite preview",
     "clean": "rm -rf dist",
     "lint": "tsc --noEmit",

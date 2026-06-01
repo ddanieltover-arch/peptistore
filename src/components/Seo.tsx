@@ -80,17 +80,21 @@ export default function Seo(props: SeoProps) {
     upsertMeta('meta[name="description"]', { name: 'description', content: description });
     upsertMeta('meta[name="robots"]', { name: 'robots', content: robots });
     upsertMeta('meta[name="revised"]', { name: 'revised', content: revised });
+    upsertMeta('meta[name="author"]', { name: 'author', content: 'Research Peptides UK' });
     upsertMeta('meta[property="og:title"]', { property: 'og:title', content: title });
     upsertMeta('meta[property="og:description"]', { property: 'og:description', content: description });
     upsertMeta('meta[property="og:image"]', { property: 'og:image', content: image });
     upsertMeta('meta[property="og:url"]', { property: 'og:url', content: canonical });
     upsertMeta('meta[property="og:type"]', { property: 'og:type', content: type === 'article' ? 'article' : 'website' });
+    upsertMeta('meta[property="og:locale"]', { property: 'og:locale', content: 'en_GB' });
     upsertMeta('meta[property="og:site_name"]', { property: 'og:site_name', content: 'Research Peptides UK' });
     upsertMeta('meta[name="twitter:card"]', { name: 'twitter:card', content: 'summary_large_image' });
     upsertMeta('meta[name="twitter:title"]', { name: 'twitter:title', content: title });
     upsertMeta('meta[name="twitter:description"]', { name: 'twitter:description', content: description });
     upsertMeta('meta[name="twitter:image"]', { name: 'twitter:image', content: image });
+    upsertMeta('meta[name="twitter:site"]', { name: 'twitter:site', content: '@researchpeptideuk' });
     upsertLink('link[rel="canonical"]', { rel: 'canonical', href: canonical });
+    upsertLink('link[rel="alternate"][hreflang="en-GB"]', { rel: 'alternate', hreflang: 'en-GB', href: canonical });
 
     const breadcrumb = buildBreadcrumbJsonLd(path, title, base);
     const pageJson = Array.isArray(props.jsonLd) ? props.jsonLd : props.jsonLd ? [props.jsonLd] : [];

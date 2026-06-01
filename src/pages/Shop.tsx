@@ -23,6 +23,7 @@ import { getPrimaryProductBadge } from '../lib/productBadges';
 import brandLabOperationsWide from '../assets/brand/brand-lab-operations-wide.webp';
 import { PathwayFilters } from '../components/products/PathwayFilters';
 import { PATHWAYS } from '../lib/scientificPathways';
+import { GeoAnswerCapsule } from '../components/seo/GeoAnswerCapsule';
 
 export default function Shop() {
   const [allProducts, setAllProducts] = useState<any[]>([]);
@@ -133,10 +134,10 @@ export default function Shop() {
   );
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div>
-          <h1>Shop Peptides</h1>
+          <h1>Shop Peptides for Research Use</h1>
           <p className="text-gray-500 mt-1">
             Showing{' '}
             <span className="font-semibold text-gray-700">{filteredProducts.length}</span> of{' '}
@@ -175,6 +176,8 @@ export default function Shop() {
           </div>
         </div>
       </div>
+
+      <GeoAnswerCapsule />
 
       <motion.figure
         initial={{ opacity: 0, y: 10 }}
@@ -470,6 +473,6 @@ export default function Shop() {
           )}
         </div>
       </div>
-    </div>
+    </main>
   );
 }

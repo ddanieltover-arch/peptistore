@@ -3,6 +3,7 @@ import { execFileSync } from 'node:child_process';
 import { dirname, join } from 'node:path';
 import dotenv from 'dotenv';
 dotenv.config();
+dotenv.config({ path: 'server/.env', override: false });
 
 import {
   BRAND_EMAIL,
@@ -47,8 +48,8 @@ function htmlEscape(value: unknown) { return xmlEscape(value).replace(/\n/g, ' '
 
 async function supabaseRows<T>(table: string, select: string, order = 'created_at.desc.nullslast'): Promise<T[]> {
   const url = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_ANON_KEY;
-  if (process.env.SEO_FETCH_REMOTE !== 'true') return [];
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_KEY || process.env.VITE_SUPABASE_ANON_KEY;
+  if (process.env.SEO_FETCH_REMOTE === 'false') return [];
   if (!url || !key) return [];
   const endpoint = url.replace(/\/+$/, '') + '/rest/v1/' + table + '?select=' + encodeURIComponent(select) + '&order=' + order;
   try {
@@ -82,13 +83,13 @@ function prerenderPage(path: string, title: string, description: string, h1: str
   const head = ['<title>' + htmlEscape(title) + '</title>', '<meta name=\'description\' content=\'' + htmlEscape(description) + '\'>', '<meta name=\'robots\' content=\'index, follow, max-image-preview:large\'>', '<link rel=\'canonical\' href=\'' + htmlEscape(canonical) + '\'>', '<meta property=\'og:title\' content=\'' + htmlEscape(title) + '\'>', '<meta property=\'og:description\' content=\'' + htmlEscape(description) + '\'>', '<meta property=\'og:url\' content=\'' + htmlEscape(canonical) + '\'>', '<meta property=\'og:image\' content=\'' + htmlEscape(assetUrl('/og-image.png', siteUrl)) + '\'>', '<meta name=\'twitter:card\' content=\'summary_large_image\'>', ...jsonLd.filter(Boolean).map((item) => '<script type=\'application/ld+json\'>' + JSON.stringify(item).replace(/</g, '\u003c') + '</script>')].join('\n    ');
   const body = '<main id=\'seo-prerender\'><article><h1>' + htmlEscape(h1) + '</h1><section id=\'answer\' aria-label=\'Quick Answer\'><p><strong>Quick Answer:</strong> ' + htmlEscape(answer) + '</p></section><p>' + htmlEscape(description) + '</p><nav aria-label=\'Related pages\'><a href=\'/shop\'>Research peptide catalog</a> <a href=\'/coas\'>COA library</a> <a href=\'/faq\'>Researcher FAQ</a></nav></article></main>';
   const html = template.replace('</head>', head + '\n  </head>').replace('<div id=\'root\'></div>', '<div id=\'root\'>' + body + '</div>');
-  const out = path === '/' ? 'dist/index.html' : join('dist', path.replace(/^\//, ''), 'index.html');
+  const out = path === '/' ? 'dist/index.html' : join('dist', path.replace(/^\//, '') + '.html');
   write(out, html);
 }
 
 async function main() {
   const fetchedProducts = await supabaseRows<ProductRow>('products', 'id,slug,title,description,price,images,categories,inventory,created_at');
-  const fetchedPosts = await supabaseRows<BlogRow>('blog_posts', 'id,title,content,image_url,created_at');
+  const fetchedPosts = await supabaseRows<BlogRow>('blog_posts', 'id,slug,title,content,image_url,created_at,updated_at');
   const products = fetchedProducts.length ? fetchedProducts : fallbackProducts;
   const posts = fetchedPosts;
 
