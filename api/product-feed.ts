@@ -91,6 +91,7 @@ function buildFeedXml(origin: string, products: ProductRow[]): string {
         `<g:price>${xmlEscape(price.toFixed(2))} GBP</g:price>`,
         `<g:condition>new</g:condition>`,
         `<g:brand>Research Peptides UK</g:brand>`,
+        `<g:identifier_exists>no</g:identifier_exists>`,
         `<g:product_type>${xmlEscape(productType)}</g:product_type>`,
         '</item>',
       ]
