@@ -92,7 +92,6 @@ function buildFeedXml(origin: string, products: ProductRow[]): string {
         `<g:condition>new</g:condition>`,
         `<g:brand>Research Peptides UK</g:brand>`,
         `<g:product_type>${xmlEscape(productType)}</g:product_type>`,
-        `<pubDate>${xmlEscape(updated)}</pubDate>`,
         '</item>',
       ]
         .filter(Boolean)
