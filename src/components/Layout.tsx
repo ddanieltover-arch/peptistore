@@ -427,7 +427,7 @@ export default function Layout() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 10 }}
             transition={{ duration: 0.2 }}
-            className="fixed bottom-24 md:bottom-8 right-4 md:right-8 z-50 bg-blue-600 hover:bg-blue-700 text-white rounded-full p-3 shadow-xl shadow-blue-600/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
+            className="fixed bottom-24 md:bottom-8 left-4 md:left-8 z-50 bg-blue-600 hover:bg-blue-700 text-white rounded-full p-3 shadow-xl shadow-blue-600/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
             aria-label="Back to top"
           >
             <ArrowUp className="h-5 w-5" aria-hidden />

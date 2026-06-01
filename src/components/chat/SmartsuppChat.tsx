@@ -44,6 +44,9 @@ export default function SmartsuppChat() {
 
     script.onload = () => {
       window.__smartsuppLoaded = true;
+      if (window.smartsupp) {
+        window.smartsupp('theme:color', brandColor);
+      }
     };
 
     document.head.appendChild(script);
