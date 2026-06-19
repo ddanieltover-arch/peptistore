@@ -4,7 +4,7 @@ import { useCartStore } from '../store/useCartStore';
 import { useAuthStore } from '../store/useAuthStore';
 import { formatCurrency } from '../lib/utils';
 import { supabase } from '../supabase';
-import { CheckCircle, Loader2, Truck, Package, Globe, Shield, CreditCard, Landmark, Bitcoin, AlertCircle } from 'lucide-react';
+import { CheckCircle, Loader2, Truck, Package, Globe, Shield, Landmark, Bitcoin } from 'lucide-react';
 import { europeanLocations } from '../data/europeanCountries';
 import { postOrderCreatedEmail, postPsilioCreateInvoice } from '../lib/transactionalEmailApi';
 import { CheckoutSkeleton } from '../components/Skeleton';
@@ -42,8 +42,7 @@ export default function Checkout() {
     postalCode: ''
   });
   const [selectedShippingId, setSelectedShippingId] = useState('rm24');
-  const [paymentMethod, setPaymentMethod] = useState<'card' | 'bank' | 'crypto'>('crypto');
-  const [billingCallbackNote, setBillingCallbackNote] = useState('');
+  const [paymentMethod, setPaymentMethod] = useState<'bank' | 'crypto'>('crypto');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [placedOrderId, setPlacedOrderId] = useState<string | null>(null);
   const [checkoutMessage, setCheckoutMessage] = useState('');
@@ -68,6 +67,10 @@ export default function Checkout() {
       setShipping(s => ({ ...s, email: user.email }));
     }
   }, [user]);
+
+  React.useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [step]);
 
   if (!hasHydrated) {
     return <CheckoutSkeleton />;
@@ -223,11 +226,11 @@ export default function Checkout() {
         user_id: user?.id || null, // Allow null for Guest Checkout
         items: items,
         total_amount: finalTotalValue,
-        status: paymentMethod === 'card' ? 'processing' : 'pending',
+        status: 'pending',
         shipping_address: {
           ...shipping,
           payment_method: paymentMethod,
-          billing_callback_note: paymentMethod === 'card' ? billingCallbackNote.trim() : '',
+          billing_callback_note: '',
           crypto_discount: cryptoDiscount,
           shipping_method: selectedMethod.name,
           shipping_cost: shippingCost
@@ -269,8 +272,6 @@ export default function Checkout() {
             `Order created, but automatic crypto redirect failed. ${psilioError?.message || 'Please contact support with your order ID.'}`
           );
         }
-      } else if (paymentMethod === 'card') {
-        setCheckoutMessage('Order created successfully. Admin and customer emails were sent. Card payment is queued for manual billing review.');
       } else {
         setCheckoutMessage('Order created successfully. Admin and customer emails were sent. Bank transfer instructions will follow by email.');
       }
@@ -418,10 +419,9 @@ export default function Checkout() {
                 <div className="grid grid-cols-1 gap-4" role="radiogroup" aria-labelledby="checkout-payment-heading">
                   {[
                     { id: 'crypto', name: 'Cryptocurrency', icon: Bitcoin, subtext: 'Pay with BTC, ETH, USDT (+5% OFF)', badge: 'Save 5%' },
-                    { id: 'card', name: 'Credit / Debit Card', icon: CreditCard, subtext: 'Secure Manual Processing' },
                     { id: 'bank', name: 'Bank Transfer', icon: Landmark, subtext: 'Direct Structural Payment' },
                   ].map((method) => (
-                    <button key={method.id} type="button" role="radio" aria-checked={paymentMethod === method.id} onClick={() => setPaymentMethod(method.id as 'card' | 'bank' | 'crypto')} className={`relative flex items-center gap-5 p-6 rounded-[2rem] border-2 transition-all ${paymentMethod === method.id ? 'border-blue-600 bg-blue-50/30' : 'border-gray-50 bg-gray-50/30 hover:border-gray-200'}`}>
+                    <button key={method.id} type="button" role="radio" aria-checked={paymentMethod === method.id} onClick={() => setPaymentMethod(method.id as 'bank' | 'crypto')} className={`relative flex items-center gap-5 p-6 rounded-[2rem] border-2 transition-all ${paymentMethod === method.id ? 'border-blue-600 bg-blue-50/30' : 'border-gray-50 bg-gray-50/30 hover:border-gray-200'}`}>
                       <div className={`w-14 h-14 rounded-2xl flex items-center justify-center ${paymentMethod === method.id ? 'bg-blue-600 text-white' : 'bg-white text-gray-400 border border-gray-100'}`}>
                         <method.icon className="w-8 h-8" aria-hidden />
                       </div>
@@ -452,40 +452,6 @@ export default function Checkout() {
                   <h2 className="text-2xl font-black text-gray-900">Final Confirmation</h2>
                   <button type="button" onClick={() => setStep(2)} className="text-xs font-black text-blue-600 uppercase tracking-widest hover:underline">Change Method</button>
                 </div>
-
-                {paymentMethod === 'card' && (
-                  <fieldset className="space-y-6 border-0 min-w-0 p-0">
-                    <legend className="sr-only">Card payment callback note</legend>
-                    <div className="bg-blue-50 p-4 rounded-2xl border border-blue-100 flex gap-3">
-                      <AlertCircle className="w-5 h-5 text-blue-600 shrink-0" aria-hidden />
-                      <p className="text-xs font-bold text-blue-900 leading-relaxed">
-                        Card payments are processed manually. Add a billing callback note (best call time / reference) and place the order.
-                        Status updates to <span className="underline">Processing</span> immediately.
-                      </p>
-                    </div>
-                    <div>
-                      <label htmlFor="checkout-billing-callback-note" className="block text-xs font-black uppercase tracking-widest text-gray-500 mb-2">
-                        Billing Callback Note (Optional)
-                      </label>
-                      <textarea
-                        id="checkout-billing-callback-note"
-                        placeholder="Example: Call me weekdays after 5pm UK time. Reference: Lab project A12."
-                        value={billingCallbackNote}
-                        onChange={e => setBillingCallbackNote(e.target.value)}
-                        className="w-full p-4 bg-gray-50 border-none rounded-2xl outline-none font-semibold text-gray-900 min-h-[120px]"
-                        maxLength={600}
-                      />
-                      <div className="mt-1 flex items-center justify-between">
-                        {paymentErrors.billingCallbackNote ? (
-                          <p className="text-xs font-semibold text-red-600">{paymentErrors.billingCallbackNote}</p>
-                        ) : (
-                          <span className="text-[10px] font-semibold text-gray-400">Shared with billing admin on order email.</span>
-                        )}
-                        <span className="text-[10px] font-semibold text-gray-400">{billingCallbackNote.length}/600</span>
-                      </div>
-                    </div>
-                  </fieldset>
-                )}
 
                 {paymentMethod === 'bank' && (
                   <div className="bg-gray-50 p-8 rounded-[2rem] text-center space-y-4">
