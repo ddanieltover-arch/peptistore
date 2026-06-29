@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-01T12:21:26.456Z",
+  "generatedAt": "2026-06-29T16:34:46.875Z",
   "status": "Generated locally; external Rich Results Test requires live URL access.",
   "schemasGenerated": [
     "Organization",
@@ -136,5 +136,126 @@
       }
     }
   ],
-  "sampleArticleSchemas": []
+  "sampleArticleSchemas": [
+    {
+      "@context": "https://schema.org",
+      "@type": "BlogPosting",
+      "@id": "https://www.researchpeptide.uk/blog/10546e55-2007-400b-abf7-7de3e70d83b5#article",
+      "headline": "BPC-157 + TB-500 Dual Action Blend: Scientific Background, Concentration Metrics, and Laboratory Protocols",
+      "description": "**RESEARCH USE ONLY** — This product is supplied strictly as a lyophilised solid for laboratory research, in vitro studies, and animal modelling. It is...",
+      "image": [
+        "https://www.researchpeptide.uk/blog/kpv-peptide.png"
+      ],
+      "author": {
+        "@type": "Organization",
+        "name": "Research Peptides UK Editorial Board",
+        "url": "https://www.researchpeptide.uk"
+      },
+      "publisher": {
+        "@id": "https://www.researchpeptide.uk#organization"
+      },
+      "datePublished": "2026-05-20T14:49:47.861923+00:00",
+      "dateModified": "2026-05-20T14:49:47.861923+00:00",
+      "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "https://www.researchpeptide.uk/blog/10546e55-2007-400b-abf7-7de3e70d83b5"
+      }
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BlogPosting",
+      "@id": "https://www.researchpeptide.uk/blog/386f14c2-d1f4-4a99-8cf5-fc1ef530538d#article",
+      "headline": "BPC-157 Acetate vs. BPC-157 Arginate: Stability, half-life, and Lab Protocols",
+      "description": "INTRODUCTION: THE CORE DIFFERENCE Body Protection Compound-157 (BPC-157) is a synthetic pentadecapeptide derived from a naturally occurring protective p...",
+      "image": [
+        "https://www.researchpeptide.uk/blog/reception-wide.png"
+      ],
+      "author": {
+        "@type": "Organization",
+        "name": "Research Peptides UK Editorial Board",
+        "url": "https://www.researchpeptide.uk"
+      },
+      "publisher": {
+        "@id": "https://www.researchpeptide.uk#organization"
+      },
+      "datePublished": "2026-05-20T14:17:36.771543+00:00",
+      "dateModified": "2026-05-20T14:17:36.771543+00:00",
+      "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "https://www.researchpeptide.uk/blog/386f14c2-d1f4-4a99-8cf5-fc1ef530538d"
+      }
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BlogPosting",
+      "@id": "https://www.researchpeptide.uk/blog/1cc4a3f1-eafd-486f-8f52-192c58141a7e#article",
+      "headline": "IGF-1 Peptide in Clinical Workflows: Receptor Dynamics and Analytical Standards",
+      "description": "INTRODUCTION: WHAT IS IGF-1? Insulin-like Growth Factor 1 (IGF-1), also known as somatomedin C, is a key endocrine and paracrine hormone that plays a fu...",
+      "image": [
+        "https://www.researchpeptide.uk/blog/igf-1-peptide.png"
+      ],
+      "author": {
+        "@type": "Organization",
+        "name": "Research Peptides UK Editorial Board",
+        "url": "https://www.researchpeptide.uk"
+      },
+      "publisher": {
+        "@id": "https://www.researchpeptide.uk#organization"
+      },
+      "datePublished": "2026-05-20T14:04:32.892531+00:00",
+      "dateModified": "2026-05-20T14:04:32.892531+00:00",
+      "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "https://www.researchpeptide.uk/blog/1cc4a3f1-eafd-486f-8f52-192c58141a7e"
+      }
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BlogPosting",
+      "@id": "https://www.researchpeptide.uk/blog/f21bd3b3-48eb-4105-ab08-04b0c6e44e6b#article",
+      "headline": "Custom Peptide Synthesis in the UK: Navigating Quality and Laboratory Standards",
+      "description": "INTRODUCTION: THE DEMAND FOR CUSTOM PEPTIDE SYNTHESIS While off-the-shelf peptide catalogs cover common research targets, specialized laboratory workflo...",
+      "image": [
+        "https://www.researchpeptide.uk/blog/custom-peptide-synthesis.png"
+      ],
+      "author": {
+        "@type": "Organization",
+        "name": "Research Peptides UK Editorial Board",
+        "url": "https://www.researchpeptide.uk"
+      },
+      "publisher": {
+        "@id": "https://www.researchpeptide.uk#organization"
+      },
+      "datePublished": "2026-05-20T14:04:32.892531+00:00",
+      "dateModified": "2026-05-20T14:04:32.892531+00:00",
+      "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "https://www.researchpeptide.uk/blog/f21bd3b3-48eb-4105-ab08-04b0c6e44e6b"
+      }
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BlogPosting",
+      "@id": "https://www.researchpeptide.uk/blog/c603f9c4-cf03-4c33-aac3-9102dcfce2f3#article",
+      "headline": "KPV Peptide Research Overview: Clinical Directions and Biological Stability",
+      "description": "INTRODUCTION: WHAT IS THE KPV PEPTIDE? KPV (Lysine-Proline-Valine) is a naturally occurring tripeptide that has emerged as a significant focus in molecu...",
+      "image": [
+        "https://www.researchpeptide.uk/blog/kpv-peptide.png"
+      ],
+      "author": {
+        "@type": "Organization",
+        "name": "Research Peptides UK Editorial Board",
+        "url": "https://www.researchpeptide.uk"
+      },
+      "publisher": {
+        "@id": "https://www.researchpeptide.uk#organization"
+      },
+      "datePublished": "2026-05-20T13:56:32.630815+00:00",
+      "dateModified": "2026-05-20T13:56:32.630815+00:00",
+      "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "https://www.researchpeptide.uk/blog/c603f9c4-cf03-4c33-aac3-9102dcfce2f3"
+      }
+    }
+  ]
 }

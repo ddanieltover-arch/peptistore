@@ -1,5 +1,4 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
-import { execFileSync } from 'node:child_process';
 import { dirname, join } from 'node:path';
 import dotenv from 'dotenv';
 dotenv.config();
@@ -8,18 +7,22 @@ dotenv.config({ path: 'server/.env', override: false });
 import {
   BRAND_EMAIL,
   BRAND_NAME,
+  DEFAULT_OG_IMAGE,
   DEFAULT_SITE_URL,
   SEO_REVISED_DATE,
   absoluteUrl,
   assetUrl,
   buildArticleJsonLd,
+  buildBreadcrumbJsonLd,
   buildOrganizationJsonLd,
   buildProductJsonLd,
   buildWebsiteJsonLd,
+  excerpt,
   seedKeywords,
   slugify,
   staticSeoRoutes,
 } from '../src/lib/seo';
+import { resolveBlogImagePath } from '../src/lib/blogImages';
 
 type ProductRow = { id?: string; slug?: string | null; title?: string | null; description?: string | null; price?: number | null; images?: string[] | null; categories?: string[] | null; inventory?: number | null; created_at?: string | null };
 type BlogRow = { id?: string; slug?: string | null; title?: string | null; content?: string | null; image_url?: string | null; created_at?: string | null; updated_at?: string | null };
@@ -54,9 +57,15 @@ async function supabaseRows<T>(table: string, select: string, order = 'created_a
   const endpoint = url.replace(/\/+$/, '') + '/rest/v1/' + table + '?select=' + encodeURIComponent(select) + '&order=' + order;
   try {
     const res = await fetch(endpoint, { headers: { apikey: key, Authorization: 'Bearer ' + key } });
-    if (!res.ok) return [];
+    if (!res.ok) {
+      console.warn(`[SEO] Supabase ${table} fetch failed (${res.status}): ${(await res.text()).slice(0, 120)}`);
+      return [];
+    }
     return (await res.json()) as T[];
-  } catch { return []; }
+  } catch (error) {
+    console.warn(`[SEO] Supabase ${table} fetch error:`, error instanceof Error ? error.message : error);
+    return [];
+  }
 }
 function productPath(item: ProductRow) { return '/product/' + (item.slug || slugify(item.title || 'product')); }
 function blogPath(item: BlogRow) { return '/blog/' + (item.slug || item.id || slugify(item.title || 'article')); }
@@ -76,22 +85,210 @@ function contentBrief(title: string, keyword: string, type: string) { return ['T
 function contentCalendar() { return csv([['Publish Date', 'Content Title', 'Content Type', 'Primary Keyword', 'Intent', 'Word Count Target', 'Status'], ['2026-05-19', 'What Are Research Peptides?', 'Guide', 'research peptides', 'Informational', 1800, 'Planned'], ['2026-05-26', 'How to Buy Research Peptides in the UK', 'Landing Page', 'peptides buy uk', 'Transactional', 1400, 'Planned'], ['2026-06-02', 'Semaglutide Peptide UK Research Brief', 'Product Guide', 'semaglutide peptide uk', 'Commercial', 1600, 'Planned'], ['2026-06-09', 'KPV Peptide Research Overview', 'Article', 'kpv peptide', 'Commercial', 1500, 'Planned'], ['2026-06-16', 'IGF-1 Peptide Research Context', 'Article', 'igf-1 peptide', 'Commercial', 1500, 'Planned'], ['2026-06-23', 'GHRP-2 Peptide Buying and Research Notes', 'Product Guide', 'buy ghrp 2', 'Transactional', 1400, 'Planned'], ['2026-06-30', 'Oxford Peptides and UK Research Sourcing', 'Local Landing Page', 'oxford peptides', 'Local', 1200, 'Planned']]); }
 function internalLinks() { return csv([['From Page', 'To Page', 'Anchor Text', 'Priority'], ['/', '/shop', 'buy research peptides in the UK', 'High'], ['/', '/peptide-guide', 'research peptide guide', 'High'], ['/shop', '/coas', 'peptide COA library', 'High'], ['/shop', '/faq', 'research peptide storage and shipping FAQ', 'Medium'], ['/peptide-guide', '/peptide-information', 'peptide synthesis and purity information', 'High'], ['/peptide-research', '/shop', 'research peptide catalog', 'Medium'], ['/faq', '/contact', 'technical peptide support', 'Medium']]); }
 
-function prerenderPage(path: string, title: string, description: string, h1: string, answer: string, jsonLd: unknown[]) {
-  if (!existsSync('dist/index.html')) return;
-  const template = readFileSync('dist/index.html', 'utf8');
-  const canonical = absoluteUrl(path, siteUrl);
-  const head = ['<title>' + htmlEscape(title) + '</title>', '<meta name=\'description\' content=\'' + htmlEscape(description) + '\'>', '<meta name=\'robots\' content=\'index, follow, max-image-preview:large\'>', '<link rel=\'canonical\' href=\'' + htmlEscape(canonical) + '\'>', '<meta property=\'og:title\' content=\'' + htmlEscape(title) + '\'>', '<meta property=\'og:description\' content=\'' + htmlEscape(description) + '\'>', '<meta property=\'og:url\' content=\'' + htmlEscape(canonical) + '\'>', '<meta property=\'og:image\' content=\'' + htmlEscape(assetUrl('/og-image.png', siteUrl)) + '\'>', '<meta name=\'twitter:card\' content=\'summary_large_image\'>', ...jsonLd.filter(Boolean).map((item) => '<script type=\'application/ld+json\'>' + JSON.stringify(item).replace(/</g, '\u003c') + '</script>')].join('\n    ');
-  const body = '<main id=\'seo-prerender\'><article><h1>' + htmlEscape(h1) + '</h1><section id=\'answer\' aria-label=\'Quick Answer\'><p><strong>Quick Answer:</strong> ' + htmlEscape(answer) + '</p></section><p>' + htmlEscape(description) + '</p><nav aria-label=\'Related pages\'><a href=\'/shop\'>Research peptide catalog</a> <a href=\'/coas\'>COA library</a> <a href=\'/faq\'>Researcher FAQ</a></nav></article></main>';
-  const html = template.replace('</head>', head + '\n  </head>').replace('<div id=\'root\'></div>', '<div id=\'root\'>' + body + '</div>');
-  const out = path === '/' ? 'dist/index.html' : join('dist', path.replace(/^\//, '') + '.html');
-  write(out, html);
+function stripMarkdown(value: string) {
+  return String(value || '')
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+    .replace(/[#*_>`~-]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function prerenderDistPath(routePath: string) {
+  if (routePath === '/') return 'dist/index.html';
+  return join('dist', ...routePath.replace(/^\//, '').split('/'), 'index.html');
+}
+
+function stripDefaultHead(template: string) {
+  return template
+    .replace(/<title>[\s\S]*?<\/title>/i, '')
+    .replace(/<meta name=['"]description['"][^>]*>/gi, '')
+    .replace(/<meta name=['"]robots['"][^>]*>/gi, '')
+    .replace(/<link rel=['"]canonical['"][^>]*>/gi, '')
+    .replace(/<meta property=['"]og:[^'"]+['"][^>]*>/gi, '')
+    .replace(/<meta name=['"]twitter:[^'"]+['"][^>]*>/gi, '');
+}
+
+function buildPrerenderHead(options: {
+  path: string;
+  title: string;
+  description: string;
+  ogImage: string;
+  ogType?: string;
+  jsonLd: unknown[];
+}) {
+  const canonical = absoluteUrl(options.path, siteUrl);
+  const tags = [
+    '<title>' + htmlEscape(options.title) + '</title>',
+    '<meta name=\'description\' content=\'' + htmlEscape(options.description) + '\'>',
+    '<meta name=\'robots\' content=\'index, follow, max-image-preview:large\'>',
+    '<link rel=\'canonical\' href=\'' + htmlEscape(canonical) + '\'>',
+    '<meta property=\'og:title\' content=\'' + htmlEscape(options.title) + '\'>',
+    '<meta property=\'og:description\' content=\'' + htmlEscape(options.description) + '\'>',
+    '<meta property=\'og:url\' content=\'' + htmlEscape(canonical) + '\'>',
+    '<meta property=\'og:image\' content=\'' + htmlEscape(options.ogImage) + '\'>',
+    '<meta property=\'og:type\' content=\'' + htmlEscape(options.ogType || 'website') + '\'>',
+    '<meta property=\'og:site_name\' content=\'' + htmlEscape(BRAND_NAME) + '\'>',
+    '<meta name=\'twitter:card\' content=\'summary_large_image\'>',
+    '<meta name=\'twitter:title\' content=\'' + htmlEscape(options.title) + '\'>',
+    '<meta name=\'twitter:description\' content=\'' + htmlEscape(options.description) + '\'>',
+    '<meta name=\'twitter:image\' content=\'' + htmlEscape(options.ogImage) + '\'>',
+    ...options.jsonLd.filter(Boolean).map((item) => '<script type=\'application/ld+json\'>' + JSON.stringify(item).replace(/</g, '\u003c') + '</script>'),
+  ];
+  return tags.join('\n    ');
+}
+
+function resetPrerenderRoot(template: string) {
+  return template.replace(/<div id=["']root["']>[\s\S]*?<\/div>/i, '<div id="root"></div>');
+}
+
+let prerenderTemplate: string | null = null;
+
+function getPrerenderTemplate() {
+  if (prerenderTemplate) return prerenderTemplate;
+  if (!existsSync('dist/index.html')) return null;
+  prerenderTemplate = resetPrerenderRoot(stripDefaultHead(readFileSync('dist/index.html', 'utf8')));
+  return prerenderTemplate;
+}
+
+function prerenderPage(options: {
+  path: string;
+  title: string;
+  description: string;
+  h1: string;
+  answer: string;
+  ogImage?: string;
+  ogType?: string;
+  bodyHtml: string;
+  jsonLd: unknown[];
+}) {
+  const template = getPrerenderTemplate();
+  if (!template) return false;
+  const head = buildPrerenderHead({
+    path: options.path,
+    title: options.title,
+    description: options.description,
+    ogImage: options.ogImage || assetUrl(DEFAULT_OG_IMAGE, siteUrl),
+    ogType: options.ogType,
+    jsonLd: options.jsonLd,
+  });
+  const body = [
+    '<main id=\'seo-prerender\'>',
+    '<article>',
+    '<h1>' + htmlEscape(options.h1) + '</h1>',
+    '<section id=\'answer\' aria-label=\'Quick Answer\'>',
+    '<p><strong>Quick Answer:</strong> ' + htmlEscape(options.answer) + '</p>',
+    '</section>',
+    options.bodyHtml,
+    '<nav aria-label=\'Related pages\'>',
+    '<a href=\'/shop\'>Research peptide catalog</a> ',
+    '<a href=\'/coas\'>COA library</a> ',
+    '<a href=\'/faq\'>Researcher FAQ</a> ',
+    '<a href=\'/blog\'>Peptide research blog</a>',
+    '</nav>',
+    '</article>',
+    '</main>',
+  ].join('');
+  const html = template
+    .replace('</head>', head + '\n  </head>')
+    .replace(/<div id=["']root["']>[\s\S]*?<\/div>/i, '<div id="root">' + body + '</div>');
+  write(prerenderDistPath(options.path), html);
+  return true;
+}
+
+function productOgImage(product: ProductRow) {
+  const image = Array.isArray(product.images) ? product.images.find(Boolean) : null;
+  if (!image) return assetUrl(DEFAULT_OG_IMAGE, siteUrl);
+  return /^https?:\/\//i.test(image) ? image : assetUrl(image, siteUrl);
+}
+
+function productPrerenderBody(product: ProductRow) {
+  const price = Number(product.price || 0);
+  const categories = Array.isArray(product.categories) ? product.categories.join(', ') : 'Research peptides';
+  const stock = Number(product.inventory || 0) > 0 ? 'In stock for research dispatch' : 'Check availability';
+  return [
+    '<p>' + htmlEscape(product.description || 'Research-use peptide product listing for laboratory workflows.') + '</p>',
+    '<ul>',
+    '<li><strong>Price:</strong> £' + htmlEscape(price.toFixed(2)) + ' GBP</li>',
+    '<li><strong>Category:</strong> ' + htmlEscape(categories) + '</li>',
+    '<li><strong>Availability:</strong> ' + htmlEscape(stock) + '</li>',
+    '</ul>',
+    '<p>Products are supplied for laboratory research use only and are not intended for human or veterinary consumption.</p>',
+  ].join('');
+}
+
+function blogPrerenderBody(post: BlogRow) {
+  const plain = stripMarkdown(post.content || '');
+  const preview = excerpt(plain, 1200);
+  return '<p>' + htmlEscape(preview) + '</p>';
+}
+
+function prerenderStaticRoute(route: (typeof staticSeoRoutes)[number]) {
+  return prerenderPage({
+    path: route.path,
+    title: route.title,
+    description: route.description,
+    h1: route.h1,
+    answer: route.answer,
+    bodyHtml: '<p>' + htmlEscape(route.description) + '</p>',
+    jsonLd: [
+      buildOrganizationJsonLd(siteUrl),
+      buildWebsiteJsonLd(siteUrl),
+      buildBreadcrumbJsonLd(route.path, route.title, siteUrl),
+    ],
+  });
+}
+
+function prerenderProduct(product: ProductRow) {
+  const path = productPath(product);
+  const title = (product.title || 'Research peptide') + ' | ' + BRAND_NAME;
+  const description = excerpt(product.description || 'Research-use peptide product listing for laboratory workflows.', 155);
+  return prerenderPage({
+    path,
+    title,
+    description,
+    h1: product.title || 'Research peptide',
+    answer: 'This research peptide listing is supplied for laboratory use only, with product notes, documentation signals, and UK dispatch options for qualified research buyers.',
+    ogImage: productOgImage(product),
+    ogType: 'product',
+    bodyHtml: productPrerenderBody(product),
+    jsonLd: [
+      buildOrganizationJsonLd(siteUrl),
+      buildProductJsonLd(product, [], siteUrl),
+      buildBreadcrumbJsonLd(path, title, siteUrl),
+    ],
+  });
+}
+
+function prerenderBlogPost(post: BlogRow) {
+  const path = blogPath(post);
+  const title = (post.title || 'Peptide research article') + ' | ' + BRAND_NAME;
+  const description = excerpt(stripMarkdown(post.content || post.title || ''), 155);
+  const imagePath = resolveBlogImagePath(post);
+  return prerenderPage({
+    path,
+    title,
+    description,
+    h1: post.title || 'Peptide research article',
+    answer: excerpt(stripMarkdown(post.content || post.title || ''), 60),
+    ogImage: assetUrl(imagePath, siteUrl),
+    ogType: 'article',
+    bodyHtml: blogPrerenderBody(post),
+    jsonLd: [
+      buildOrganizationJsonLd(siteUrl),
+      buildArticleJsonLd(post, siteUrl),
+      buildBreadcrumbJsonLd(path, title, siteUrl),
+    ],
+  });
 }
 
 async function main() {
   const fetchedProducts = await supabaseRows<ProductRow>('products', 'id,slug,title,description,price,images,categories,inventory,created_at');
-  const fetchedPosts = await supabaseRows<BlogRow>('blog_posts', 'id,slug,title,content,image_url,created_at,updated_at');
+  const fetchedPosts = await supabaseRows<BlogRow>('blog_posts', 'id,title,content,image_url,created_at');
   const products = fetchedProducts.length ? fetchedProducts : fallbackProducts;
   const posts = fetchedPosts;
+  if (writeDist && posts.length === 0) {
+    console.warn('\x1b[33m[SEO WARNING] No blog posts fetched for prerender. Set SUPABASE_SERVICE_ROLE_KEY (or SUPABASE_SERVICE_KEY) in the build environment so blog HTML snapshots are generated.\x1b[0m');
+  }
 
   // Validate blog posts have internal and external links
   posts.forEach((post) => {
@@ -110,10 +307,12 @@ async function main() {
   write('public/sitemap.xml', sitemapXml(products, posts));
   write('public/llms.txt', llmsTxt(products, posts));
   ensureDir('seo/content_briefs');
-  write('seo/audit_report.json', JSON.stringify({ generatedAt: new Date().toISOString(), target: siteUrl, stack: 'Vite React SPA with SEO prerender/static generation', crawlInventoryCount: routes(products, posts).length, highPriorityFindings: ['Route-level metadata and JSON-LD were missing before implementation.', 'Static sitemap coverage was incomplete before regeneration.', 'Dynamic product and blog pages require prerendered HTML snapshots for AI crawler reliability.', 'GSC, GA4, Ahrefs/SEMrush/DataForSEO and GBP validation require credentials.'], publicRoutes: staticSeoRoutes.map((r) => ({ path: r.path, title: r.title, indexable: r.index, primaryKeyword: r.primaryKeyword })), dynamicRoutes: { products: products.length, blogPosts: posts.length } }, null, 2));
+  write('seo/audit_report.json', JSON.stringify({ generatedAt: new Date().toISOString(), target: siteUrl, stack: 'Vite React SPA with build-time SEO prerender', crawlInventoryCount: routes(products, posts).length, highPriorityFindings: ['Monitor Core Web Vitals on production URLs after prerender deploy.', 'Validate prerender HTML in GSC URL Inspection for product and blog samples.', 'Ahrefs/SEMrush keyword volumes and GBP remain optional follow-ups.'], publicRoutes: staticSeoRoutes.map((r) => ({ path: r.path, title: r.title, indexable: r.index, primaryKeyword: r.primaryKeyword })), dynamicRoutes: { products: products.length, blogPosts: posts.length } }, null, 2));
   write('seo/crawl_inventory.csv', crawlInventory(products, posts));
   write('seo/core_web_vitals_baseline.json', JSON.stringify({ generatedAt: new Date().toISOString(), status: 'Requires Lighthouse/PageSpeed execution against deployed or preview URLs', targets: { LCP: '<= 2.5s', INP: '<= 200ms', CLS: '< 0.1' } }, null, 2));
-  write('seo/seo_baseline.json', JSON.stringify({ generatedAt: new Date().toISOString(), gsc: 'pending credentials', ga4: 'pending credentials', sitemap: siteUrl + '/sitemap.xml', robots: siteUrl + '/robots.txt', indexedPages: 'pending GSC access', domainAuthority: 'pending Ahrefs/Moz access' }, null, 2));
+  if (!existsSync('seo/seo_baseline.json')) {
+    write('seo/seo_baseline.json', JSON.stringify({ generatedAt: new Date().toISOString(), gsc: 'pending', ga4: 'pending', sitemap: siteUrl + '/sitemap.xml', robots: siteUrl + '/robots.txt', indexedPages: 'pending GSC access', domainAuthority: 'pending Ahrefs/Moz access' }, null, 2));
+  }
   write('seo/competitor_report.csv', competitorReport());
   write('seo/keyword_map.csv', keywordMap());
   write('seo/seo_strategy.md', '# SEO + GEO Strategy\n\nTarget: ' + siteUrl + '\n\n## Positioning\n' + BRAND_NAME + ' should rank and be cited for UK research peptide sourcing, laboratory-use peptide education, COA visibility, and research-only compliance guidance.\n\n## Pillars\n- Commercial catalog: /shop, product pages, category hub.\n- Trust: /coas, /about-us, /terms, /privacy, /refund-returns.\n- Education: /peptide-guide, /peptide-information, /peptide-research, /blog.\n- GEO/AEO: quick answers, definitions, FAQ schema, Product schema, Article schema, llms.txt.\n');
@@ -121,7 +320,9 @@ async function main() {
   write('seo/content_calendar.csv', contentCalendar());
   write('seo/schema_validation_report.json', JSON.stringify({ generatedAt: new Date().toISOString(), status: 'Generated locally; external Rich Results Test requires live URL access.', schemasGenerated: ['Organization', 'WebSite', 'BreadcrumbList', 'Product', 'BlogPosting', 'FAQPage'], sampleProductSchemas: products.slice(0, 5).map((p) => buildProductJsonLd(p)), sampleArticleSchemas: posts.slice(0, 5).map((p) => buildArticleJsonLd(p)) }, null, 2));
   write('seo/geo_content_briefs.md', contentBrief('GEO Content Expansion for Research Peptides UK', 'research peptides', 'GEO/AEO Plan'));
-  write('seo/analytics_setup.md', '# Analytics Setup\n\nSet VITE_GTM_ID and/or VITE_GA4_MEASUREMENT_ID in the deployment environment. Verify GA4 web stream, enhanced measurement, GSC link, conversion events, and consent behavior before production reporting.\n\nEvents implemented or planned: generate_lead, purchase, begin_checkout, sign_up, schedule_appointment, cta_click, search, view_item, add_to_cart.\n');
+  if (!existsSync('seo/analytics_setup.md')) {
+    write('seo/analytics_setup.md', '# Analytics Setup\n\nSet VITE_GA4_MEASUREMENT_ID in the deployment environment.\n');
+  }
   write('seo/kpis_dashboard.md', '# KPI Dashboard\n\n- Organic sessions: baseline from GA4, target +30% in 90 days.\n- Top 10 organic keywords: baseline from GSC/Ahrefs, target 2x in 6 months.\n- CTR: target >3%.\n- LCP: <=2.5s.\n- INP: <=200ms.\n- CLS: <0.1.\n- AI citation rate: monthly tracking.\n- Conversion rate: site-specific target after GA4 baseline.\n');
   write('seo/link_gap_opportunities.csv', csv([['Domain', 'DR', 'Linking to Competitors', 'Opportunity Type'], ['researchpeptide.co.uk', 'pending', 'pending Ahrefs/SEMrush', 'Competitor overlap'], ['oxfordpeptides.com', 'pending', 'pending Ahrefs/SEMrush', 'Entity/local competitor'], ['cambridge-research-biochemicals.com', 'pending', 'pending Ahrefs/SEMrush', 'Authority resource outreach']]));
   write('seo/guest_post_pipeline.csv', csv([['Target Site', 'DR', 'Editor Contact', 'Pitch Status', 'Published Link'], ['Lab and biotech publications', 'pending', 'pending prospecting', 'Not started', '']]));
@@ -129,7 +330,36 @@ async function main() {
   write('seo/email_templates.md', '# Outreach Email Templates\n\n## Unlinked Mention\nSubject: Quick note about your mention of Research Peptides UK\n\nHi [Name], I noticed you mentioned Research Peptides UK in your article. Would you consider adding a link to https://www.researchpeptide.uk so readers can find the referenced source directly?\n');
   write('seo/disavow.txt', '# No toxic backlinks identified from local/public data. Populate only after GSC/Ahrefs/Majestic review.\n');
   [['what-are-research-peptides.md', 'What Are Research Peptides?', 'research peptides', 'Guide'], ['buy-research-peptides-uk.md', 'How to Buy Research Peptides in the UK', 'peptides buy uk', 'Landing Page'], ['semaglutide-peptide-uk.md', 'Semaglutide Peptide UK Research Brief', 'semaglutide peptide uk', 'Product Guide'], ['kpv-peptide.md', 'KPV Peptide Research Overview', 'kpv peptide', 'Article'], ['igf-1-peptide.md', 'IGF-1 Peptide Research Context', 'igf-1 peptide', 'Article']].forEach(([file, title, keyword, type]) => write('seo/content_briefs/' + file, contentBrief(title, keyword, type)));
-  if (writeDist) { staticSeoRoutes.forEach((r) => prerenderPage(r.path, r.title, r.description, r.h1, r.answer, [buildOrganizationJsonLd(siteUrl), buildWebsiteJsonLd(siteUrl)])); products.forEach((p) => prerenderPage(productPath(p), (p.title || 'Research peptide') + ' | ' + BRAND_NAME, p.description || 'Research-use peptide product listing.', p.title || 'Research peptide', 'This product page summarizes a research-use peptide listing, documentation signals, and compliance context for non-human laboratory workflows.', [buildProductJsonLd(p, [], siteUrl)])); posts.forEach((p) => prerenderPage(blogPath(p), (p.title || 'Peptide research article') + ' | ' + BRAND_NAME, (p.content || '').slice(0, 155), p.title || 'Peptide research article', 'This article summarizes peptide research information for non-clinical laboratory planning and education.', [buildArticleJsonLd(p, siteUrl)])); }
+  let prerenderCount = 0;
+  const prerenderManifest: string[] = [];
+  if (writeDist) {
+    if (!getPrerenderTemplate()) {
+      console.warn('Skipping prerender: dist/index.html not found. Run vite build first.');
+    } else {
+    staticSeoRoutes.filter((r) => r.index).forEach((route) => {
+      if (prerenderStaticRoute(route)) {
+        prerenderCount += 1;
+        prerenderManifest.push(route.path);
+      }
+    });
+    products.forEach((item) => {
+      const path = productPath(item);
+      if (prerenderProduct(item)) {
+        prerenderCount += 1;
+        prerenderManifest.push(path);
+      }
+    });
+    posts.forEach((item) => {
+      const path = blogPath(item);
+      if (prerenderBlogPost(item)) {
+        prerenderCount += 1;
+        prerenderManifest.push(path);
+      }
+    });
+    write('seo/prerender_manifest.json', JSON.stringify({ generatedAt: new Date().toISOString(), count: prerenderCount, paths: prerenderManifest }, null, 2));
+    console.log('Prerendered ' + prerenderCount + ' HTML snapshots into dist/.');
+    }
+  }
   console.log('SEO/GEO assets generated for ' + siteUrl + ' with ' + products.length + ' product routes and ' + posts.length + ' blog routes.');
 }
 main().catch((error) => { console.error(error); process.exit(1); });

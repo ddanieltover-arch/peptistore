@@ -8,7 +8,7 @@
   },
   "scripts": {
     "dev": "vite --port=5173 --host=0.0.0.0 --configLoader native",
-    "build": "npm run build:app && npm run seo:generate -- --dist",
+    "build": "npm run build:app && npm run seo:generate -- --dist && npm run seo:validate",
     "build:app": "vite build",
     "build:seo": "npm run build",
     "preview": "vite preview",

@@ -1,13 +1,12 @@
 {
-  "generatedAt": "2026-06-01T12:21:26.445Z",
+  "generatedAt": "2026-06-29T16:34:46.863Z",
   "target": "https://www.researchpeptide.uk",
-  "stack": "Vite React SPA with SEO prerender/static generation",
-  "crawlInventoryCount": 162,
+  "stack": "Vite React SPA with build-time SEO prerender",
+  "crawlInventoryCount": 167,
   "highPriorityFindings": [
-    "Route-level metadata and JSON-LD were missing before implementation.",
-    "Static sitemap coverage was incomplete before regeneration.",
-    "Dynamic product and blog pages require prerendered HTML snapshots for AI crawler reliability.",
-    "GSC, GA4, Ahrefs/SEMrush/DataForSEO and GBP validation require credentials."
+    "Monitor Core Web Vitals on production URLs after prerender deploy.",
+    "Validate prerender HTML in GSC URL Inspection for product and blog samples.",
+    "Ahrefs/SEMrush keyword volumes and GBP remain optional follow-ups."
   ],
   "publicRoutes": [
     {
@@ -109,6 +108,6 @@
   ],
   "dynamicRoutes": {
     "products": 146,
-    "blogPosts": 0
+    "blogPosts": 5
   }
 }

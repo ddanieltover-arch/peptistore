@@ -7,55 +7,30 @@
 
 ---
 
-## 1. Google Search Console (done)
+## 1. Google Search Console ✅
 
-Your property is verified and receiving data. Complete these checks:
-
-| Task | Where in GSC | Status |
-|------|----------------|--------|
-| Submit sitemap | **Indexing → Sitemaps** → add `https://www.researchpeptide.uk/sitemap.xml` | Do if not already submitted |
-| Inspect homepage | **URL inspection** → `https://www.researchpeptide.uk/` → Request indexing | After major deploys |
-| Check www vs non-www | Ensure both `www` and apex redirect to one canonical (`www` is canonical in code) | Verify in browser |
-| Core Web Vitals | **Experience → Core Web Vitals** | Monitor weekly |
-| Link to GA4 | **Settings → Associations → Google Analytics** → link property `538450148` | Do once GA4 is live |
+| Task | Status |
+|------|--------|
+| Property verified (`researchpeptide.uk`) | ✅ Done |
+| Sitemap submitted (`/sitemap.xml`) | ✅ Done |
+| Linked to GA4 property `538450148` | ✅ Done |
 
 ---
 
-## 2. Google Analytics 4 — activate on site
+## 2. Google Analytics 4 ✅
 
-### Get your Measurement ID
+| Task | Status |
+|------|--------|
+| Measurement ID `G-XXTCQPY79Y` in Vercel | ✅ Done |
+| Production deploy | ✅ Done |
+| Realtime hits confirmed | ✅ Done |
+| `purchase` + `generate_lead` marked as key events | ✅ Done |
 
-1. Open [Google Analytics](https://analytics.google.com/) → **Research Peptides UK** property.
-2. **Admin** (gear) → **Data collection and modification → Data streams**.
-3. Open your **Web** stream for `researchpeptide.uk` (create one if missing).
-4. Copy the **Measurement ID** (format `G-XXXXXXXXXX`) — this is **not** the numeric Property ID `538450148`.
+### Reference (already configured)
 
-### Add to Vercel
+## 3. Link GSC ↔ GA4 ✅
 
-1. Vercel → **peptistore** project → **Settings → Environment Variables**.
-2. Add:
-
-   | Name | Value | Environments |
-   |------|--------|--------------|
-   | `VITE_GA4_MEASUREMENT_ID` | `G-XXTCQPY79Y` | Production, Preview |
-
-3. **Redeploy** production so the tag loads.
-
-### Verify it works
-
-1. GA4 → **Admin → DebugView** (or install [Google Analytics Debugger](https://chrome.google.com/webstore/detail/google-analytics-debugger) extension).
-2. Visit https://www.researchpeptide.uk — you should see `page_view` events.
-3. Test conversions: add to cart, start checkout, submit contact form.
-
----
-
-## 3. Link GSC ↔ GA4
-
-1. **Search Console** → **Settings** → **Associations** → **Google Analytics associations** → **Associate**.
-2. Select GA4 property **Research Peptides UK** (`538450148`).
-3. In **GA4** → **Admin → Product links → Google Search Console links** → confirm the link.
-
-This unlocks Search Console reports inside GA4 (queries, landing pages, devices).
+Association complete between Search Console and GA4 property `538450148`.
 
 ---
 
@@ -128,3 +103,42 @@ Restart `npm run dev`. Events only fire in the browser when this variable is set
 | Conversions | Set after GA4 live | Track `purchase` + `generate_lead` |
 
 Update `seo/seo_baseline.json` after GA4 is live and GSC is linked.
+
+---
+
+## 9. Build-time prerender (Option B) ✅
+
+Each production build runs `seo:generate --dist` after Vite, writing static HTML snapshots into `dist/` for crawlers and AI bots.
+
+| Route type | Count (typical) | Example |
+|------------|-----------------|---------|
+| Static SEO pages | 16 | `/shop`, `/faq`, `/peptide-guide` |
+| Product pages | ~146 | `/product/adamax` |
+| Blog articles | 5 | `/blog/{id}` |
+
+### What crawlers receive
+
+- Full `<title>`, meta description, canonical, OG/Twitter tags
+- JSON-LD (`Product`, `Article`, `BreadcrumbList`, etc.)
+- Visible `<h1>` and answer capsule in `#seo-prerender` (no JS required)
+
+### Vercel env (build)
+
+```env
+SEO_FETCH_REMOTE=true
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=...   # server-only; enables product + blog fetch
+```
+
+### After deploy — verify in GSC
+
+1. **URL Inspection** → test `/product/adamax` and one `/blog/{id}` URL.
+2. Confirm **Google-selected canonical** and rendered HTML show product/article content (not empty SPA shell).
+3. **Request indexing** for a sample product + blog URL.
+4. Check `seo/prerender_manifest.json` in the repo after build logs (`Prerendered N HTML snapshots`).
+
+### Notes
+
+- Vercel serves static files from `dist/` before the SPA rewrite, so prerender HTML is returned for matching paths.
+- Blog URLs use post `id` (no `slug` column in DB yet).
+- Local builds need `server/.env` or root `.env` with Supabase credentials; anon key works for public tables.

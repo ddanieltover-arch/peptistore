@@ -1,9 +1,12 @@
 {
   "generatedAt": "2026-06-01T12:21:26.452Z",
-  "gsc": "pending credentials",
-  "ga4": "pending credentials",
+  "gsc": "verified — researchpeptide.uk",
+  "ga4": "live — G-XXTCQPY79Y (property 538450148)",
+  "gscGa4Linked": true,
   "sitemap": "https://www.researchpeptide.uk/sitemap.xml",
+  "sitemapSubmitted": true,
   "robots": "https://www.researchpeptide.uk/robots.txt",
-  "indexedPages": "pending GSC access",
+  "keyEvents": ["purchase", "generate_lead"],
+  "indexedPages": "monitor in GSC → Pages",
   "domainAuthority": "pending Ahrefs/Moz access"
 }

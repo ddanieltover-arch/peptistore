@@ -9,6 +9,7 @@ const requiredFiles = [
   'seo/crawl_inventory.csv',
   'seo/keyword_map.csv',
   'seo/schema_validation_report.json',
+  'seo/prerender_manifest.json',
 ];
 
 const errors: string[] = [];
@@ -27,6 +28,23 @@ if (existsSync('public/sitemap.xml')) {
   for (const route of staticSeoRoutes.filter((item) => item.index)) {
     if (!sitemap.includes(route.path === '/' ? 'https://www.researchpeptide.uk/' : 'https://www.researchpeptide.uk' + route.path)) {
       errors.push('Sitemap missing route: ' + route.path);
+    }
+  }
+}
+
+if (existsSync('dist/index.html') && existsSync('seo/prerender_manifest.json')) {
+  const manifest = JSON.parse(readFileSync('seo/prerender_manifest.json', 'utf8')) as { count?: number; paths?: string[] };
+  if (!manifest.count || manifest.count < 5) {
+    errors.push('Prerender manifest missing or too small: ' + String(manifest.count || 0));
+  }
+  const samplePaths = (manifest.paths || []).filter((path) => path.startsWith('/product/') || path.startsWith('/blog/')).slice(0, 3);
+  for (const path of samplePaths) {
+    const file = 'dist' + path.replace(/\/$/, '') + '/index.html';
+    if (!existsSync(file)) errors.push('Missing prerender file: ' + file);
+    else {
+      const html = readFileSync(file, 'utf8');
+      if (!html.includes('seo-prerender')) errors.push('Prerender body missing in: ' + file);
+      if (!html.includes('application/ld+json')) errors.push('Prerender JSON-LD missing in: ' + file);
     }
   }
 }
