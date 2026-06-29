@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { PRIMARY_PROMO_CODE, PROMO_DISCOUNT_PERCENT, isValidPromoCode } from '../lib/promoCodes';
+import { trackAddToCart } from '../lib/analytics';
 
 export interface CartItem {
   productId: string;
@@ -61,6 +62,12 @@ export const useCartStore = create<CartState>()(
         } else {
           set({ items: [...items, item], isOpen: true }); // Auto open cart on add
         }
+        trackAddToCart({
+          item_id: item.productId,
+          item_name: item.title,
+          price: item.price,
+          quantity: item.quantity,
+        });
       },
       removeItem: (productId, specification) => {
         set({ 

@@ -9,6 +9,7 @@ import { europeanLocations } from '../data/europeanCountries';
 import { postOrderCreatedEmail, postPsilioCreateInvoice } from '../lib/transactionalEmailApi';
 import { CheckoutSkeleton } from '../components/Skeleton';
 import { PRIMARY_PROMO_CODE, PROMO_DISCOUNT_PERCENT, isValidPromoCode } from '../lib/promoCodes';
+import { trackBeginCheckout, trackPurchase } from '../lib/analytics';
 
 const SHIPPING_METHODS = {
   UK: [
@@ -71,6 +72,24 @@ export default function Checkout() {
   React.useEffect(() => {
     window.scrollTo(0, 0);
   }, [step]);
+
+  const checkoutItems = React.useMemo(
+    () => items.map((item) => ({
+      item_id: item.productId,
+      item_name: item.title,
+      price: item.price,
+      quantity: item.quantity,
+    })),
+    [items],
+  );
+
+  const beganCheckoutRef = React.useRef(false);
+
+  React.useEffect(() => {
+    if (!hasHydrated || items.length === 0 || placedOrderId || beganCheckoutRef.current) return;
+    beganCheckoutRef.current = true;
+    trackBeginCheckout(checkoutItems, getSubtotal());
+  }, [hasHydrated, items.length, placedOrderId, checkoutItems, getSubtotal]);
 
   if (!hasHydrated) {
     return <CheckoutSkeleton />;
@@ -243,6 +262,13 @@ export default function Checkout() {
       const orderId = orderResponse.id;
       createdOrderId = orderId;
       setPlacedOrderId(orderId);
+
+      trackPurchase({
+        transaction_id: orderId,
+        value: finalTotalValue,
+        items: checkoutItems,
+        payment_method: paymentMethod,
+      });
 
       let emailDispatchFailed = false;
       try {

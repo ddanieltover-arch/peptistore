@@ -3,6 +3,7 @@ import { Mail, MessageSquare, Clock, ArrowRight, ShieldCheck, MapPin } from 'luc
 import { motion } from 'motion/react';
 import { useToastStore } from '../store/useToastStore';
 import { postContactEmail } from '../lib/transactionalEmailApi';
+import { trackEvent } from '../lib/analytics';
 import brandReceptionLobby from '../assets/brand/brand-reception-lobby.webp';
 
 export default function Contact() {
@@ -22,6 +23,7 @@ export default function Contact() {
     setSubmitErrorDetail('');
     try {
       await postContactEmail({ fullName, email, subject, message });
+      trackEvent('generate_lead', { lead_type: 'contact_form', subject });
       setSubmitState('success');
       addToast('Dispatch sent successfully. We will reply shortly.', 'success');
       setFullName('');

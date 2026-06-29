@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '../supabase';
 import { LogIn, Mail, Lock, Loader2 } from 'lucide-react';
+import { trackEvent } from '../lib/analytics';
 
 export default function Login() {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -26,6 +27,7 @@ export default function Login() {
         });
         if (signUpError) throw signUpError;
         if (data.user) {
+          trackEvent('sign_up', { method: 'email' });
           setSuccess('Account created! Please check your email for the confirmation link.');
         }
       } else {

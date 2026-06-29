@@ -18,6 +18,7 @@ import Omnisearch from './search/Omnisearch';
 import SmartsuppChat from './chat/SmartsuppChat';
 import logo from '../assets/logo.webp';
 import { postNewsletterSubscribe } from '../lib/transactionalEmailApi';
+import { trackEvent } from '../lib/analytics';
 
 export default function Layout() {
   const { user, profile } = useAuthStore();
@@ -110,6 +111,7 @@ export default function Layout() {
 
     try {
       await postNewsletterSubscribe({ email });
+      trackEvent('generate_lead', { lead_type: 'newsletter' });
       setNewsletterMessage('Subscription confirmed. Check your inbox for confirmation.');
       setNewsletterEmail('');
     } catch (error) {

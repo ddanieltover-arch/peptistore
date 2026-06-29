@@ -36,3 +36,49 @@ export function trackPageView(path: string, title: string) {
     window.gtag('event', 'page_view', { page_path: path, page_title: title });
   }
 }
+
+export type EcommerceItem = {
+  item_id: string;
+  item_name: string;
+  price: number;
+  quantity: number;
+};
+
+function pushEcommerceEvent(
+  name: 'begin_checkout' | 'purchase' | 'add_to_cart' | 'view_item',
+  payload: AnalyticsPayload & { items?: EcommerceItem[] },
+) {
+  trackEvent(name, { currency: 'GBP', ...payload });
+}
+
+export function trackAddToCart(item: EcommerceItem) {
+  pushEcommerceEvent('add_to_cart', {
+    value: item.price * item.quantity,
+    items: [item],
+  });
+}
+
+export function trackViewItem(item: EcommerceItem) {
+  pushEcommerceEvent('view_item', {
+    value: item.price,
+    items: [item],
+  });
+}
+
+export function trackBeginCheckout(items: EcommerceItem[], value: number) {
+  pushEcommerceEvent('begin_checkout', { value, items });
+}
+
+export function trackPurchase(params: {
+  transaction_id: string;
+  value: number;
+  items: EcommerceItem[];
+  payment_method?: string;
+}) {
+  pushEcommerceEvent('purchase', {
+    transaction_id: params.transaction_id,
+    value: params.value,
+    payment_method: params.payment_method,
+    items: params.items,
+  });
+}
