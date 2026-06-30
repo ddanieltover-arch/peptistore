@@ -1,39 +1,9 @@
 {
-  "generatedAt": "2026-06-29T18:06:44.000Z",
-  "source": "PageSpeed Insights lab data (mobile, slow 4G)",
+  "generatedAt": "2026-06-30T02:33:47.214Z",
+  "status": "Requires Lighthouse/PageSpeed execution against deployed or preview URLs",
   "targets": {
     "LCP": "<= 2.5s",
     "INP": "<= 200ms",
     "CLS": "< 0.1"
-  },
-  "pages": {
-    "/product/hyaluronic-acid": {
-      "testedAt": "2026-06-29T18:06:44+01:00",
-      "device": "mobile",
-      "psiUrl": "https://pagespeed.web.dev/analysis/https-www-researchpeptide-uk-product-hyaluronic-acid/vbnlwjt5cw?form_factor=mobile",
-      "scores": {
-        "performance": 70,
-        "accessibility": 90,
-        "bestPractices": 96,
-        "seo": 100
-      },
-      "metrics": {
-        "FCP": "2.6s",
-        "LCP": "8.9s",
-        "TBT": "20ms",
-        "CLS": 0.001,
-        "speedIndex": "5.9s",
-        "note": "Post-9d91ea0 deploy: performance 70 (was 67). Further LCP work in progress."
-      },
-      "topOpportunities": [
-        "Render-blocking requests (~1,500ms)",
-        "Improve image delivery (~852 KiB)",
-        "Reduce unused JavaScript (~243 KiB)",
-        "LCP request discovery",
-        "Images missing explicit width/height"
-      ],
-      "status": "LCP failing; CLS and TBT passing"
-    }
-  },
-  "notes": "CrUX field data unavailable (insufficient traffic). Homepage and /shop PSI scores not yet recorded."
+  }
 }

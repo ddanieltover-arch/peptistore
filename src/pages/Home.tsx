@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, ShieldCheck, Zap, Truck, ShoppingCart, Star, Heart, Sparkles, Users, Globe, Activity, LifeBuoy, Send, Award } from 'lucide-react';
-import { motion } from 'motion/react';
 import { supabase } from '../supabase';
 import { useCartStore } from '../store/useCartStore';
 import { useToastStore } from '../store/useToastStore';
@@ -9,8 +8,6 @@ import { useWishlistStore } from '../store/useWishlistStore';
 import { useAuthStore } from '../store/useAuthStore';
 import { ProductSkeleton } from '../components/Skeleton';
 import { useWizardStore } from '../store/useWizardStore';
-import heroBg from '../assets/hero_bg.png';
-import brandLabCatalogDisplay from '../assets/brand/brand-lab-catalog-display.webp';
 import brandLabAnalystFocus from '../assets/brand/brand-lab-analyst-focus.webp';
 import brandStorefrontDusk from '../assets/brand/brand-storefront-dusk.webp';
 import { CatalogTrustStrip } from '../components/products/CatalogTrustStrip';
@@ -20,7 +17,11 @@ import { ProductCardPriceBlock } from '../components/products/ProductCardPriceBl
 import { productPath } from '../lib/productUrl';
 import { ProductBadge } from '../components/products/ProductBadge';
 import { getPrimaryProductBadge } from '../lib/productBadges';
+import { SHOP_PRODUCT_COLUMNS } from '../lib/shopCatalogQuery';
+import { resolveProductImageUrl } from '../lib/productImages';
 import { GeoAnswerCapsule } from '../components/seo/GeoAnswerCapsule';
+
+const HERO_CATALOG_IMAGE = '/hero-catalog.webp';
 
 export default function Home() {
   const [featured, setFeatured] = useState<any[]>([]);
@@ -33,7 +34,7 @@ export default function Home() {
 
   useEffect(() => {
     const fetchFeatured = async () => {
-      const { data } = await supabase.from('products').select('*').limit(4);
+      const { data } = await supabase.from('products').select(SHOP_PRODUCT_COLUMNS).limit(4);
       if (data) setFeatured(data);
       setLoading(false);
     };
@@ -44,25 +45,15 @@ export default function Home() {
     <main className="overflow-hidden">
       {/* Hero Banner */}
       <section className="relative overflow-hidden bg-[#0A0F1E]">
-        {/* Background: Artistic scientific pattern */}
-        <div className="absolute inset-0">
-          <img
-            src={heroBg}
-            alt=""
-            aria-hidden={true}
-            className="w-full h-full object-cover opacity-40"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#0A0F1E]/80 via-transparent to-[#0A0F1E]/60" />
-        </div>
+        {/* Desktop-only gradient accent (hero_bg.png removed — 750 KiB hurt image delivery score) */}
+        <div
+          className="absolute inset-0 hidden md:block bg-gradient-to-br from-blue-950/50 via-[#0A0F1E] to-indigo-950/40"
+          aria-hidden={true}
+        />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 py-16 md:py-24">
-          {/* Glassmorphic Card */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, ease: "easeOut" }}
-            className="bg-slate-900/50 backdrop-blur-2xl border border-white/10 rounded-[2rem] md:rounded-[3rem] overflow-hidden shadow-2xl shadow-black/40"
-          >
+          {/* Glassmorphic Card — no backdrop-blur on mobile (expensive paint) */}
+          <div className="bg-slate-900/90 md:bg-slate-900/50 md:backdrop-blur-2xl border border-white/10 rounded-[2rem] md:rounded-[3rem] overflow-hidden shadow-2xl shadow-black/40">
             <div className="grid grid-cols-1 md:grid-cols-2 items-center">
               {/* Left: Text Content */}
               <div className="p-8 md:p-12 lg:p-16">
@@ -100,17 +91,20 @@ export default function Home() {
 
               {/* Right: Product Vials Image */}
               <div className="relative flex items-center justify-center p-6 md:p-10">
-                <motion.img
-                  initial={{ opacity: 0, x: 40 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.8, delay: 0.3, ease: "easeOut" }}
-                  src={brandLabCatalogDisplay}
+                <img
+                  id="home-hero-lcp"
+                  src={HERO_CATALOG_IMAGE}
                   alt="Research Peptides laboratory with catalogued research compounds"
+                  width={640}
+                  height={640}
+                  decoding="sync"
+                  fetchPriority="high"
+                  loading="eager"
                   className="w-full max-w-md object-contain drop-shadow-[0_20px_40px_rgba(37,99,235,0.15)]"
                 />
               </div>
             </div>
-          </motion.div>
+          </div>
         </div>
       </section>
 
@@ -176,12 +170,8 @@ export default function Home() {
                 desc: 'Fully compliant with international research chemical standards, ensuring the highest echelon of quality for your laboratory.' 
               }
             ].map((item, i) => (
-              <motion.div
+              <div
                 key={i}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
                 className="group p-8 rounded-[2.5rem] bg-gray-50/50 border border-gray-100 hover:bg-white hover:shadow-2xl hover:shadow-blue-500/10 hover:border-blue-100 transition-all duration-500"
               >
                 <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center mb-6 shadow-sm group-hover:bg-blue-600 group-hover:shadow-lg group-hover:shadow-blue-200 transition-all duration-500">
@@ -189,7 +179,7 @@ export default function Home() {
                 </div>
                 <h3 className="text-xl font-black text-gray-900 mb-4 group-hover:text-blue-600 transition-colors">{item.title}</h3>
                 <p className="text-gray-500 text-sm leading-relaxed font-medium">{item.desc}</p>
-              </motion.div>
+              </div>
             ))}
           </div>
         </div>
@@ -224,12 +214,8 @@ export default function Home() {
               {featured.map((product, i) => {
                 const primaryBadge = getPrimaryProductBadge(product);
                 return (
-                <motion.div
+                <div
                   key={product.id}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: i * 0.1 }}
                   className="group relative bg-white rounded-[3rem] p-4 shadow-xl shadow-gray-200/40 border border-gray-100 hover:shadow-2xl hover:shadow-blue-500/10 transition-all duration-500 hover:-translate-y-3"
                 >
                   {/* Badge */}
@@ -241,8 +227,12 @@ export default function Home() {
                   <Link to={productPath(product)} className="block relative aspect-[4/5] rounded-[2.5rem] overflow-hidden bg-gray-50 mb-8">
                     {product.images?.[0] ? (
                       <img
-                        src={product.images[0]}
+                        src={resolveProductImageUrl(product)}
                         alt={product.title}
+                        width={320}
+                        height={400}
+                        loading="lazy"
+                        decoding="async"
                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000"
                       />
                     ) : (
@@ -303,7 +293,7 @@ export default function Home() {
                       </button>
                     </div>
                   </div>
-                </motion.div>
+                </div>
               )})}
             </div>
           )}
@@ -327,12 +317,8 @@ export default function Home() {
                   { icon: Zap, title: 'Crypto Privacy', desc: 'Accepting BTC, ETH, USDT for complete transaction anonymity.' },
                   { icon: Truck, title: 'Guaranteed Stealth', desc: 'Bypass delays with our proprietary stealth shipping methods.' }
                 ].map((item, i) => (
-                  <motion.div
+                  <div
                     key={i}
-                    initial={{ opacity: 0, x: -20 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: i * 0.1 }}
                     className="flex gap-6"
                   >
                     <div className="flex-shrink-0 w-14 h-14 bg-blue-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/20">
@@ -342,7 +328,7 @@ export default function Home() {
                       <h4 className="text-xl font-bold mb-2">{item.title}</h4>
                       <p className="text-gray-400 text-sm leading-relaxed">{item.desc}</p>
                     </div>
-                  </motion.div>
+                  </div>
                 ))}
               </div>
             </div>
@@ -350,7 +336,7 @@ export default function Home() {
             <div className="relative">
               {/* Reduced height aspect ratio: aspect-video or aspect-[16/10] */}
               <div className="aspect-video lg:aspect-[4/3] bg-gray-800 rounded-[3rem] overflow-hidden border border-white/5 relative group">
-                <img src={brandLabAnalystFocus} alt="Scientists at work in a peptide research laboratory" className="w-full h-full object-cover opacity-60 group-hover:scale-105 transition-transform duration-1000" />
+                <img src={brandLabAnalystFocus} alt="Scientists at work in a peptide research laboratory" loading="lazy" decoding="async" width={800} height={500} className="w-full h-full object-cover opacity-60 group-hover:scale-105 transition-transform duration-1000" />
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="text-center p-8 bg-black/40 backdrop-blur-xl border border-white/10 rounded-[2rem] w-3/4 mx-auto">
                     <Star className="h-10 w-10 text-blue-500 mx-auto mb-4 fill-current" />
@@ -377,24 +363,22 @@ export default function Home() {
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
             {/* Left Column: Custom Imagery */}
-            <motion.div 
-               initial={{ opacity: 0, x: -50 }}
-               whileInView={{ opacity: 1, x: 0 }}
-               viewport={{ once: true }}
-               transition={{ duration: 0.8 }}
-               className="relative"
-            >
+            <div className="relative">
                <div className="relative z-10 rounded-[4rem] overflow-hidden shadow-2xl shadow-blue-900/10 border-[12px] border-white group">
-                  <img 
-                    src={brandStorefrontDusk} 
-                    alt="Research Peptides UK storefront — purity, precision, performance" 
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" 
+                  <img
+                    src={brandStorefrontDusk}
+                    alt="Research Peptides UK storefront — purity, precision, performance"
+                    loading="lazy"
+                    decoding="async"
+                    width={800}
+                    height={600}
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000"
                   />
                   <div className="absolute inset-0 bg-gradient-to-tr from-blue-900/20 via-transparent to-transparent" />
                </div>
                {/* Decorative Gradient Blob */}
                <div className="absolute -top-12 -right-12 w-64 h-64 bg-blue-100/40 rounded-full blur-3xl -z-10" />
-            </motion.div>
+            </div>
 
             {/* Right Column: Key Benefits and Call to Action */}
             <div className="space-y-12">
@@ -406,17 +390,13 @@ export default function Home() {
                     { title: 'VIP Eligibility Status', bg: 'bg-slate-50 border-slate-100 text-slate-900', icon: '👑' },
                     { title: 'Institutional Purity', bg: 'bg-emerald-50 border-emerald-100 text-emerald-900', icon: '🔬' }
                   ].map((block, i) => (
-                    <motion.div
+                    <div
                       key={i}
-                      initial={{ opacity: 0, y: 15 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true }}
-                      transition={{ delay: i * 0.1 }}
                       className={`p-6 rounded-[2rem] border ${block.bg} flex items-center gap-4 hover:-translate-y-1 hover:shadow-lg transition-all duration-300`}
                     >
                       <span className="text-2xl">{block.icon}</span>
                       <span className="text-[10px] font-black uppercase tracking-widest leading-tight">{block.title}</span>
-                    </motion.div>
+                    </div>
                   ))}
                </div>
 
@@ -436,12 +416,7 @@ export default function Home() {
                </div>
 
                {/* Final Call to Action */}
-               <motion.div
-                 initial={{ opacity: 0, scale: 0.95 }}
-                 whileInView={{ opacity: 1, scale: 1 }}
-                 viewport={{ once: true }}
-                 className="pt-4"
-               >
+               <div className="pt-4">
                  <Link 
                    to="/shop" 
                    className="inline-flex items-center gap-4 bg-gray-900 text-white font-black text-xs uppercase tracking-[0.3em] px-12 py-7 rounded-3xl hover:bg-blue-600 hover:shadow-2xl hover:shadow-blue-200 transition-all active:scale-95 group"
@@ -449,7 +424,7 @@ export default function Home() {
                    Access the Collection
                    <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-3" />
                  </Link>
-               </motion.div>
+               </div>
             </div>
           </div>
         </div>

@@ -59,17 +59,10 @@ export default function SmartsuppChat() {
     window.addEventListener('pointerdown', onInteract, { once: true, passive: true });
     window.addEventListener('keydown', onInteract, { once: true });
 
-    const delayId = window.setTimeout(mount, 6000);
-    const idleId =
-      'requestIdleCallback' in window
-        ? window.requestIdleCallback(mount, { timeout: 8000 })
-        : undefined;
+    const delayId = window.setTimeout(mount, 12_000);
 
     return () => {
       window.clearTimeout(delayId);
-      if (idleId !== undefined && 'cancelIdleCallback' in window) {
-        window.cancelIdleCallback(idleId);
-      }
       window.removeEventListener('pointerdown', onInteract);
       window.removeEventListener('keydown', onInteract);
     };

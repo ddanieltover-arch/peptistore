@@ -1,5 +1,4 @@
 import { create } from 'zustand';
-import { supabase } from '../supabase';
 
 interface WishlistState {
   productIds: string[];
@@ -15,6 +14,7 @@ export const useWishlistStore = create<WishlistState>((set, get) => ({
       return;
     }
     try {
+      const { supabase } = await import('../supabase');
       const { data } = await supabase.from('wishlist').select('product_id').eq('user_id', userId);
       const ids = data ? data.map((d: any) => d.product_id) : [];
       set({ productIds: ids });
@@ -29,6 +29,7 @@ export const useWishlistStore = create<WishlistState>((set, get) => ({
     const isAdding = !currentIds.includes(productId);
     
     try {
+      const { supabase } = await import('../supabase');
       if (isAdding) {
         set({ productIds: [...currentIds, productId] });
         await supabase.from('wishlist').insert([{ user_id: userId, product_id: productId }]);

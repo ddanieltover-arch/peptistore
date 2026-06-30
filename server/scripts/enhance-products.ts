@@ -47,7 +47,8 @@ async function downloadAndUploadImage(url: string, productId: string): Promise<s
       .from('products')
       .upload(fileName, buffer, {
         contentType: res.headers.get('content-type') || 'image/jpeg',
-        upsert: true
+        upsert: true,
+        cacheControl: '31536000',
       });
 
     if (error) throw error;

@@ -1,6 +1,5 @@
 import { create } from 'zustand';
-import { User } from '@supabase/supabase-js';
-import { supabase } from '../supabase';
+import type { User } from '@supabase/supabase-js';
 
 export interface UserProfile {
   id: string;
@@ -44,7 +43,8 @@ export const useAuthStore = create<AuthState>((set) => ({
   setAuthReady: (isReady) => set({ isAuthReady: isReady }),
   fetchProfile: async (id, email, displayName, photoURL) => {
     try {
-      const { data: existingUser, error: reqError } = await supabase
+      const { supabase } = await import('../supabase');
+      const { data: existingUser } = await supabase
         .from('users')
         .select('*')
         .eq('id', id)

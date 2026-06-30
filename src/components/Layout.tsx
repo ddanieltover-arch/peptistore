@@ -1,18 +1,12 @@
 import React, { Suspense, useEffect, useRef, useState } from 'react';
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
 import { ShoppingCart, Heart, User, LogOut, Menu, X, Search, ArrowUp } from 'lucide-react';
-import { motion, AnimatePresence } from 'motion/react';
 import { useAuthStore } from '../store/useAuthStore';
 import { useCartStore } from '../store/useCartStore';
 import { useSearchStore } from '../store/useSearchStore';
 import { useWizardStore } from '../store/useWizardStore';
-import { supabase } from '../supabase';
-import SelectorWizard from './wizard/SelectorWizard';
-import RecentlyViewedSidebar from './products/RecentlyViewedSidebar';
 import ToastContainer from './ToastContainer';
 import MobileBottomNav from './MobileBottomNav';
-import CartDrawer from './cart/CartDrawer';
-import Omnisearch from './search/Omnisearch';
 import SmartsuppChat from './chat/SmartsuppChat';
 import logo from '../assets/logo.webp';
 import { postNewsletterSubscribe } from '../lib/transactionalEmailApi';
@@ -20,11 +14,17 @@ import { trackEvent } from '../lib/analytics';
 
 const LiveTicker = React.lazy(() => import('./ticker/LiveTicker'));
 const SalesNotification = React.lazy(() => import('./SalesNotification'));
+const CartDrawer = React.lazy(() => import('./cart/CartDrawer'));
+const Omnisearch = React.lazy(() => import('./search/Omnisearch'));
+const SelectorWizard = React.lazy(() => import('./wizard/SelectorWizard'));
+const RecentlyViewedSidebar = React.lazy(() => import('./products/RecentlyViewedSidebar'));
 
 export default function Layout() {
   const { user, profile } = useAuthStore();
-  const { items, openCart } = useCartStore();
-  const { openSearch } = useSearchStore();
+  const { items, openCart, isOpen: isCartOpen } = useCartStore();
+  const { isOpen: isSearchOpen, openSearch } = useSearchStore();
+  const { isOpen: isWizardOpen } = useWizardStore();
+  const [mountDeferredUi, setMountDeferredUi] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
   const [accountMenuOpen, setAccountMenuOpen] = useState(false);
   const [showBackToTop, setShowBackToTop] = useState(false);
@@ -42,6 +42,7 @@ export default function Layout() {
 
   const handleLogout = async () => {
     try {
+      const { supabase } = await import('../supabase');
       await supabase.auth.signOut();
       navigate('/');
     } catch (error) {
@@ -50,6 +51,20 @@ export default function Layout() {
   };
 
   const cartItemCount = items.reduce((acc, item) => acc + item.quantity, 0);
+
+  useEffect(() => {
+    const delayId = window.setTimeout(() => setMountDeferredUi(true), 2500);
+    const idleId =
+      'requestIdleCallback' in window
+        ? window.requestIdleCallback(() => setMountDeferredUi(true), { timeout: 4000 })
+        : undefined;
+    return () => {
+      window.clearTimeout(delayId);
+      if (idleId !== undefined && 'cancelIdleCallback' in window) {
+        window.cancelIdleCallback(idleId);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     if (!accountMenuOpen) return;
@@ -423,30 +438,40 @@ export default function Layout() {
           </div>
         </div>
       </footer>
-      <AnimatePresence>
-        {showBackToTop && (
-          <motion.button
-            type="button"
-            onClick={handleBackToTop}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 10 }}
-            transition={{ duration: 0.2 }}
-            className="fixed bottom-24 md:bottom-8 left-4 md:left-8 z-50 bg-blue-600 hover:bg-blue-700 text-white rounded-full p-3 shadow-xl shadow-blue-600/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
-            aria-label="Back to top"
-          >
-            <ArrowUp className="h-5 w-5" aria-hidden />
-          </motion.button>
-        )}
-      </AnimatePresence>
+      {showBackToTop ? (
+        <button
+          type="button"
+          onClick={handleBackToTop}
+          className="fixed bottom-24 md:bottom-8 left-4 md:left-8 z-50 bg-blue-600 hover:bg-blue-700 text-white rounded-full p-3 shadow-xl shadow-blue-600/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
+          aria-label="Back to top"
+        >
+          <ArrowUp className="h-5 w-5" aria-hidden />
+        </button>
+      ) : null}
       <MobileBottomNav />
       <Suspense fallback={null}>
         <SalesNotification />
       </Suspense>
-      <CartDrawer />
-      <Omnisearch />
-      <SelectorWizard />
-      <RecentlyViewedSidebar />
+      {(isCartOpen || mountDeferredUi) && (
+        <Suspense fallback={null}>
+          <CartDrawer />
+        </Suspense>
+      )}
+      {isSearchOpen && (
+        <Suspense fallback={null}>
+          <Omnisearch />
+        </Suspense>
+      )}
+      {isWizardOpen && (
+        <Suspense fallback={null}>
+          <SelectorWizard />
+        </Suspense>
+      )}
+      {mountDeferredUi && (
+        <Suspense fallback={null}>
+          <RecentlyViewedSidebar />
+        </Suspense>
+      )}
       <ToastContainer />
       <SmartsuppChat />
     </div>

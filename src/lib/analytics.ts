@@ -10,7 +10,14 @@ export type AnalyticsEventName =
   | 'search'
   | 'cta_click';
 
-type AnalyticsPayload = Record<string, string | number | boolean | null | undefined>;
+export type EcommerceItem = {
+  item_id: string;
+  item_name: string;
+  price: number;
+  quantity: number;
+};
+
+type AnalyticsPayload = Record<string, string | number | boolean | null | undefined | EcommerceItem[]>;
 
 declare global {
   interface Window {
@@ -36,13 +43,6 @@ export function trackPageView(path: string, title: string) {
     window.gtag('event', 'page_view', { page_path: path, page_title: title });
   }
 }
-
-export type EcommerceItem = {
-  item_id: string;
-  item_name: string;
-  price: number;
-  quantity: number;
-};
 
 function pushEcommerceEvent(
   name: 'begin_checkout' | 'purchase' | 'add_to_cart' | 'view_item',

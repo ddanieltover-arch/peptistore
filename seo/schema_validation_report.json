@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-29T16:34:46.875Z",
+  "generatedAt": "2026-06-30T02:33:47.220Z",
   "status": "Generated locally; external Rich Results Test requires live URL access.",
   "schemasGenerated": [
     "Organization",
@@ -13,125 +13,125 @@
     {
       "@context": "https://schema.org",
       "@type": "Product",
-      "@id": "https://www.researchpeptide.uk/product/hyaluronic-acid#product",
-      "name": "Hyaluronic Acid",
+      "@id": "https://www.researchpeptide.uk/product/nad#product",
+      "name": "NAD+",
       "image": [
-        "https://researchpeptide.co.uk/wp-content/uploads/2026/01/Klow-Blend-ghk--scaled.jpg"
+        "https://bepzxmukveqobaqffqop.supabase.co/storage/v1/object/public/products/catalog/nad/0.webp"
       ],
-      "description": "Glycosaminoglycan hydrator reference.",
-      "sku": "4d28aa89-5704-4cc7-9824-e7b70709bf2d",
+      "description": "Nicotinamide adenine dinucleotide bulk vials.",
+      "sku": "2be46580-3b46-4044-94c4-371e4c16e435",
       "brand": {
         "@type": "Brand",
         "name": "Research Peptides UK"
       },
-      "category": "supplements, peptide-powder",
-      "url": "https://www.researchpeptide.uk/product/hyaluronic-acid",
+      "category": "supplements, research-chemicals, peptide-powder",
+      "url": "https://www.researchpeptide.uk/product/nad",
       "offers": {
         "@type": "Offer",
         "priceCurrency": "GBP",
-        "price": "145.69",
+        "price": "35.32",
         "availability": "https://schema.org/InStock",
-        "url": "https://www.researchpeptide.uk/product/hyaluronic-acid",
+        "url": "https://www.researchpeptide.uk/product/nad",
         "itemCondition": "https://schema.org/NewCondition"
       }
     },
     {
       "@context": "https://schema.org",
       "@type": "Product",
-      "@id": "https://www.researchpeptide.uk/product/sermorelin-acetate#product",
-      "name": "Sermorelin Acetate (powder list)",
+      "@id": "https://www.researchpeptide.uk/product/survodutide#product",
+      "name": "Survodutide",
       "image": [
-        "https://researchpeptide.co.uk/wp-content/uploads/2026/01/sermorelin--scaled.jpg"
+        "https://bepzxmukveqobaqffqop.supabase.co/storage/v1/object/public/products/catalog/survodutide/0.webp"
       ],
-      "description": "GHRH fragment secretagogue analog.",
-      "sku": "1e8cdc69-ab02-42fc-a429-d4aed2f0ceb7",
+      "description": "GCGR / GLP-1 dual agonist class (research).",
+      "sku": "376cac57-c437-44f1-9f26-02c3d0b65153",
       "brand": {
         "@type": "Brand",
         "name": "Research Peptides UK"
       },
-      "category": "peptides, peptide-powder",
-      "url": "https://www.researchpeptide.uk/product/sermorelin-acetate",
+      "category": "peptides, research-chemicals, peptide-powder",
+      "url": "https://www.researchpeptide.uk/product/survodutide",
       "offers": {
         "@type": "Offer",
         "priceCurrency": "GBP",
-        "price": "36.05",
+        "price": "199.40",
         "availability": "https://schema.org/InStock",
-        "url": "https://www.researchpeptide.uk/product/sermorelin-acetate",
+        "url": "https://www.researchpeptide.uk/product/survodutide",
         "itemCondition": "https://schema.org/NewCondition"
       }
     },
     {
       "@context": "https://schema.org",
       "@type": "Product",
-      "@id": "https://www.researchpeptide.uk/product/ss-31#product",
-      "name": "SS-31 (powder list)",
+      "@id": "https://www.researchpeptide.uk/product/thymalin#product",
+      "name": "Thymalin",
       "image": [
-        "https://researchpeptide.co.uk/wp-content/uploads/2026/01/SS-31-copy-scaled.jpg"
+        "https://bepzxmukveqobaqffqop.supabase.co/storage/v1/object/public/products/catalog/thymalin/0.webp"
       ],
-      "description": "Mitochondrial-targeted tetrapeptide.",
-      "sku": "ffbc2b50-9c28-41da-99d5-c7d37936e7e9",
+      "description": "Thymic peptide complex analog.",
+      "sku": "35ac0c47-185c-4955-8b9d-348c5fa4128a",
       "brand": {
         "@type": "Brand",
         "name": "Research Peptides UK"
       },
       "category": "peptides, peptide-powder",
-      "url": "https://www.researchpeptide.uk/product/ss-31",
+      "url": "https://www.researchpeptide.uk/product/thymalin",
       "offers": {
         "@type": "Offer",
         "priceCurrency": "GBP",
-        "price": "69.90",
+        "price": "55.92",
         "availability": "https://schema.org/InStock",
-        "url": "https://www.researchpeptide.uk/product/ss-31",
+        "url": "https://www.researchpeptide.uk/product/thymalin",
         "itemCondition": "https://schema.org/NewCondition"
       }
     },
     {
       "@context": "https://schema.org",
       "@type": "Product",
-      "@id": "https://www.researchpeptide.uk/product/tb500-thymosin-beta-4-acetate#product",
-      "name": "TB500 (Thymosin Beta-4 Acetate)",
+      "@id": "https://www.researchpeptide.uk/product/cjc-1295-with-dac#product",
+      "name": "CJC-1295 (With DAC)",
       "image": [
-        "https://researchpeptide.co.uk/wp-content/uploads/2026/01/tb500-scaled.jpg"
+        "https://bepzxmukveqobaqffqop.supabase.co/storage/v1/object/public/products/catalog/cjc-1295-with-dac/0.webp"
       ],
-      "description": "Actin-binding thymosin fragment analog.",
-      "sku": "f6bb0f4d-45c9-4a1e-90a1-d0aef5932489",
+      "description": "Extended half-life GHRH analog (DAC).",
+      "sku": "44775dc1-2c1a-4cf2-a853-bccd47b20e86",
       "brand": {
         "@type": "Brand",
         "name": "Research Peptides UK"
       },
       "category": "peptides, peptide-powder",
-      "url": "https://www.researchpeptide.uk/product/tb500-thymosin-beta-4-acetate",
+      "url": "https://www.researchpeptide.uk/product/cjc-1295-with-dac",
       "offers": {
         "@type": "Offer",
         "priceCurrency": "GBP",
-        "price": "33.85",
+        "price": "89.77",
         "availability": "https://schema.org/InStock",
-        "url": "https://www.researchpeptide.uk/product/tb500-thymosin-beta-4-acetate",
+        "url": "https://www.researchpeptide.uk/product/cjc-1295-with-dac",
         "itemCondition": "https://schema.org/NewCondition"
       }
     },
     {
       "@context": "https://schema.org",
       "@type": "Product",
-      "@id": "https://www.researchpeptide.uk/product/adamax#product",
-      "name": "Adamax",
+      "@id": "https://www.researchpeptide.uk/product/follistatin#product",
+      "name": "Follistatin",
       "image": [
-        "https://researchpeptide.co.uk/wp-content/uploads/2026/01/Semax-scaled.jpg"
+        "https://bepzxmukveqobaqffqop.supabase.co/storage/v1/object/public/products/catalog/follistatin/0.webp"
       ],
-      "description": "Semax-derived research analog.",
-      "sku": "f4bd3603-1821-494a-ad80-1fd8581c380c",
+      "description": "Binding protein / regulatory scaffold.",
+      "sku": "4598caa6-cb0e-4ba9-9bfd-07386e5ee192",
       "brand": {
         "@type": "Brand",
         "name": "Research Peptides UK"
       },
-      "category": "peptides, peptide-powder",
-      "url": "https://www.researchpeptide.uk/product/adamax",
+      "category": "peptides, research-chemicals, peptide-powder",
+      "url": "https://www.researchpeptide.uk/product/follistatin",
       "offers": {
         "@type": "Offer",
         "priceCurrency": "GBP",
-        "price": "126.56",
+        "price": "317.13",
         "availability": "https://schema.org/InStock",
-        "url": "https://www.researchpeptide.uk/product/adamax",
+        "url": "https://www.researchpeptide.uk/product/follistatin",
         "itemCondition": "https://schema.org/NewCondition"
       }
     }

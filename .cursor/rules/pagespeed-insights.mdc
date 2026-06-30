@@ -12,6 +12,6 @@ When the user sends a PageSpeed Insights report, Lighthouse screenshot, or Core 
 3. **Prefer smallest high-impact diffs** — match existing patterns; avoid over-engineering.
 4. **Update `seo/core_web_vitals_baseline.json`** when new scores are provided.
 5. **Brief summary after** — what changed, expected metric impact, and what (if anything) cannot be fixed in code alone (e.g. external CDN images, CrUX “No Data”).
-6. **Commit** when the user has been pushing SEO/CWV work in the session, unless they said not to commit.
+6. **Commit/push** only when the user explicitly asks — implement and commit locally if they ask to commit; never push to remote unless they say so.
 
 Scope order: fix the **specific URL/page** audited first, then **shared bottlenecks** (`index.html` fonts, `Layout.tsx` third parties) if the audit calls them out.

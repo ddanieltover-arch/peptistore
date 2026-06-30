@@ -47,7 +47,8 @@ async function uploadToSupabase(imageUrl: string, fileName: string): Promise<str
       .from('products')
       .upload(`enhanced/${fileName}`, buffer, {
         contentType: blob.type || 'image/jpeg',
-        upsert: true
+        upsert: true,
+        cacheControl: '31536000',
       });
 
     if (error) throw error;

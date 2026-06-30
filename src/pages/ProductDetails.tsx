@@ -38,10 +38,16 @@ function preloadHeroImage(url: string) {
 
 export default function ProductDetails() {
   const { slug, id } = useParams<{ slug?: string; id?: string }>();
-  const [product, setProduct] = useState<any>(null);
+  const [prerenderHint] = useState(() => getPrerenderProductHint());
+  const [product, setProduct] = useState<any | null>(() =>
+    prerenderHint.image
+      ? { title: prerenderHint.title || 'Research peptide', images: [prerenderHint.image] }
+      : null,
+  );
   const [reviews, setReviews] = useState<any[]>([]);
   const [recommended, setRecommended] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(() => !prerenderHint.image);
+  const [fetchingDetails, setFetchingDetails] = useState(() => Boolean(prerenderHint.image));
   const [quantity, setQuantity] = useState(1);
   const [selectedVariant, setSelectedVariant] = useState<any>(null);
   const [reviewText, setReviewText] = useState('');
@@ -49,8 +55,8 @@ export default function ProductDetails() {
   const [showShare, setShowShare] = useState(false);
   const [activeImage, setActiveImage] = useState(0);
   const [recentlyViewed, setRecentlyViewed] = useState<any[]>([]);
-  const [prerenderHint] = useState(() => getPrerenderProductHint());
   
+  const productReady = Boolean(product?.id);
   const addItem = useCartStore(state => state.addItem);
   const { user, profile } = useAuthStore();
   const { productIds, toggleWishlist } = useWishlistStore();
@@ -89,8 +95,12 @@ export default function ProductDetails() {
     const fetchProduct = async () => {
       if (!slug && !id) return;
 
-      setLoading(true);
-      setProduct(null);
+      if (prerenderHint.image) {
+        setFetchingDetails(true);
+      } else {
+        setLoading(true);
+        setProduct(null);
+      }
       setReviews([]);
       setRecommended([]);
       setRecentlyViewed([]);
@@ -122,11 +132,15 @@ export default function ProductDetails() {
         }
         setActiveImage(0);
         setLoading(false);
+        setFetchingDetails(false);
 
         void loadSecondaryData(pData);
       } catch (error) {
         console.error('Error fetching product:', error);
-        if (!cancelled) setLoading(false);
+        if (!cancelled) {
+          setLoading(false);
+          setFetchingDetails(false);
+        }
       }
     };
 
@@ -135,10 +149,10 @@ export default function ProductDetails() {
     return () => {
       cancelled = true;
     };
-  }, [slug, id, navigate]);
+  }, [slug, id, navigate, prerenderHint.image]);
 
   const handleAddToCart = () => {
-    if (product) {
+    if (product && product.id) {
       let pricePerUnit = selectedVariant ? selectedVariant.display_price : product.price;
       
       // Apply Tier Discounts
@@ -190,33 +204,7 @@ export default function ProductDetails() {
     alert('Link copied to clipboard!');
   };
 
-  if (loading) {
-    if (prerenderHint.image) {
-      return (
-        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-            <div className="bg-white rounded-3xl aspect-square overflow-hidden border border-gray-100 shadow-sm">
-              <img
-                id="product-hero-image"
-                src={prerenderHint.image}
-                alt={prerenderHint.title || 'Research peptide'}
-                width={800}
-                height={800}
-                fetchPriority="high"
-                decoding="sync"
-                loading="eager"
-                className="w-full h-full object-cover"
-              />
-            </div>
-            <div className="animate-pulse space-y-4 pt-4">
-              <div className="h-10 bg-gray-100 rounded-xl w-3/4" />
-              <div className="h-6 bg-gray-100 rounded-lg w-1/3" />
-              <div className="h-24 bg-gray-100 rounded-xl" />
-            </div>
-          </div>
-        </main>
-      );
-    }
+  if (loading && !product) {
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <DetailedProductSkeleton />
@@ -521,9 +509,10 @@ export default function ProductDetails() {
             <button 
               type="button"
               onClick={handleAddToCart}
-              className="flex-1 bg-blue-600 text-white py-4 px-6 rounded-xl font-bold hover:bg-blue-700 flex items-center justify-center transition-all shadow-lg hover:shadow-xl active:scale-95"
+              disabled={!productReady || fetchingDetails}
+              className="flex-1 bg-blue-600 text-white py-4 px-6 rounded-xl font-bold hover:bg-blue-700 flex items-center justify-center transition-all shadow-lg hover:shadow-xl active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed"
             >
-                 <ShoppingCart className="mr-2 h-5 w-5" aria-hidden /> Add to Cart
+                 <ShoppingCart className="mr-2 h-5 w-5" aria-hidden /> {fetchingDetails ? 'Loading…' : 'Add to Cart'}
             </button>
           </div>
         </div>
@@ -532,6 +521,7 @@ export default function ProductDetails() {
           <GeoAnswerCapsule answer={`This page details the research profile, documentation signals, and compliance context for ${product.title}. It is supplied exclusively for non-human laboratory workflows and scientific evaluation.`} />
 
       {/* Dynamic Research Stack Bundle Builder */}
+      {productReady && (
       <Suspense fallback={<div className="mt-12 h-48 rounded-3xl bg-gray-50 border border-gray-100 animate-pulse" aria-hidden />}>
         <ResearchStackBuilder
           baseProduct={product}
@@ -539,6 +529,7 @@ export default function ProductDetails() {
           recommendedProducts={recommended}
         />
       </Suspense>
+      )}
 
       {/* Interactive Reconstitution Calculator */}
       <div className="mt-12">

@@ -25,11 +25,17 @@ function ensureMeta(name: string, content: string) {
 }
 
 function scheduleAnalyticsLoad(run: () => void) {
-  if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
-    window.requestIdleCallback(run, { timeout: 3000 });
-    return;
-  }
-  setTimeout(run, 2000);
+  let loaded = false;
+  const go = () => {
+    if (loaded) return;
+    loaded = true;
+    run();
+  };
+
+  window.addEventListener('pointerdown', go, { once: true, passive: true });
+  window.addEventListener('keydown', go, { once: true });
+  window.addEventListener('scroll', go, { once: true, passive: true });
+  window.setTimeout(go, 10_000);
 }
 
 export default function Analytics() {

@@ -16,15 +16,13 @@ export function ProductCardRating({ rating = 0, reviewCount = 0, className = '',
 
   const sc = starClassName ?? 'h-3 w-3';
 
+  const label =
+    starsValue > 0 || rc > 0
+      ? `Rated ${starsValue.toFixed(1)} out of 5, ${rc} reviews`
+      : 'No ratings yet';
+
   return (
-    <div
-      className={`flex items-center gap-2 ${className}`}
-      aria-label={
-        starsValue > 0 || rc > 0
-          ? `Rated ${starsValue.toFixed(1)} out of 5, ${rc} reviews`
-          : 'No ratings yet'
-      }
-    >
+    <div className={`flex items-center gap-2 ${className}`} role="img" aria-label={label}>
       <div className="flex text-amber-400" aria-hidden>
         {[0, 1, 2, 3, 4].map((i) =>
           i < filled ? (

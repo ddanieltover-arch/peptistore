@@ -8,7 +8,7 @@ import Seo from '../components/Seo';
 import { buildArticleJsonLd, excerpt } from '../lib/seo';
 import { resolveBlogImageUrl } from '../lib/blogImages';
 import { productPath } from '../lib/productUrl';
-import heroBg from '../assets/hero_bg.png';
+import heroBg from '../assets/hero_bg.webp';
 
 export default function BlogPost() {
   const { id } = useParams<{ id: string }>();
@@ -102,7 +102,7 @@ export default function BlogPost() {
         {/* Banner with a clean subtle gradient and pattern */}
         <div className="bg-[#0A0F1E] text-white relative py-24 overflow-hidden border-b border-white/5">
           <div className="absolute inset-0 opacity-20">
-            <img src={heroBg} className="w-full h-full object-cover" />
+            <img src={heroBg} alt="" aria-hidden={true} loading="lazy" decoding="async" fetchPriority="low" className="w-full h-full object-cover" />
           </div>
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <Link 

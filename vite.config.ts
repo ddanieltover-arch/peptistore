@@ -51,8 +51,12 @@ export default defineConfig(({ mode }) => {
         output: {
           manualChunks(id) {
             if (!id.includes('node_modules')) return undefined;
+            if (id.includes('react-markdown') || id.includes('micromark') || id.includes('mdast') || id.includes('remark')) {
+              return 'vendor-markdown';
+            }
             if (id.includes('@supabase')) return 'vendor-supabase';
             if (id.includes('motion')) return 'vendor-motion';
+            if (id.includes('lucide-react')) return 'vendor-icons';
             return 'vendor';
           },
         },

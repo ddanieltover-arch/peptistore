@@ -6,7 +6,6 @@ import Seo from './components/Seo';
 import Analytics from './components/Analytics';
 import { useAuthStore } from './store/useAuthStore';
 import { useWishlistStore } from './store/useWishlistStore';
-import { supabase } from './supabase';
 
 const Home = React.lazy(() => import('./pages/Home'));
 const Shop = React.lazy(() => import('./pages/Shop'));
@@ -41,36 +40,41 @@ export default function App() {
   const { fetchWishlist } = useWishlistStore();
 
   React.useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        fetchProfile(
-          session.user.id, 
-          session.user.email || '', 
-          session.user.user_metadata?.full_name || null, 
-          session.user.user_metadata?.avatar_url || null
-        );
-        fetchWishlist(session.user.id);
-      }
-      setAuthReady(true);
+    let subscription: { unsubscribe: () => void } | undefined;
+
+    void import('./supabase').then(({ supabase }) => {
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        setUser(session?.user ?? null);
+        if (session?.user) {
+          fetchProfile(
+            session.user.id,
+            session.user.email || '',
+            session.user.user_metadata?.full_name || null,
+            session.user.user_metadata?.avatar_url || null,
+          );
+          fetchWishlist(session.user.id);
+        }
+        setAuthReady(true);
+      });
+
+      const { data } = supabase.auth.onAuthStateChange((_event, session) => {
+        setUser(session?.user ?? null);
+        if (session?.user) {
+          fetchProfile(
+            session.user.id,
+            session.user.email || '',
+            session.user.user_metadata?.full_name || null,
+            session.user.user_metadata?.avatar_url || null,
+          );
+          fetchWishlist(session.user.id);
+        } else {
+          useAuthStore.getState().setProfile(null);
+        }
+      });
+      subscription = data.subscription;
     });
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        fetchProfile(
-          session.user.id, 
-          session.user.email || '', 
-          session.user.user_metadata?.full_name || null, 
-          session.user.user_metadata?.avatar_url || null
-        );
-        fetchWishlist(session.user.id);
-      } else {
-         useAuthStore.getState().setProfile(null);
-      }
-    });
-
-    return () => subscription.unsubscribe();
+    return () => subscription?.unsubscribe();
   }, [setUser, fetchProfile, setAuthReady, fetchWishlist]);
 
   return (
@@ -86,7 +90,7 @@ function AppRoutes() {
     <>
       <Seo />
       <Analytics />
-      <React.Suspense fallback={<div className="min-h-screen bg-white" aria-label="Loading page" />}>
+      <React.Suspense fallback={<div className="min-h-screen bg-white" role="status" aria-live="polite" />}>
         <Routes>
           <Route path="/" element={<Layout />}>
             <Route index element={<Home />} />

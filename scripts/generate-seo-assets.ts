@@ -76,7 +76,46 @@ function sitemapXml(products: ProductRow[], posts: BlogRow[]) {
   return '<?xml version=\'1.0\' encoding=\'UTF-8\'?>\n<urlset xmlns=\'http://www.sitemaps.org/schemas/sitemap/0.9\'>\n' + body + '\n</urlset>\n';
 }
 function robotsTxt() { return ['User-agent: *', 'Allow: /', 'Disallow: /admin', 'Disallow: /checkout', 'Disallow: /cart', 'Disallow: /profile', 'Disallow: /orders', 'Disallow: /wishlist', 'Disallow: /login', 'Disallow: /search?', 'Disallow: /api/', 'Disallow: /*.json$', '', 'User-agent: GPTBot', 'Allow: /', '', 'User-agent: ChatGPT-User', 'Allow: /', '', 'User-agent: ClaudeBot', 'Allow: /', '', 'User-agent: PerplexityBot', 'Allow: /', '', 'User-agent: Googlebot-Extended', 'Allow: /', '', 'User-agent: CCBot', 'Allow: /', '', 'Sitemap: ' + siteUrl + '/sitemap.xml', ''].join('\n'); }
-function llmsTxt(products: ProductRow[], posts: BlogRow[]) { return ['# ' + BRAND_NAME, '> Research-grade peptide catalog and education hub for laboratory research workflows in the UK and globally.', '', BRAND_NAME + ' supplies research-use-only peptide compounds, documentation references, and educational resources for qualified laboratory contexts. Products are not for human or veterinary use.', '', '## Key Pages', ...staticSeoRoutes.filter((r) => r.index).map((r) => '- ' + r.path + ': ' + r.h1 + ' - ' + r.description), '', '## Primary Topics', ...seedKeywords.map((k) => '- ' + k), '', '## Product Examples', ...products.slice(0, 30).map((p) => '- ' + productPath(p) + ': ' + (p.title || 'Research peptide')), '', '## Research Articles', ...posts.slice(0, 20).map((p) => '- ' + blogPath(p) + ': ' + (p.title || 'Peptide research article')), '', '## Contact', '- Email: ' + BRAND_EMAIL, '- Research-use-only policy: /terms', ''].join('\n'); }
+function llmsLink(path: string, label: string, note?: string) {
+  const url = absoluteUrl(path, siteUrl);
+  const link = '[' + label + '](' + url + ')';
+  return '- ' + (note ? link + ': ' + note : link);
+}
+
+function llmsTxt(products: ProductRow[], posts: BlogRow[]) {
+  const lines = [
+    '# ' + BRAND_NAME,
+    '',
+    '> Research-grade peptide catalog and education hub for laboratory research workflows in the UK and globally.',
+    '',
+    BRAND_NAME + ' supplies research-use-only peptide compounds, documentation references, and educational resources for qualified laboratory contexts. Products are not for human or veterinary use.',
+    '',
+    '## Key Pages',
+    ...staticSeoRoutes
+      .filter((r) => r.index)
+      .map((r) => llmsLink(r.path, r.h1, r.description)),
+    '',
+    '## Primary Topics',
+    ...seedKeywords.map((k) => '- ' + k),
+    '',
+    '## Product Examples',
+    ...products
+      .slice(0, 30)
+      .map((p) => llmsLink(productPath(p), p.title || 'Research peptide')),
+    '',
+    '## Research Articles',
+    ...posts
+      .slice(0, 20)
+      .map((p) => llmsLink(blogPath(p), p.title || 'Peptide research article')),
+    '',
+    '## Contact',
+    '- Email: [' + BRAND_EMAIL + '](mailto:' + BRAND_EMAIL + ')',
+    llmsLink('/terms', 'Research-use-only policy'),
+    '- [XML Sitemap](' + siteUrl + '/sitemap.xml)',
+    '',
+  ];
+  return lines.join('\n');
+}
 
 function keywordMap() { return csv([['Keyword', 'Volume', 'Difficulty', 'Intent', 'Assigned Page URL', 'Page Type', 'Gap (Y/N)', 'Priority'], ['research peptides', '', '', 'Commercial', '/', 'Homepage', 'N', 'High'], ['peptides buy uk', '', '', 'Transactional', '/shop', 'Product Listing', 'N', 'High'], ['uk research peptides', '', '', 'Commercial', '/categories', 'Category Hub', 'N', 'High'], ['semaglutide peptide uk', '', '', 'Commercial', '/product/semaglutide-peptide-uk', 'Product Page', 'N', 'High'], ['peptide research uk', '', '', 'Informational', '/peptide-research', 'Guide', 'N', 'High'], ['glp-3', '', '', 'Informational', '/peptide-research', 'Guide', 'Y', 'Medium'], ['buy ghrp 2', '', '', 'Transactional', '/product/ghrp-2-peptide', 'Product Page', 'N', 'High'], ['peptides buy', '', '', 'Transactional', '/shop', 'Product Listing', 'N', 'High'], ['kpv peptide', '', '', 'Commercial', '/product/kpv-peptide', 'Product Page', 'N', 'High'], ['igf-1 peptide', '', '', 'Commercial', '/product/igf-1-peptide', 'Product Page', 'N', 'High'], ['oxford peptides', '', '', 'Local/Navigational', '/contact', 'Support/Local Landing', 'Y', 'Medium']]); }
 function competitorReport() { return csv([['Domain', 'Estimated Traffic', 'Top 5 Ranking Keywords', 'Domain Authority', 'Notes'], ['researchpeptide.co.uk', 'Credential required', 'research peptides; peptides buy uk; uk research peptides; peptide research; buy peptides uk', 'Credential required', 'Historical/source competitor'], ['uk-peptides.com', 'Credential required', 'buy peptides uk; research peptides uk; peptide supplier uk; bpc 157 uk; semaglutide peptide uk', 'Credential required', 'Validate with Ahrefs/SEMrush'], ['oxfordpeptides.com', 'Credential required', 'oxford peptides; custom peptide synthesis; peptide synthesis uk; research peptides', 'Credential required', 'Entity/local competitor'], ['peptidesuk.com', 'Credential required', 'peptides uk; buy peptides; research peptides uk; ghrp 2 peptide', 'Credential required', 'Validate SERP presence'], ['cambridge-research-biochemicals.com', 'Credential required', 'peptide synthesis uk; custom peptides; research peptides; peptide services', 'Credential required', 'Authority competitor']]); }
@@ -104,6 +143,7 @@ function stripDefaultHead(template: string) {
     .replace(/<meta name=['"]description['"][^>]*>/gi, '')
     .replace(/<meta name=['"]robots['"][^>]*>/gi, '')
     .replace(/<link rel=['"]canonical['"][^>]*>/gi, '')
+    .replace(/<link rel=['"]preload['"][^>]*>/gi, '')
     .replace(/<meta property=['"]og:[^'"]+['"][^>]*>/gi, '')
     .replace(/<meta name=['"]twitter:[^'"]+['"][^>]*>/gi, '');
 }
@@ -114,17 +154,19 @@ function buildPrerenderHead(options: {
   description: string;
   ogImage: string;
   ogType?: string;
+  preloadImage?: string;
   preloadOgImage?: boolean;
   jsonLd: unknown[];
 }) {
   const canonical = absoluteUrl(options.path, siteUrl);
+  const preloadHref = options.preloadImage || (options.preloadOgImage ? options.ogImage : null);
   const tags = [
     '<title>' + htmlEscape(options.title) + '</title>',
     '<meta name=\'description\' content=\'' + htmlEscape(options.description) + '\'>',
     '<meta name=\'robots\' content=\'index, follow, max-image-preview:large\'>',
     '<link rel=\'canonical\' href=\'' + htmlEscape(canonical) + '\'>',
-    ...(options.preloadOgImage
-      ? ['<link rel=\'preload\' as=\'image\' href=\'' + htmlEscape(options.ogImage) + '\' fetchpriority=\'high\'>']
+    ...(preloadHref
+      ? ['<link rel=\'preload\' as=\'image\' href=\'' + htmlEscape(preloadHref) + '\' fetchpriority=\'high\'>']
       : []),
     '<meta property=\'og:title\' content=\'' + htmlEscape(options.title) + '\'>',
     '<meta property=\'og:description\' content=\'' + htmlEscape(options.description) + '\'>',
@@ -162,18 +204,22 @@ function prerenderPage(options: {
   answer: string;
   ogImage?: string;
   ogType?: string;
+  preloadImage?: string;
+  preloadOgImage?: boolean;
   bodyHtml: string;
   jsonLd: unknown[];
 }) {
   const template = getPrerenderTemplate();
   if (!template) return false;
+  const ogImage = options.ogImage || assetUrl(DEFAULT_OG_IMAGE, siteUrl);
   const head = buildPrerenderHead({
     path: options.path,
     title: options.title,
     description: options.description,
-    ogImage: options.ogImage || assetUrl(DEFAULT_OG_IMAGE, siteUrl),
+    ogImage,
     ogType: options.ogType,
-    preloadOgImage: options.ogType === 'product' || options.ogType === 'article',
+    preloadImage: options.preloadImage,
+    preloadOgImage: options.preloadOgImage ?? (options.ogType === 'product' || options.ogType === 'article'),
     jsonLd: options.jsonLd,
   });
   const body = [
@@ -230,13 +276,24 @@ function blogPrerenderBody(post: BlogRow) {
 }
 
 function prerenderStaticRoute(route: (typeof staticSeoRoutes)[number]) {
+  const isHome = route.path === '/';
+  const heroImage = assetUrl('/hero-catalog.webp', siteUrl);
+  const bodyHtml = isHome
+    ? [
+        '<img id=\'home-hero-lcp\' src=\'' + htmlEscape(heroImage) + '\' alt=\'Research Peptides laboratory catalog\' width=\'640\' height=\'640\' fetchpriority=\'high\' loading=\'eager\' decoding=\'sync\'>',
+        '<p>' + htmlEscape(route.description) + '</p>',
+      ].join('')
+    : '<p>' + htmlEscape(route.description) + '</p>';
+
   return prerenderPage({
     path: route.path,
     title: route.title,
     description: route.description,
     h1: route.h1,
     answer: route.answer,
-    bodyHtml: '<p>' + htmlEscape(route.description) + '</p>',
+    ogImage: isHome ? heroImage : undefined,
+    preloadImage: isHome ? heroImage : undefined,
+    bodyHtml,
     jsonLd: [
       buildOrganizationJsonLd(siteUrl),
       buildWebsiteJsonLd(siteUrl),
@@ -249,14 +306,16 @@ function prerenderProduct(product: ProductRow) {
   const path = productPath(product);
   const title = (product.title || 'Research peptide') + ' | ' + BRAND_NAME;
   const description = excerpt(product.description || 'Research-use peptide product listing for laboratory workflows.', 155);
+  const heroImage = productOgImage(product);
   return prerenderPage({
     path,
     title,
     description,
     h1: product.title || 'Research peptide',
     answer: 'This research peptide listing is supplied for laboratory use only, with product notes, documentation signals, and UK dispatch options for qualified research buyers.',
-    ogImage: productOgImage(product),
+    ogImage: heroImage,
     ogType: 'product',
+    preloadImage: heroImage,
     bodyHtml: productPrerenderBody(product),
     jsonLd: [
       buildOrganizationJsonLd(siteUrl),

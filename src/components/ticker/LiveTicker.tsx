@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'motion/react';
 import { AlertCircle, TrendingUp, Zap, Globe } from 'lucide-react';
 
@@ -11,6 +11,15 @@ const TICKER_ITEMS = [
 ];
 
 export default function LiveTicker() {
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const delay = window.setTimeout(() => setVisible(true), 4000);
+    return () => window.clearTimeout(delay);
+  }, []);
+
+  if (!visible) return null;
+
   // We double the items to create a seamless loop
   const displayItems = [...TICKER_ITEMS, ...TICKER_ITEMS];
 
