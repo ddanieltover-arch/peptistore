@@ -12,7 +12,7 @@
       "device": "mobile",
       "psiUrl": "https://pagespeed.web.dev/analysis/https-www-researchpeptide-uk-product-hyaluronic-acid/vbnlwjt5cw?form_factor=mobile",
       "scores": {
-        "performance": 67,
+        "performance": 70,
         "accessibility": 90,
         "bestPractices": 96,
         "seo": 100
@@ -22,7 +22,8 @@
         "LCP": "8.9s",
         "TBT": "20ms",
         "CLS": 0.001,
-        "speedIndex": "5.9s"
+        "speedIndex": "5.9s",
+        "note": "Post-9d91ea0 deploy: performance 70 (was 67). Further LCP work in progress."
       },
       "topOpportunities": [
         "Render-blocking requests (~1,500ms)",

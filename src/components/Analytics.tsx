@@ -24,6 +24,14 @@ function ensureMeta(name: string, content: string) {
   document.head.appendChild(meta);
 }
 
+function scheduleAnalyticsLoad(run: () => void) {
+  if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
+    window.requestIdleCallback(run, { timeout: 3000 });
+    return;
+  }
+  setTimeout(run, 2000);
+}
+
 export default function Analytics() {
   const location = useLocation();
   const gtmId = import.meta.env.VITE_GTM_ID;
@@ -37,21 +45,23 @@ export default function Analytics() {
   }, [gscVerification]);
 
   React.useEffect(() => {
-    if (gtmId) {
-      window.dataLayer = window.dataLayer || [];
-      window.dataLayer.push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' });
-      loadScript('gtm-script', 'https://www.googletagmanager.com/gtm.js?id=' + encodeURIComponent(gtmId));
-    }
-    if (gaId) {
-      window.dataLayer = window.dataLayer || [];
-      window.gtag = window.gtag || function gtag() { window.dataLayer?.push(arguments); };
-      loadScript('ga4-script', 'https://www.googletagmanager.com/gtag/js?id=' + encodeURIComponent(gaId));
-      window.gtag('js', new Date());
-      window.gtag('config', gaId, {
-        send_page_view: false,
-        cookie_flags: 'SameSite=None;Secure',
-      });
-    }
+    scheduleAnalyticsLoad(() => {
+      if (gtmId) {
+        window.dataLayer = window.dataLayer || [];
+        window.dataLayer.push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' });
+        loadScript('gtm-script', 'https://www.googletagmanager.com/gtm.js?id=' + encodeURIComponent(gtmId));
+      }
+      if (gaId) {
+        window.dataLayer = window.dataLayer || [];
+        window.gtag = window.gtag || function gtag() { window.dataLayer?.push(arguments); };
+        loadScript('ga4-script', 'https://www.googletagmanager.com/gtag/js?id=' + encodeURIComponent(gaId));
+        window.gtag('js', new Date());
+        window.gtag('config', gaId, {
+          send_page_view: false,
+          cookie_flags: 'SameSite=None;Secure',
+        });
+      }
+    });
   }, [gaId, gtmId]);
 
   React.useEffect(() => {

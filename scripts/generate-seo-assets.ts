@@ -114,6 +114,7 @@ function buildPrerenderHead(options: {
   description: string;
   ogImage: string;
   ogType?: string;
+  preloadOgImage?: boolean;
   jsonLd: unknown[];
 }) {
   const canonical = absoluteUrl(options.path, siteUrl);
@@ -122,6 +123,9 @@ function buildPrerenderHead(options: {
     '<meta name=\'description\' content=\'' + htmlEscape(options.description) + '\'>',
     '<meta name=\'robots\' content=\'index, follow, max-image-preview:large\'>',
     '<link rel=\'canonical\' href=\'' + htmlEscape(canonical) + '\'>',
+    ...(options.preloadOgImage
+      ? ['<link rel=\'preload\' as=\'image\' href=\'' + htmlEscape(options.ogImage) + '\' fetchpriority=\'high\'>']
+      : []),
     '<meta property=\'og:title\' content=\'' + htmlEscape(options.title) + '\'>',
     '<meta property=\'og:description\' content=\'' + htmlEscape(options.description) + '\'>',
     '<meta property=\'og:url\' content=\'' + htmlEscape(canonical) + '\'>',
@@ -169,6 +173,7 @@ function prerenderPage(options: {
     description: options.description,
     ogImage: options.ogImage || assetUrl(DEFAULT_OG_IMAGE, siteUrl),
     ogType: options.ogType,
+    preloadOgImage: options.ogType === 'product' || options.ogType === 'article',
     jsonLd: options.jsonLd,
   });
   const body = [
@@ -205,7 +210,9 @@ function productPrerenderBody(product: ProductRow) {
   const price = Number(product.price || 0);
   const categories = Array.isArray(product.categories) ? product.categories.join(', ') : 'Research peptides';
   const stock = Number(product.inventory || 0) > 0 ? 'In stock for research dispatch' : 'Check availability';
+  const hero = productOgImage(product);
   return [
+    '<img src=\'' + htmlEscape(hero) + '\' alt=\'' + htmlEscape(product.title || 'Research peptide') + '\' width=\'800\' height=\'800\' fetchpriority=\'high\' loading=\'eager\' decoding=\'sync\'>',
     '<p>' + htmlEscape(product.description || 'Research-use peptide product listing for laboratory workflows.') + '</p>',
     '<ul>',
     '<li><strong>Price:</strong> £' + htmlEscape(price.toFixed(2)) + ' GBP</li>',

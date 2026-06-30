@@ -14,6 +14,7 @@ import { productPath } from '../lib/productUrl';
 import Seo from '../components/Seo';
 import { buildProductJsonLd, excerpt } from '../lib/seo';
 import { fetchProductDetail, SHOP_PRODUCT_COLUMNS } from '../lib/shopCatalogQuery';
+import { getPrerenderProductHint } from '../lib/prerenderHint';
 import { ScientificTextRenderer } from '../components/ui/ScientificHoverCard';
 import { GeoAnswerCapsule } from '../components/seo/GeoAnswerCapsule';
 
@@ -48,6 +49,7 @@ export default function ProductDetails() {
   const [showShare, setShowShare] = useState(false);
   const [activeImage, setActiveImage] = useState(0);
   const [recentlyViewed, setRecentlyViewed] = useState<any[]>([]);
+  const [prerenderHint] = useState(() => getPrerenderProductHint());
   
   const addItem = useCartStore(state => state.addItem);
   const { user, profile } = useAuthStore();
@@ -188,11 +190,39 @@ export default function ProductDetails() {
     alert('Link copied to clipboard!');
   };
 
-  if (loading) return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <DetailedProductSkeleton />
-    </div>
-  );
+  if (loading) {
+    if (prerenderHint.image) {
+      return (
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+            <div className="bg-white rounded-3xl aspect-square overflow-hidden border border-gray-100 shadow-sm">
+              <img
+                id="product-hero-image"
+                src={prerenderHint.image}
+                alt={prerenderHint.title || 'Research peptide'}
+                width={800}
+                height={800}
+                fetchPriority="high"
+                decoding="sync"
+                loading="eager"
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <div className="animate-pulse space-y-4 pt-4">
+              <div className="h-10 bg-gray-100 rounded-xl w-3/4" />
+              <div className="h-6 bg-gray-100 rounded-lg w-1/3" />
+              <div className="h-24 bg-gray-100 rounded-xl" />
+            </div>
+          </div>
+        </main>
+      );
+    }
+    return (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <DetailedProductSkeleton />
+      </div>
+    );
+  }
   if (!product) return (
     <div className="max-w-7xl mx-auto px-4 py-20 text-center">
        <h2 className="text-2xl font-bold text-gray-900 mb-4">Product Not Found</h2>
@@ -231,7 +261,6 @@ export default function ProductDetails() {
       />
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <article>
-          <GeoAnswerCapsule answer={`This page details the research profile, documentation signals, and compliance context for ${product.title}. It is supplied exclusively for non-human laboratory workflows and scientific evaluation.`} />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-16">
         <div className="space-y-4">
           <div className="bg-white rounded-3xl aspect-square overflow-hidden flex items-center justify-center border border-gray-100 shadow-sm relative group">
@@ -291,9 +320,7 @@ export default function ProductDetails() {
 
         <div>
           <div className="flex justify-between items-start">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              <ScientificTextRenderer text={product.title} />
-            </h1>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">{product.title}</h1>
             <div className="flex space-x-2 relative">
               <button 
                 type="button"
@@ -348,7 +375,9 @@ export default function ProductDetails() {
           </div>
           
           <div className="text-gray-600 mb-8 whitespace-pre-line">
-            <ScientificTextRenderer text={product.description} />
+            <Suspense fallback={<p>{product.description}</p>}>
+              <ScientificTextRenderer text={product.description} />
+            </Suspense>
           </div>
 
           {/* New Variant Selector Section */}
@@ -499,6 +528,8 @@ export default function ProductDetails() {
           </div>
         </div>
       </div>
+
+          <GeoAnswerCapsule answer={`This page details the research profile, documentation signals, and compliance context for ${product.title}. It is supplied exclusively for non-human laboratory workflows and scientific evaluation.`} />
 
       {/* Dynamic Research Stack Bundle Builder */}
       <Suspense fallback={<div className="mt-12 h-48 rounded-3xl bg-gray-50 border border-gray-100 animate-pulse" aria-hidden />}>

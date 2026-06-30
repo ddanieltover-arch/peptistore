@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { Suspense, useEffect, useRef, useState } from 'react';
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
 import { ShoppingCart, Heart, User, LogOut, Menu, X, Search, ArrowUp } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
@@ -9,16 +9,17 @@ import { useWizardStore } from '../store/useWizardStore';
 import { supabase } from '../supabase';
 import SelectorWizard from './wizard/SelectorWizard';
 import RecentlyViewedSidebar from './products/RecentlyViewedSidebar';
-import LiveTicker from './ticker/LiveTicker';
 import ToastContainer from './ToastContainer';
 import MobileBottomNav from './MobileBottomNav';
-import SalesNotification from './SalesNotification';
 import CartDrawer from './cart/CartDrawer';
 import Omnisearch from './search/Omnisearch';
 import SmartsuppChat from './chat/SmartsuppChat';
 import logo from '../assets/logo.webp';
 import { postNewsletterSubscribe } from '../lib/transactionalEmailApi';
 import { trackEvent } from '../lib/analytics';
+
+const LiveTicker = React.lazy(() => import('./ticker/LiveTicker'));
+const SalesNotification = React.lazy(() => import('./SalesNotification'));
 
 export default function Layout() {
   const { user, profile } = useAuthStore();
@@ -131,7 +132,9 @@ export default function Layout() {
       >
         Skip to main content
       </a>
-      <LiveTicker />
+      <Suspense fallback={null}>
+        <LiveTicker />
+      </Suspense>
       {/* Navbar */}
       <header className="bg-white shadow-sm sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -437,7 +440,9 @@ export default function Layout() {
         )}
       </AnimatePresence>
       <MobileBottomNav />
-      <SalesNotification />
+      <Suspense fallback={null}>
+        <SalesNotification />
+      </Suspense>
       <CartDrawer />
       <Omnisearch />
       <SelectorWizard />
