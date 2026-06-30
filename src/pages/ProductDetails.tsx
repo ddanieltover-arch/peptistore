@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { Suspense, useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { supabase } from '../supabase';
 import { useCartStore } from '../store/useCartStore';
@@ -7,17 +7,33 @@ import { formatCurrency } from '../lib/utils';
 import { ShoppingCart, Star, Heart, Share2, LinkIcon, ShieldCheck, Zap, Truck, CheckCircle2 } from 'lucide-react';
 import { useWishlistStore } from '../store/useWishlistStore';
 import { useToastStore } from '../store/useToastStore';
-import { motion } from 'motion/react';
 import { DetailedProductSkeleton } from '../components/Skeleton';
 import { ProductBadge } from '../components/products/ProductBadge';
 import { ProductImagePlaceholder } from '../components/products/ProductImagePlaceholder';
 import { productPath } from '../lib/productUrl';
 import Seo from '../components/Seo';
 import { buildProductJsonLd, excerpt } from '../lib/seo';
-import { ResearchStackBuilder } from '../components/products/ResearchStackBuilder';
-import { InteractiveReconstitutionCalculator } from '../components/ui/InteractiveReconstitutionCalculator';
-import { ScientificTextRenderer, ScientificHoverCard } from '../components/ui/ScientificHoverCard';
+import { PRODUCT_DETAIL_COLUMNS, SHOP_PRODUCT_COLUMNS } from '../lib/shopCatalogQuery';
+import { ScientificTextRenderer } from '../components/ui/ScientificHoverCard';
 import { GeoAnswerCapsule } from '../components/seo/GeoAnswerCapsule';
+
+const ResearchStackBuilder = React.lazy(() =>
+  import('../components/products/ResearchStackBuilder').then((m) => ({ default: m.ResearchStackBuilder })),
+);
+const InteractiveReconstitutionCalculator = React.lazy(() =>
+  import('../components/ui/InteractiveReconstitutionCalculator').then((m) => ({
+    default: m.InteractiveReconstitutionCalculator,
+  })),
+);
+
+function preloadHeroImage(url: string) {
+  if (!url || document.querySelector(`link[rel="preload"][href="${url}"]`)) return;
+  const link = document.createElement('link');
+  link.rel = 'preload';
+  link.as = 'image';
+  link.href = url;
+  document.head.appendChild(link);
+}
 
 export default function ProductDetails() {
   const { slug, id } = useParams<{ slug?: string; id?: string }>();
@@ -40,61 +56,83 @@ export default function ProductDetails() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchProductAndReviews = async () => {
+    let cancelled = false;
+
+    const loadSecondaryData = async (pData: { id: string | number }) => {
+      const stored = localStorage.getItem('recentlyViewed');
+      let prevIds: string[] = stored ? JSON.parse(stored) : [];
+      prevIds = [String(pData.id), ...prevIds.filter((pid) => pid !== String(pData.id))].slice(0, 10);
+      localStorage.setItem('recentlyViewed', JSON.stringify(prevIds));
+
+      const displayIds = prevIds.filter((pid) => pid !== String(pData.id)).slice(0, 4);
+      const productId = String(pData.id);
+
+      const [reviewsResult, recommendedResult, recentlyViewedResult] = await Promise.all([
+        supabase.from('reviews').select('*').eq('product_id', productId),
+        supabase.from('products').select(SHOP_PRODUCT_COLUMNS).limit(4),
+        displayIds.length > 0
+          ? supabase.from('products').select(SHOP_PRODUCT_COLUMNS).in('id', displayIds)
+          : Promise.resolve({ data: [] as any[] }),
+      ]);
+
+      if (cancelled) return;
+
+      if (reviewsResult.data) setReviews(reviewsResult.data);
+      if (recommendedResult.data) {
+        setRecommended(recommendedResult.data.filter((p) => String(p.id) !== productId).slice(0, 3));
+      }
+      if (recentlyViewedResult.data) setRecentlyViewed(recentlyViewedResult.data);
+    };
+
+    const fetchProduct = async () => {
       if (!slug && !id) return;
+
       setLoading(true);
+      setProduct(null);
+      setReviews([]);
+      setRecommended([]);
+      setRecentlyViewed([]);
+
       try {
-        const query = supabase.from('products').select('*');
         const { data: pData } = slug
-          ? await query.eq('slug', slug).maybeSingle()
-          : await query.eq('id', id as string).maybeSingle();
-        if (pData) {
-          const canonical = productPath(pData);
-          if (canonical !== window.location.pathname) {
-            navigate(canonical, { replace: true });
-          }
-          setProduct(pData);
-          if (pData.variants && pData.variants.length > 0) {
-            setSelectedVariant(pData.variants[0]);
-          }
-          setActiveImage(0); // Reset image on product change
+          ? await supabase.from('products').select(PRODUCT_DETAIL_COLUMNS).eq('slug', slug).maybeSingle()
+          : await supabase.from('products').select(PRODUCT_DETAIL_COLUMNS).eq('id', id as string).maybeSingle();
 
-          // Tracking: Add to Recently Viewed in LocalStorage
-          const stored = localStorage.getItem('recentlyViewed');
-          let prevIds = stored ? JSON.parse(stored) : [];
-          // Keep unique last 10
-          prevIds = [pData.id, ...prevIds.filter((pid: string) => pid !== pData.id)].slice(0, 10);
-          localStorage.setItem('recentlyViewed', JSON.stringify(prevIds));
+        if (cancelled) return;
 
-          // Fetch details for recently viewed (excluding current)
-          const displayIds = prevIds.filter((pid: string) => pid !== pData.id).slice(0, 4);
-          if (displayIds.length > 0) {
-            const { data: rvData } = await supabase.from('products').select('*').in('id', displayIds);
-            if (rvData) setRecentlyViewed(rvData);
-          }
-        }
-
-        const productId = pData?.id;
-        if (!productId) {
-          setReviews([]);
-          setRecommended([]);
+        if (!pData) {
+          setProduct(null);
+          setLoading(false);
           return;
         }
 
-        const { data: rData } = await supabase.from('reviews').select('*').eq('product_id', productId);
-        if (rData) setReviews(rData);
+        const heroImage = pData.images?.[0];
+        if (heroImage) preloadHeroImage(heroImage);
 
-        const { data: recData } = await supabase.from('products').select('*').limit(4);
-        if (recData) setRecommended(recData.filter(p => String(p.id) !== String(productId)).slice(0, 3));
+        const canonical = productPath(pData);
+        if (canonical !== window.location.pathname) {
+          navigate(canonical, { replace: true });
+        }
 
-      } catch (error) {
-        console.error("Error fetching product:", error);
-      } finally {
+        setProduct(pData);
+        if (pData.variants && pData.variants.length > 0) {
+          setSelectedVariant(pData.variants[0]);
+        }
+        setActiveImage(0);
         setLoading(false);
+
+        void loadSecondaryData(pData);
+      } catch (error) {
+        console.error('Error fetching product:', error);
+        if (!cancelled) setLoading(false);
       }
     };
-    fetchProductAndReviews();
+
+    fetchProduct();
     window.scrollTo(0, 0);
+    return () => {
+      cancelled = true;
+    };
   }, [slug, id, navigate]);
 
   const handleAddToCart = () => {
@@ -187,6 +225,7 @@ export default function ProductDetails() {
         description={seoDescription}
         path={productPath(product)}
         image={product.images?.[0]}
+        preloadImage={product.images?.[0]}
         type='product'
         jsonLd={buildProductJsonLd(product, reviews)}
       />
@@ -197,13 +236,17 @@ export default function ProductDetails() {
         <div className="space-y-4">
           <div className="bg-white rounded-3xl aspect-square overflow-hidden flex items-center justify-center border border-gray-100 shadow-sm relative group">
             {product.images && product.images.length > 0 ? (
-              <motion.img 
+              <img
+                id="product-hero-image"
                 key={activeImage}
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                src={product.images[activeImage]} 
-                alt={product.title} 
-                className="w-full h-full object-cover" 
+                src={product.images[activeImage]}
+                alt={product.title}
+                width={800}
+                height={800}
+                decoding={activeImage === 0 ? 'sync' : 'async'}
+                fetchPriority={activeImage === 0 ? 'high' : 'auto'}
+                loading={activeImage === 0 ? 'eager' : 'lazy'}
+                className="w-full h-full object-cover"
               />
             ) : (
               <ProductImagePlaceholder productId={String(product.id)} title={product.title} className="h-full w-full min-h-[16rem]" />
@@ -231,7 +274,15 @@ export default function ProductDetails() {
                   aria-label={`Show product image ${i + 1} of ${product.images.length}`}
                   aria-current={activeImage === i ? 'true' : undefined}
                 >
-                  <img src={img} alt="" className="w-full h-full object-cover" />
+                  <img
+                    src={img}
+                    alt=""
+                    width={80}
+                    height={80}
+                    loading="lazy"
+                    decoding="async"
+                    className="w-full h-full object-cover"
+                  />
                 </button>
               ))}
             </div>
@@ -427,13 +478,14 @@ export default function ProductDetails() {
           <div className="flex items-center space-x-4">
             <div className="flex items-center border border-gray-300 rounded-xl overflow-hidden shadow-sm">
               <button type="button" onClick={() => setQuantity(Math.max(1, quantity - 1))} className="px-4 py-3 text-gray-600 hover:bg-gray-100 transition-colors" aria-label="Decrease quantity">−</button>
-              <input 
-                type="number" 
+              <label htmlFor="product-quantity" className="sr-only">Quantity</label>
+              <input
+                id="product-quantity"
+                type="number"
                 min="1"
                 value={quantity}
                 onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
                 className="w-16 px-2 py-3 font-bold text-gray-900 border-x border-gray-300 bg-white text-center focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                aria-label="Quantity"
               />
               <button type="button" onClick={() => setQuantity(quantity + 1)} className="px-4 py-3 text-gray-600 hover:bg-gray-100 transition-colors" aria-label="Increase quantity">+</button>
             </div>
@@ -449,15 +501,19 @@ export default function ProductDetails() {
       </div>
 
       {/* Dynamic Research Stack Bundle Builder */}
-      <ResearchStackBuilder 
-        baseProduct={product} 
-        basePrice={currentPrice} 
-        recommendedProducts={recommended} 
-      />
+      <Suspense fallback={<div className="mt-12 h-48 rounded-3xl bg-gray-50 border border-gray-100 animate-pulse" aria-hidden />}>
+        <ResearchStackBuilder
+          baseProduct={product}
+          basePrice={currentPrice}
+          recommendedProducts={recommended}
+        />
+      </Suspense>
 
       {/* Interactive Reconstitution Calculator */}
       <div className="mt-12">
-        <InteractiveReconstitutionCalculator initialMassMg={initialMass} />
+        <Suspense fallback={<div className="h-64 rounded-3xl bg-gray-50 border border-gray-100 animate-pulse" aria-hidden />}>
+          <InteractiveReconstitutionCalculator initialMassMg={initialMass} />
+        </Suspense>
       </div>
 
       {/* Verified Researcher Reviews Section */}
@@ -525,7 +581,15 @@ export default function ProductDetails() {
               <Link key={rec.id} to={productPath(rec)} className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden group hover:shadow-xl transition-all duration-500">
                 <div className="h-48 bg-gray-100 overflow-hidden relative">
                   {rec.images && rec.images.length > 0 ? (
-                     <img src={rec.images[0]} alt={rec.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                     <img
+                       src={rec.images[0]}
+                       alt={rec.title}
+                       width={320}
+                       height={192}
+                       loading="lazy"
+                       decoding="async"
+                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                     />
                   ) : (
                      <ProductImagePlaceholder productId={String(rec.id)} title={rec.title} className="h-full min-h-[12rem]" />
                   )}
@@ -554,7 +618,15 @@ export default function ProductDetails() {
               <Link key={`rv-${rv.id}`} to={productPath(rv)} className="flex-shrink-0 w-48 group">
                 <div className="h-48 rounded-2xl bg-gray-100 overflow-hidden border border-gray-50 group-hover:shadow-lg transition-all">
                   {rv.images?.[0] ? (
-                    <img src={rv.images[0]} alt={rv.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                    <img
+                      src={rv.images[0]}
+                      alt={rv.title}
+                      width={192}
+                      height={192}
+                      loading="lazy"
+                      decoding="async"
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
                   ) : (
                     <ProductImagePlaceholder productId={String(rv.id)} title={rv.title} className="h-full min-h-[12rem] rounded-2xl" />
                   )}

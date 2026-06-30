@@ -18,6 +18,8 @@ type SeoProps = {
   path?: string;
   robots?: string;
   image?: string;
+  /** Preload LCP candidate (e.g. product hero image). */
+  preloadImage?: string;
   type?: 'website' | 'article' | 'product';
   revised?: string;
   jsonLd?: unknown | unknown[];
@@ -96,10 +98,21 @@ export default function Seo(props: SeoProps) {
     upsertLink('link[rel="canonical"]', { rel: 'canonical', href: canonical });
     upsertLink('link[rel="alternate"][hreflang="en-GB"]', { rel: 'alternate', hreflang: 'en-GB', href: canonical });
 
+    document.head.querySelectorAll('link[data-managed-seo="preload-image"]').forEach((node) => node.remove());
+    if (props.preloadImage) {
+      const preloadHref = assetUrl(props.preloadImage, base);
+      const link = document.createElement('link');
+      link.rel = 'preload';
+      link.as = 'image';
+      link.href = preloadHref;
+      link.setAttribute(MANAGED, 'preload-image');
+      document.head.appendChild(link);
+    }
+
     const breadcrumb = buildBreadcrumbJsonLd(path, title, base);
     const pageJson = Array.isArray(props.jsonLd) ? props.jsonLd : props.jsonLd ? [props.jsonLd] : [];
     applyJsonLd([buildOrganizationJsonLd(base), buildWebsiteJsonLd(base), breadcrumb, ...pageJson]);
-  }, [base, canonical, description, image, path, props.jsonLd, revised, robots, title, type]);
+  }, [base, canonical, description, image, path, props.jsonLd, props.preloadImage, revised, robots, title, type]);
 
   return null;
 }

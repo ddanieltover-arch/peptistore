@@ -1,0 +1,17 @@
+---
+description: When the user shares PageSpeed Insights or Lighthouse results, implement fixes immediately in code.
+alwaysApply: true
+---
+
+# PageSpeed Insights — implement fixes immediately
+
+When the user sends a PageSpeed Insights report, Lighthouse screenshot, or Core Web Vitals analysis (any URL):
+
+1. **Do not stop at analysis** — implement all reasonable code fixes in the same turn without asking permission first.
+2. **Map audits to code** — e.g. LCP → hero image/fetch/skeleton, render-blocking → fonts/scripts, unused JS → lazy imports, images → dimensions/lazy/preload, CLS → width/height, a11y → labels/contrast where obvious.
+3. **Prefer smallest high-impact diffs** — match existing patterns; avoid over-engineering.
+4. **Update `seo/core_web_vitals_baseline.json`** when new scores are provided.
+5. **Brief summary after** — what changed, expected metric impact, and what (if anything) cannot be fixed in code alone (e.g. external CDN images, CrUX “No Data”).
+6. **Commit** when the user has been pushing SEO/CWV work in the session, unless they said not to commit.
+
+Scope order: fix the **specific URL/page** audited first, then **shared bottlenecks** (`index.html` fonts, `Layout.tsx` third parties) if the audit calls them out.
