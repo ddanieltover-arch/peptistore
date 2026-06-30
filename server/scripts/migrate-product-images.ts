@@ -5,6 +5,7 @@
  *   npx tsx server/scripts/migrate-product-images.ts
  *   npx tsx server/scripts/migrate-product-images.ts --dry-run
  *   npx tsx server/scripts/migrate-product-images.ts --limit 5
+ *   npx tsx server/scripts/migrate-product-images.ts --legacy-only   # re-encode legacy Supabase JPEGs/PNGs
  */
 import sharp from 'sharp';
 import dotenv from 'dotenv';
@@ -21,6 +22,7 @@ const BUCKET = 'products';
 const MAX_DIMENSION = 1200;
 const WEBP_QUALITY = 82;
 const dryRun = process.argv.includes('--dry-run');
+const legacyOnly = process.argv.includes('--legacy-only');
 const limitArg = process.argv.find((a) => a.startsWith('--limit='));
 const limit = limitArg ? Number(limitArg.split('=')[1]) : undefined;
 
@@ -119,6 +121,20 @@ async function uploadWebp(key: string, body: Buffer): Promise<string> {
   return data.publicUrl;
 }
 
+function isCatalogWebp(url: string) {
+  return isHostedOnSupabase(url) && url.includes('/catalog/') && /\.webp(\?|$)/i.test(url);
+}
+
+/** COA scans in the images array are not product photos — skip re-encoding. */
+function isCoaAsset(url: string) {
+  return /\/COA-/i.test(url) || /\/coa[-_]/i.test(url);
+}
+
+function needsImageMigration(images: string[]) {
+  if (images.some(isCatalogWebp)) return false;
+  return images.some((url) => !isCoaAsset(url));
+}
+
 async function migrateProduct(product: ProductRow): Promise<'skipped' | 'updated' | 'failed'> {
   const images = Array.isArray(product.images) ? product.images.filter(Boolean) : [];
   if (images.length === 0) {
@@ -126,23 +142,32 @@ async function migrateProduct(product: ProductRow): Promise<'skipped' | 'updated
     return 'skipped';
   }
 
-  if (images.every(isHostedOnSupabase)) {
-    console.log(`  skip (already on Supabase): ${product.title}`);
+  if (!needsImageMigration(images)) {
+    console.log(`  skip (catalog WebP): ${product.title}`);
     return 'skipped';
   }
 
   const slug = fileSlug(product);
   const nextUrls: string[] = [];
+  let changed = false;
 
   for (let i = 0; i < images.length; i++) {
     const source = images[i]!;
-    if (isHostedOnSupabase(source)) {
+
+    if (isCatalogWebp(source)) {
+      nextUrls.push(source);
+      continue;
+    }
+
+    if (isCoaAsset(source)) {
       nextUrls.push(source);
       continue;
     }
 
     const key = storageKey(slug, i);
-    console.log(`  [${i + 1}/${images.length}] ${source.slice(0, 80)}…`);
+    const label = isHostedOnSupabase(source) ? 'legacy Supabase' : 'external';
+    console.log(`  [${i + 1}/${images.length}] (${label}) ${source.slice(0, 90)}…`);
+    changed = true;
 
     if (dryRun) {
       nextUrls.push(`(dry-run) ${key}`);
@@ -161,6 +186,7 @@ async function migrateProduct(product: ProductRow): Promise<'skipped' | 'updated
     }
   }
 
+  if (!changed) return 'skipped';
   if (dryRun) return 'updated';
 
   const { error } = await supabase.from('products').update({ images: nextUrls }).eq('id', product.id);
@@ -182,9 +208,18 @@ async function main() {
 
   if (error) throw error;
   const rows = (products ?? []) as ProductRow[];
-  const queue = typeof limit === 'number' ? rows.slice(0, limit) : rows;
+  const filtered = legacyOnly
+    ? rows.filter((p) => {
+        const images = Array.isArray(p.images) ? p.images.filter(Boolean) : [];
+        return images.length > 0 && images.some((url) => isHostedOnSupabase(url) && !isCatalogWebp(url));
+      })
+    : rows.filter((p) => {
+        const images = Array.isArray(p.images) ? p.images.filter(Boolean) : [];
+        return images.length > 0 && needsImageMigration(images);
+      });
+  const queue = typeof limit === 'number' ? filtered.slice(0, limit) : filtered;
 
-  console.log(`Processing ${queue.length} of ${rows.length} products…\n`);
+  console.log(`Processing ${queue.length} of ${rows.length} products (${filtered.length} need migration)…\n`);
 
   let updated = 0;
   let skipped = 0;

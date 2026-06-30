@@ -16,6 +16,12 @@ const BRAND_IMAGE_BY_POST_ID: Record<string, (typeof BRAND_BLOG_IMAGES)[number]>
   'c603f9c4-cf03-4c33-aac3-9102dcfce2f3': '/blog/kpv-peptide.png',
   '10546e55-2007-400b-abf7-7de3e70d83b5': '/blog/kpv-peptide.png',
   '386f14c2-d1f4-4a99-8cf5-fc1ef530538d': '/blog/reception-wide.png',
+  'b929bc9d-1428-46b0-ad56-3263103a2f93': '/blog/reception-lobby.png',
+  '706aeaa6-97a8-420c-871b-4d9b45814f6c': '/blog/storefront-street.png',
+  '2531a39a-d991-4a94-8e89-3191746bff90': '/blog/storefront-night.png',
+  'e57c4254-c148-48d0-a66f-4fe9081ba519': '/blog/igf-1-peptide.png',
+  '8d3ded7c-5399-409f-9edc-55215675d343': '/blog/reception-wide.png',
+  '06d06090-713f-41cb-b3f1-8e28a0e04e9d': '/blog/storefront-wet-street.png',
 };
 
 function hashId(id: string): number {

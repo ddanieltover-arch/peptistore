@@ -179,6 +179,17 @@ export default function Shop() {
 
       <GeoAnswerCapsule />
 
+      <p className="text-sm text-gray-600 mb-6 leading-relaxed">
+        Verify batches in our{' '}
+        <Link to="/coas" className="text-blue-600 font-semibold hover:underline">
+          peptide COA library
+        </Link>
+        <span className="text-gray-400"> · </span>
+        <Link to="/faq" className="text-blue-600 font-semibold hover:underline">
+          research peptide storage and shipping FAQ
+        </Link>
+      </p>
+
       <motion.figure
         initial={{ opacity: 0, y: 10 }}
         whileInView={{ opacity: 1, y: 0 }}

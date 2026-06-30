@@ -6,6 +6,7 @@ import { motion } from 'motion/react';
 import ReactMarkdown from 'react-markdown';
 import Seo from '../components/Seo';
 import { buildArticleJsonLd, excerpt } from '../lib/seo';
+import { blogPath } from '../lib/blogUrl';
 import { resolveBlogImageUrl } from '../lib/blogImages';
 import { productPath } from '../lib/productUrl';
 import heroBg from '../assets/hero_bg.webp';
@@ -92,7 +93,7 @@ export default function BlogPost() {
       <Seo
         title={(post.title || 'Peptide research article') + ' | Research Peptides UK'}
         description={seoDescription}
-        path={'/blog/' + (post.slug || post.id)}
+        path={blogPath(post)}
         image={heroImage}
         type='article'
         jsonLd={buildArticleJsonLd({ ...post, image_url: heroImage })}

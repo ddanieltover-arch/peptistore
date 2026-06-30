@@ -19,7 +19,11 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_KEY!
 );
 
-const SCRAPERAPI_KEY = '57598939deeac0e6fcd3c03247788a03';
+const SCRAPERAPI_KEY = process.env.SCRAPERAPI_KEY?.trim();
+if (!SCRAPERAPI_KEY) {
+  console.error('SCRAPERAPI_KEY is required in server/.env');
+  process.exit(1);
+}
 
 async function fetchWithRetry(url: string, retries = 3, options = {}): Promise<Response> {
   for (let i = 0; i < retries; i++) {

@@ -44,6 +44,8 @@ Association complete between Search Console and GA4 property `538450148`.
 | `purchase` | Order successfully created |
 | `generate_lead` | Contact form or newsletter signup |
 | `sign_up` | New account registration |
+| `view_item` | Product detail page loaded |
+| `search` | Omnisearch or `/search?q=` with results |
 
 ### Mark conversions in GA4
 
@@ -114,7 +116,7 @@ Each production build runs `seo:generate --dist` after Vite, writing static HTML
 |------------|-----------------|---------|
 | Static SEO pages | 16 | `/shop`, `/faq`, `/peptide-guide` |
 | Product pages | ~146 | `/product/adamax` |
-| Blog articles | 5 | `/blog/{id}` |
+| Blog articles | 11 | `/blog/{slug}` |
 
 ### What crawlers receive
 
@@ -132,13 +134,63 @@ SUPABASE_SERVICE_ROLE_KEY=...   # server-only; enables product + blog fetch
 
 ### After deploy — verify in GSC
 
-1. **URL Inspection** → test `/product/adamax` and one `/blog/{id}` URL.
+1. **URL Inspection** → test `/product/adamax` and `/blog/what-are-research-peptides`.
 2. Confirm **Google-selected canonical** and rendered HTML show product/article content (not empty SPA shell).
-3. **Request indexing** for a sample product + blog URL.
+3. **Request indexing** for priority URLs (see §10).
 4. Check `seo/prerender_manifest.json` in the repo after build logs (`Prerendered N HTML snapshots`).
 
 ### Notes
 
 - Vercel serves static files from `dist/` before the SPA rewrite, so prerender HTML is returned for matching paths.
-- Blog URLs use post `id` (no `slug` column in DB yet).
+- Blog URLs use SEO slugs (`blog_posts.slug`); legacy UUID URLs still resolve.
 - Local builds need `server/.env` or root `.env` with Supabase credentials; anon key works for public tables.
+
+---
+
+## 10. Off-page & measurement runbook
+
+### Blocked on paid tools (Ahrefs / SEMrush / Moz)
+
+| Asset | File | Status |
+|-------|------|--------|
+| Competitor backlink gaps | `seo/link_gap_opportunities.csv` | Pending tool export |
+| Outreach CRM | `seo/link_building_crm.csv` | Pending prospect list |
+| Guest posts | `seo/guest_post_pipeline.csv` | Not started |
+| Domain authority baseline | `seo/seo_baseline.json` | Pending Ahrefs/Moz |
+| Disavow list | `seo/disavow.txt` | Empty until toxic links confirmed |
+
+**When you have access:** export referring domains for `researchpeptide.co.uk`, `oxfordpeptides.com`, and `cambridge-research-biochemicals.com`, then fill the CSVs and start outreach using `seo/email_templates.md`.
+
+### Blocked on traffic / time
+
+| Metric | Why | Workaround |
+|--------|-----|------------|
+| CrUX field data (PSI “No Data”) | Needs sustained real-user volume | Use Lighthouse lab scores; re-check monthly |
+| AI citation rate | No standard free dashboard | Manual monthly spot-check (Perplexity, ChatGPT, Google AI Overviews) |
+
+### You can do now (no extra tools)
+
+**GSC — request indexing** (after each deploy with new content):
+
+| Priority | URL |
+|----------|-----|
+| Pillar | `https://www.researchpeptide.uk/blog/what-are-research-peptides` |
+| Pillar | `https://www.researchpeptide.uk/blog/how-to-buy-research-peptides-in-the-uk` |
+| Commercial | `https://www.researchpeptide.uk/shop` |
+| Product sample | `https://www.researchpeptide.uk/product/adamax` |
+| Trust | `https://www.researchpeptide.uk/peptide-guide` |
+
+**GA4 — monthly review** (`seo/kpis_dashboard.md`):
+
+1. **Reports → Acquisition → Traffic acquisition** — organic sessions vs prior month.
+2. **Reports → Engagement → Events** — `purchase`, `generate_lead`, `view_item`, `search`.
+3. **Admin → Data display → Search Console links** — top queries and CTR.
+4. Record snapshots in `seo/seo_baseline.json` (`organicSessions`, `topQueries`, `indexedPages`).
+
+**PSI lab baseline** — run mobile on `/`, `/shop`, one product; paste scores into `seo/core_web_vitals_baseline.json`.
+
+**Free off-page (manual, ~2 hrs/week):**
+
+- Unlinked brand mentions → template in `seo/email_templates.md`
+- UK lab / biotech resource pages that link to competitors → polite resource inclusion pitch
+- Google Business Profile (if you have a physical presence) — NAP consistency with site footer

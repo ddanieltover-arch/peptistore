@@ -6,7 +6,23 @@
   "sitemap": "https://www.researchpeptide.uk/sitemap.xml",
   "sitemapSubmitted": true,
   "robots": "https://www.researchpeptide.uk/robots.txt",
-  "keyEvents": ["purchase", "generate_lead"],
+  "keyEvents": ["purchase", "generate_lead", "begin_checkout"],
   "indexedPages": "monitor in GSC → Pages",
-  "domainAuthority": "pending Ahrefs/Moz access"
+  "domainAuthority": "pending Ahrefs/Moz access",
+  "organicSessions": null,
+  "searchClicks": "~43 (May 2026 snapshot)",
+  "ctr": "monitor in GSC Performance",
+  "offPage": {
+    "linkBuildingCrm": "pending Ahrefs/SEMrush export",
+    "guestPosts": "not started",
+    "disavow": "no toxic links identified"
+  },
+  "measurementNextReview": "2026-06-20",
+  "gscIndexingQueue": [
+    "/blog/what-are-research-peptides",
+    "/blog/how-to-buy-research-peptides-in-the-uk",
+    "/shop",
+    "/product/adamax",
+    "/peptide-guide"
+  ]
 }

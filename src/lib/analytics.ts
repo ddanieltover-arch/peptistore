@@ -82,3 +82,9 @@ export function trackPurchase(params: {
     items: params.items,
   });
 }
+
+export function trackSearch(searchTerm: string, resultCount?: number) {
+  const term = searchTerm.trim();
+  if (!term) return;
+  trackEvent('search', { search_term: term, result_count: resultCount });
+}

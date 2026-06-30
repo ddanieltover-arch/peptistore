@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { HelpCircle, ChevronDown, FlaskConical, Truck, CreditCard } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import Seo from '../components/Seo';
@@ -84,7 +85,12 @@ export default function FAQ() {
             <div className='absolute top-0 right-0 w-32 h-32 bg-blue-600/10 rounded-full blur-3xl' />
             <h2 className='text-white mb-2 italic'>Still have technical questions?</h2>
             <p className='text-gray-400 text-sm mb-6'>Our liaison team is available for deep-dive research support.</p>
-            <a href='/contact' className='inline-flex items-center gap-2 bg-blue-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-blue-700 transition-all uppercase tracking-widest text-xs'>Liaison Office</a>
+            <Link
+              to='/contact'
+              className='inline-flex items-center gap-2 bg-blue-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-blue-700 transition-all uppercase tracking-widest text-xs'
+            >
+              Technical peptide support
+            </Link>
           </div>
         </div>
       </main>

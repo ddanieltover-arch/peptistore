@@ -8,6 +8,7 @@ import { formatCurrency } from '../../lib/utils';
 import { useNavigate } from 'react-router-dom';
 import { ProductImagePlaceholder } from '../products/ProductImagePlaceholder';
 import { productPath } from '../../lib/productUrl';
+import { trackSearch } from '../../lib/analytics';
 
 const POPULAR_SEARCHES = ['BPC-157', 'TB-500', 'Semaglutide', 'CJC-1295', 'AOD-9604'];
 
@@ -18,6 +19,7 @@ export default function Omnisearch() {
   const [results, setResults] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const lastTrackedQuery = useRef('');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -45,6 +47,11 @@ export default function Omnisearch() {
 
         if (error) throw error;
         setResults(data || []);
+        const term = query.trim();
+        if (term.length >= 2 && term !== lastTrackedQuery.current) {
+          lastTrackedQuery.current = term;
+          trackSearch(term, data?.length ?? 0);
+        }
       } catch (err) {
         console.error('Search error:', err);
       } finally {

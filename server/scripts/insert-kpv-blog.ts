@@ -2,6 +2,7 @@ import pg from 'pg';
 import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { allocateBlogSlug } from '../lib/blogSlug';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -62,12 +63,13 @@ This article is intended solely for educational and laboratory research purposes
 async function insertPost() {
   const client = await pool.connect();
   try {
+    const slug = await allocateBlogSlug(client, title);
     const query = `
-      INSERT INTO blog_posts (title, content, image_url, created_at)
-      VALUES ($1, $2, $3, NOW())
-      RETURNING id, title, created_at
+      INSERT INTO blog_posts (title, slug, content, image_url, created_at)
+      VALUES ($1, $2, $3, $4, NOW())
+      RETURNING id, title, slug, created_at
     `;
-    const { rows } = await client.query(query, [title, content, imageUrl]);
+    const { rows } = await client.query(query, [title, slug, content, imageUrl]);
     console.log('Successfully inserted blog post:');
     console.log(rows[0]);
   } catch (error) {

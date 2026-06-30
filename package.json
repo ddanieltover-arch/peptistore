@@ -18,7 +18,8 @@
     "db:migrate": "tsx server/scripts/migrate.ts",
     "db:import:powder": "tsx server/scripts/import-peptide-powder-catalog.ts",
     "db:migrate-images": "tsx server/scripts/migrate-product-images.ts",
-    "db:refresh-image-cache": "tsx server/scripts/refresh-product-image-cache.ts",
+    "db:insert-content-calendar": "tsx server/scripts/insert-content-calendar.ts",
+    "db:backfill-blog-slugs": "tsx server/scripts/backfill-blog-slugs.ts",
     "optimize:brand-images": "tsx scripts/optimize-brand-images.ts",
     "seo:generate": "tsx scripts/generate-seo-assets.ts",
     "seo:validate": "tsx scripts/validate-seo.ts"

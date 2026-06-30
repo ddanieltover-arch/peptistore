@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'motion/react';
 import { Microscope, ShieldAlert } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import brandReceptionSuite from '../assets/brand/brand-reception-suite.webp';
 
 type ResearchCard = {
@@ -89,6 +90,18 @@ export default function PeptideResearch() {
               <p className="text-sm text-gray-600 leading-relaxed">{card.summary}</p>
             </motion.article>
           ))}
+        </div>
+
+        <div className="mt-14 text-center border-t border-gray-100 pt-10">
+          <p className="text-gray-500 text-sm mb-5 max-w-xl mx-auto leading-relaxed">
+            Match pathway briefs to catalogue compounds for your next non-clinical study design.
+          </p>
+          <Link
+            to="/shop"
+            className="inline-flex items-center justify-center bg-blue-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-blue-700 transition-colors text-sm uppercase tracking-wider"
+          >
+            Research peptide catalog
+          </Link>
         </div>
       </div>
     </div>

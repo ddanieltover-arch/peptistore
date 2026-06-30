@@ -1,4 +1,4 @@
-import React, { Suspense, useEffect, useState } from 'react';
+import React, { Suspense, useEffect, useRef, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { supabase } from '../supabase';
 import { useCartStore } from '../store/useCartStore';
@@ -15,6 +15,7 @@ import Seo from '../components/Seo';
 import { buildProductJsonLd, excerpt } from '../lib/seo';
 import { fetchProductDetail, SHOP_PRODUCT_COLUMNS } from '../lib/shopCatalogQuery';
 import { getPrerenderProductHint } from '../lib/prerenderHint';
+import { trackViewItem } from '../lib/analytics';
 import { ScientificTextRenderer } from '../components/ui/ScientificHoverCard';
 import { GeoAnswerCapsule } from '../components/seo/GeoAnswerCapsule';
 
@@ -55,6 +56,7 @@ export default function ProductDetails() {
   const [showShare, setShowShare] = useState(false);
   const [activeImage, setActiveImage] = useState(0);
   const [recentlyViewed, setRecentlyViewed] = useState<any[]>([]);
+  const viewedIdRef = useRef<string | null>(null);
   
   const productReady = Boolean(product?.id);
   const addItem = useCartStore(state => state.addItem);
@@ -127,6 +129,15 @@ export default function ProductDetails() {
         }
 
         setProduct(pData);
+        if (pData.id && viewedIdRef.current !== String(pData.id)) {
+          viewedIdRef.current = String(pData.id);
+          trackViewItem({
+            item_id: String(pData.id),
+            item_name: String(pData.title || 'product'),
+            price: Number(pData.price) || 0,
+            quantity: 1,
+          });
+        }
         if (pData.variants && pData.variants.length > 0) {
           setSelectedVariant(pData.variants[0]);
         }

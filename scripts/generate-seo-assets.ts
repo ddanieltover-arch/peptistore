@@ -351,7 +351,7 @@ function prerenderBlogPost(post: BlogRow) {
 
 async function main() {
   const fetchedProducts = await supabaseRows<ProductRow>('products', 'id,slug,title,description,price,images,categories,inventory,created_at');
-  const fetchedPosts = await supabaseRows<BlogRow>('blog_posts', 'id,title,content,image_url,created_at');
+  const fetchedPosts = await supabaseRows<BlogRow>('blog_posts', 'id,slug,title,content,image_url,created_at');
   const products = fetchedProducts.length ? fetchedProducts : fallbackProducts;
   const posts = fetchedPosts;
   if (writeDist && posts.length === 0) {

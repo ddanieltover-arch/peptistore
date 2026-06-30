@@ -5,11 +5,8 @@ import { BookOpen, Sparkles, ArrowRight, Clock, User } from 'lucide-react';
 import { motion } from 'motion/react';
 import { resolveBlogImageUrl } from '../lib/blogImages';
 import Seo from '../components/Seo';
-import { DEFAULT_SITE_URL, absoluteUrl, buildArticleJsonLd, slugify } from '../lib/seo';
-
-function blogPath(post: { id?: string; slug?: string | null; title?: string | null }) {
-  return `/blog/${post.slug || post.id || slugify(String(post.title || 'article'))}`;
-}
+import { DEFAULT_SITE_URL, absoluteUrl, buildArticleJsonLd } from '../lib/seo';
+import { blogPath } from '../lib/blogUrl';
 
 export default function Blog() {
   const [posts, setPosts] = useState<any[]>([]);

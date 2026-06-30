@@ -215,7 +215,7 @@ export function buildProductJsonLd(product: any, reviews: any[] = [], siteUrl = 
 }
 
 export function buildArticleJsonLd(post: any, siteUrl = DEFAULT_SITE_URL) {
-  const path = '/blog/' + (post?.slug || post?.id || '');
+  const path = '/blog/' + (post?.slug || post?.id || slugify(String(post?.title || 'article')));
   return {
     '@context': 'https://schema.org',
     '@type': 'BlogPosting',

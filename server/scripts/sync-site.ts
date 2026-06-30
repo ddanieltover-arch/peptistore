@@ -8,7 +8,11 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 dotenv.config({ path: path.join(__dirname, '../.env') });
 
-const API_KEY = '57598939deeac0e6fcd3c03247788a03';
+const API_KEY = process.env.SCRAPERAPI_KEY?.trim();
+if (!API_KEY) {
+  console.error('SCRAPERAPI_KEY is required in server/.env');
+  process.exit(1);
+}
 const TARGET_BASE = 'https://researchpeptide.co.uk/shop/';
 
 async function scanViaApi() {

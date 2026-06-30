@@ -64,10 +64,20 @@ export default function Home() {
                   </span>
                 </h1>
 
-                <p className="text-gray-400 text-sm md:text-base leading-relaxed mb-8 max-w-md">
+                <p className="text-gray-400 text-sm md:text-base leading-relaxed mb-4 max-w-md">
                   Sourced for precision and purity. Third-party lab tested
                   to ensure 99%+ consistency for your scientific studies.
                   Fast UK-wide shipping.
+                </p>
+
+                <p className="text-sm text-gray-500 mb-8 max-w-md leading-relaxed">
+                  <Link to="/shop" className="text-blue-400 hover:text-blue-300 font-semibold underline-offset-2 hover:underline">
+                    Buy research peptides in the UK
+                  </Link>
+                  <span className="text-gray-600"> · </span>
+                  <Link to="/peptide-guide" className="text-blue-400 hover:text-blue-300 font-semibold underline-offset-2 hover:underline">
+                    Research peptide guide
+                  </Link>
                 </p>
 
                 <div className="flex flex-col sm:flex-row gap-3">

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-30T02:43:11.307Z",
+  "generatedAt": "2026-06-30T03:14:03.738Z",
   "status": "Generated locally; external Rich Results Test requires live URL access.",
   "schemasGenerated": [
     "Organization",
@@ -13,125 +13,125 @@
     {
       "@context": "https://schema.org",
       "@type": "Product",
-      "@id": "https://www.researchpeptide.uk/product/nad#product",
-      "name": "NAD+",
+      "@id": "https://www.researchpeptide.uk/product/tb500-frag#product",
+      "name": "TB500 (Frag)",
       "image": [
-        "https://bepzxmukveqobaqffqop.supabase.co/storage/v1/object/public/products/catalog/nad/0.webp"
+        "https://bepzxmukveqobaqffqop.supabase.co/storage/v1/object/public/products/catalog/tb500-frag/0.webp"
       ],
-      "description": "Nicotinamide adenine dinucleotide bulk vials.",
-      "sku": "2be46580-3b46-4044-94c4-371e4c16e435",
-      "brand": {
-        "@type": "Brand",
-        "name": "Research Peptides UK"
-      },
-      "category": "supplements, research-chemicals, peptide-powder",
-      "url": "https://www.researchpeptide.uk/product/nad",
-      "offers": {
-        "@type": "Offer",
-        "priceCurrency": "GBP",
-        "price": "35.32",
-        "availability": "https://schema.org/InStock",
-        "url": "https://www.researchpeptide.uk/product/nad",
-        "itemCondition": "https://schema.org/NewCondition"
-      }
-    },
-    {
-      "@context": "https://schema.org",
-      "@type": "Product",
-      "@id": "https://www.researchpeptide.uk/product/survodutide#product",
-      "name": "Survodutide",
-      "image": [
-        "https://bepzxmukveqobaqffqop.supabase.co/storage/v1/object/public/products/catalog/survodutide/0.webp"
-      ],
-      "description": "GCGR / GLP-1 dual agonist class (research).",
-      "sku": "376cac57-c437-44f1-9f26-02c3d0b65153",
-      "brand": {
-        "@type": "Brand",
-        "name": "Research Peptides UK"
-      },
-      "category": "peptides, research-chemicals, peptide-powder",
-      "url": "https://www.researchpeptide.uk/product/survodutide",
-      "offers": {
-        "@type": "Offer",
-        "priceCurrency": "GBP",
-        "price": "199.40",
-        "availability": "https://schema.org/InStock",
-        "url": "https://www.researchpeptide.uk/product/survodutide",
-        "itemCondition": "https://schema.org/NewCondition"
-      }
-    },
-    {
-      "@context": "https://schema.org",
-      "@type": "Product",
-      "@id": "https://www.researchpeptide.uk/product/thymalin#product",
-      "name": "Thymalin",
-      "image": [
-        "https://bepzxmukveqobaqffqop.supabase.co/storage/v1/object/public/products/catalog/thymalin/0.webp"
-      ],
-      "description": "Thymic peptide complex analog.",
-      "sku": "35ac0c47-185c-4955-8b9d-348c5fa4128a",
+      "description": "Thymosin beta fragment scaffold.",
+      "sku": "8f603fa2-15e9-419d-9e25-0aea9415e1e8",
       "brand": {
         "@type": "Brand",
         "name": "Research Peptides UK"
       },
       "category": "peptides, peptide-powder",
-      "url": "https://www.researchpeptide.uk/product/thymalin",
+      "url": "https://www.researchpeptide.uk/product/tb500-frag",
       "offers": {
         "@type": "Offer",
         "priceCurrency": "GBP",
-        "price": "55.92",
+        "price": "77.26",
         "availability": "https://schema.org/InStock",
-        "url": "https://www.researchpeptide.uk/product/thymalin",
+        "url": "https://www.researchpeptide.uk/product/tb500-frag",
         "itemCondition": "https://schema.org/NewCondition"
       }
     },
     {
       "@context": "https://schema.org",
       "@type": "Product",
-      "@id": "https://www.researchpeptide.uk/product/cjc-1295-with-dac#product",
-      "name": "CJC-1295 (With DAC)",
+      "@id": "https://www.researchpeptide.uk/product/hgh-fragment-176-191#product",
+      "name": "HGH Fragment 176-191",
       "image": [
-        "https://bepzxmukveqobaqffqop.supabase.co/storage/v1/object/public/products/catalog/cjc-1295-with-dac/0.webp"
+        "https://bepzxmukveqobaqffqop.supabase.co/storage/v1/object/public/products/catalog/hgh-fragment-176-191/0.webp"
       ],
-      "description": "Extended half-life GHRH analog (DAC).",
-      "sku": "44775dc1-2c1a-4cf2-a853-bccd47b20e86",
+      "description": "Isolated C-terminal fragment reference material.",
+      "sku": "e56d6913-086a-4b49-abe7-865b6a3054aa",
       "brand": {
         "@type": "Brand",
         "name": "Research Peptides UK"
       },
       "category": "peptides, peptide-powder",
-      "url": "https://www.researchpeptide.uk/product/cjc-1295-with-dac",
+      "url": "https://www.researchpeptide.uk/product/hgh-fragment-176-191",
       "offers": {
         "@type": "Offer",
         "priceCurrency": "GBP",
-        "price": "89.77",
+        "price": "39.00",
         "availability": "https://schema.org/InStock",
-        "url": "https://www.researchpeptide.uk/product/cjc-1295-with-dac",
+        "url": "https://www.researchpeptide.uk/product/hgh-fragment-176-191",
         "itemCondition": "https://schema.org/NewCondition"
       }
     },
     {
       "@context": "https://schema.org",
       "@type": "Product",
-      "@id": "https://www.researchpeptide.uk/product/follistatin#product",
-      "name": "Follistatin",
+      "@id": "https://www.researchpeptide.uk/product/dsip#product",
+      "name": "DSIP",
       "image": [
-        "https://bepzxmukveqobaqffqop.supabase.co/storage/v1/object/public/products/catalog/follistatin/0.webp"
+        "https://bepzxmukveqobaqffqop.supabase.co/storage/v1/object/public/products/catalog/dsip/0.webp"
       ],
-      "description": "Binding protein / regulatory scaffold.",
-      "sku": "4598caa6-cb0e-4ba9-9bfd-07386e5ee192",
+      "description": "Delta sleep-inducing peptide reference standard.",
+      "sku": "1ff5e995-80ca-438b-b256-ab3bc89f66ca",
       "brand": {
         "@type": "Brand",
         "name": "Research Peptides UK"
       },
-      "category": "peptides, research-chemicals, peptide-powder",
-      "url": "https://www.researchpeptide.uk/product/follistatin",
+      "category": "peptides, peptide-powder",
+      "url": "https://www.researchpeptide.uk/product/dsip",
       "offers": {
         "@type": "Offer",
         "priceCurrency": "GBP",
-        "price": "317.13",
+        "price": "19.87",
         "availability": "https://schema.org/InStock",
-        "url": "https://www.researchpeptide.uk/product/follistatin",
+        "url": "https://www.researchpeptide.uk/product/dsip",
+        "itemCondition": "https://schema.org/NewCondition"
+      }
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "Product",
+      "@id": "https://www.researchpeptide.uk/product/selank#product",
+      "name": "Selank",
+      "image": [
+        "https://bepzxmukveqobaqffqop.supabase.co/storage/v1/object/public/products/catalog/selank/0.webp"
+      ],
+      "description": "Anxiolytic peptide nootropic scaffold for neurochemical studies.",
+      "sku": "09891dc6-cea1-422d-a3dc-f66f75d9239a",
+      "brand": {
+        "@type": "Brand",
+        "name": "Research Peptides UK"
+      },
+      "category": "peptides, peptide-powder",
+      "url": "https://www.researchpeptide.uk/product/selank",
+      "offers": {
+        "@type": "Offer",
+        "priceCurrency": "GBP",
+        "price": "30.17",
+        "availability": "https://schema.org/InStock",
+        "url": "https://www.researchpeptide.uk/product/selank",
+        "itemCondition": "https://schema.org/NewCondition"
+      }
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "Product",
+      "@id": "https://www.researchpeptide.uk/product/snap-8#product",
+      "name": "SNAP-8",
+      "image": [
+        "https://bepzxmukveqobaqffqop.supabase.co/storage/v1/object/public/products/catalog/snap-8/0.webp"
+      ],
+      "description": "Neurotransmitter-snare mimetic cosmetic-research peptide.",
+      "sku": "cd1eb6ab-d1c2-4cc3-a0db-b50de4cc0d1e",
+      "brand": {
+        "@type": "Brand",
+        "name": "Research Peptides UK"
+      },
+      "category": "peptides, peptide-powder",
+      "url": "https://www.researchpeptide.uk/product/snap-8",
+      "offers": {
+        "@type": "Offer",
+        "priceCurrency": "GBP",
+        "price": "39.73",
+        "availability": "https://schema.org/InStock",
+        "url": "https://www.researchpeptide.uk/product/snap-8",
         "itemCondition": "https://schema.org/NewCondition"
       }
     }
@@ -140,11 +140,11 @@
     {
       "@context": "https://schema.org",
       "@type": "BlogPosting",
-      "@id": "https://www.researchpeptide.uk/blog/10546e55-2007-400b-abf7-7de3e70d83b5#article",
-      "headline": "BPC-157 + TB-500 Dual Action Blend: Scientific Background, Concentration Metrics, and Laboratory Protocols",
-      "description": "**RESEARCH USE ONLY** — This product is supplied strictly as a lyophilised solid for laboratory research, in vitro studies, and animal modelling. It is...",
+      "@id": "https://www.researchpeptide.uk/blog/oxford-peptides-and-uk-research-sourcing#article",
+      "headline": "Oxford Peptides and UK Research Sourcing",
+      "description": "**Quick Answer:** Researchers searching “Oxford peptides” usually want UK-trusted research peptide sourcing with documentation, discreet dispatch, and r...",
       "image": [
-        "https://www.researchpeptide.uk/blog/kpv-peptide.png"
+        "https://www.researchpeptide.uk/blog/storefront-wet-street.png"
       ],
       "author": {
         "@type": "Organization",
@@ -154,19 +154,19 @@
       "publisher": {
         "@id": "https://www.researchpeptide.uk#organization"
       },
-      "datePublished": "2026-05-20T14:49:47.861923+00:00",
-      "dateModified": "2026-05-20T14:49:47.861923+00:00",
+      "datePublished": "2026-06-30T03:10:22.074696+00:00",
+      "dateModified": "2026-06-30T03:10:22.074696+00:00",
       "mainEntityOfPage": {
         "@type": "WebPage",
-        "@id": "https://www.researchpeptide.uk/blog/10546e55-2007-400b-abf7-7de3e70d83b5"
+        "@id": "https://www.researchpeptide.uk/blog/oxford-peptides-and-uk-research-sourcing"
       }
     },
     {
       "@context": "https://schema.org",
       "@type": "BlogPosting",
-      "@id": "https://www.researchpeptide.uk/blog/386f14c2-d1f4-4a99-8cf5-fc1ef530538d#article",
-      "headline": "BPC-157 Acetate vs. BPC-157 Arginate: Stability, half-life, and Lab Protocols",
-      "description": "INTRODUCTION: THE CORE DIFFERENCE Body Protection Compound-157 (BPC-157) is a synthetic pentadecapeptide derived from a naturally occurring protective p...",
+      "@id": "https://www.researchpeptide.uk/blog/ghrp-2-peptide-buying-and-research-notes#article",
+      "headline": "GHRP-2 Peptide Buying and Research Notes",
+      "description": "**Quick Answer:** GHRP-2 (pralmorelin) is a growth-hormone secretagogue peptide used in UK laboratories to study ghrelin receptor (GHS-R) signalling—not...",
       "image": [
         "https://www.researchpeptide.uk/blog/reception-wide.png"
       ],
@@ -178,19 +178,19 @@
       "publisher": {
         "@id": "https://www.researchpeptide.uk#organization"
       },
-      "datePublished": "2026-05-20T14:17:36.771543+00:00",
-      "dateModified": "2026-05-20T14:17:36.771543+00:00",
+      "datePublished": "2026-06-30T03:10:21.743857+00:00",
+      "dateModified": "2026-06-30T03:10:21.743857+00:00",
       "mainEntityOfPage": {
         "@type": "WebPage",
-        "@id": "https://www.researchpeptide.uk/blog/386f14c2-d1f4-4a99-8cf5-fc1ef530538d"
+        "@id": "https://www.researchpeptide.uk/blog/ghrp-2-peptide-buying-and-research-notes"
       }
     },
     {
       "@context": "https://schema.org",
       "@type": "BlogPosting",
-      "@id": "https://www.researchpeptide.uk/blog/1cc4a3f1-eafd-486f-8f52-192c58141a7e#article",
-      "headline": "IGF-1 Peptide in Clinical Workflows: Receptor Dynamics and Analytical Standards",
-      "description": "INTRODUCTION: WHAT IS IGF-1? Insulin-like Growth Factor 1 (IGF-1), also known as somatomedin C, is a key endocrine and paracrine hormone that plays a fu...",
+      "@id": "https://www.researchpeptide.uk/blog/igf-1-peptide-research-context#article",
+      "headline": "IGF-1 Peptide Research Context",
+      "description": "**Quick Answer:** IGF-1 peptides—including LR3 and DES variants—are studied in UK labs for insulin-like growth factor pathway modelling, receptor bindin...",
       "image": [
         "https://www.researchpeptide.uk/blog/igf-1-peptide.png"
       ],
@@ -202,21 +202,21 @@
       "publisher": {
         "@id": "https://www.researchpeptide.uk#organization"
       },
-      "datePublished": "2026-05-20T14:04:32.892531+00:00",
-      "dateModified": "2026-05-20T14:04:32.892531+00:00",
+      "datePublished": "2026-06-30T03:10:21.404157+00:00",
+      "dateModified": "2026-06-30T03:10:21.404157+00:00",
       "mainEntityOfPage": {
         "@type": "WebPage",
-        "@id": "https://www.researchpeptide.uk/blog/1cc4a3f1-eafd-486f-8f52-192c58141a7e"
+        "@id": "https://www.researchpeptide.uk/blog/igf-1-peptide-research-context"
       }
     },
     {
       "@context": "https://schema.org",
       "@type": "BlogPosting",
-      "@id": "https://www.researchpeptide.uk/blog/f21bd3b3-48eb-4105-ab08-04b0c6e44e6b#article",
-      "headline": "Custom Peptide Synthesis in the UK: Navigating Quality and Laboratory Standards",
-      "description": "INTRODUCTION: THE DEMAND FOR CUSTOM PEPTIDE SYNTHESIS While off-the-shelf peptide catalogs cover common research targets, specialized laboratory workflo...",
+      "@id": "https://www.researchpeptide.uk/blog/semaglutide-peptide-uk-research-brief#article",
+      "headline": "Semaglutide Peptide UK Research Brief",
+      "description": "**Quick Answer:** Semaglutide is a GLP-1 receptor agonist peptide studied in UK laboratories for incretin-pathway models—not for human prescribing. Rese...",
       "image": [
-        "https://www.researchpeptide.uk/blog/custom-peptide-synthesis.png"
+        "https://www.researchpeptide.uk/blog/storefront-night.png"
       ],
       "author": {
         "@type": "Organization",
@@ -226,21 +226,21 @@
       "publisher": {
         "@id": "https://www.researchpeptide.uk#organization"
       },
-      "datePublished": "2026-05-20T14:04:32.892531+00:00",
-      "dateModified": "2026-05-20T14:04:32.892531+00:00",
+      "datePublished": "2026-06-30T03:10:21.072768+00:00",
+      "dateModified": "2026-06-30T03:10:21.072768+00:00",
       "mainEntityOfPage": {
         "@type": "WebPage",
-        "@id": "https://www.researchpeptide.uk/blog/f21bd3b3-48eb-4105-ab08-04b0c6e44e6b"
+        "@id": "https://www.researchpeptide.uk/blog/semaglutide-peptide-uk-research-brief"
       }
     },
     {
       "@context": "https://schema.org",
       "@type": "BlogPosting",
-      "@id": "https://www.researchpeptide.uk/blog/c603f9c4-cf03-4c33-aac3-9102dcfce2f3#article",
-      "headline": "KPV Peptide Research Overview: Clinical Directions and Biological Stability",
-      "description": "INTRODUCTION: WHAT IS THE KPV PEPTIDE? KPV (Lysine-Proline-Valine) is a naturally occurring tripeptide that has emerged as a significant focus in molecu...",
+      "@id": "https://www.researchpeptide.uk/blog/how-to-buy-research-peptides-in-the-uk#article",
+      "headline": "How to Buy Research Peptides in the UK",
+      "description": "**Quick Answer:** To buy research peptides in the UK, qualified laboratories should verify research-only supplier policies, compare COA documentation, c...",
       "image": [
-        "https://www.researchpeptide.uk/blog/kpv-peptide.png"
+        "https://www.researchpeptide.uk/blog/storefront-street.png"
       ],
       "author": {
         "@type": "Organization",
@@ -250,11 +250,11 @@
       "publisher": {
         "@id": "https://www.researchpeptide.uk#organization"
       },
-      "datePublished": "2026-05-20T13:56:32.630815+00:00",
-      "dateModified": "2026-05-20T13:56:32.630815+00:00",
+      "datePublished": "2026-06-30T03:10:20.73947+00:00",
+      "dateModified": "2026-06-30T03:10:20.73947+00:00",
       "mainEntityOfPage": {
         "@type": "WebPage",
-        "@id": "https://www.researchpeptide.uk/blog/c603f9c4-cf03-4c33-aac3-9102dcfce2f3"
+        "@id": "https://www.researchpeptide.uk/blog/how-to-buy-research-peptides-in-the-uk"
       }
     }
   ]

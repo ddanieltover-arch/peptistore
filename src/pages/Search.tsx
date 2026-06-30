@@ -16,6 +16,7 @@ import { ProductCardPriceBlock } from '../components/products/ProductCardPriceBl
 import { productPath } from '../lib/productUrl';
 import { ProductBadge } from '../components/products/ProductBadge';
 import { getPrimaryProductBadge } from '../lib/productBadges';
+import { trackSearch } from '../lib/analytics';
 
 export default function Search() {
   const [allProducts, setAllProducts] = useState<any[]>([]);
@@ -30,6 +31,7 @@ export default function Search() {
   const addToast = useToastStore(state => state.addToast);
   const selectedCategory = searchParams.get('category') || '';
   const queryParam = searchParams.get('q') || '';
+  const lastTrackedQuery = React.useRef('');
 
   useEffect(() => {
     setSearchTerm(queryParam);
@@ -81,6 +83,13 @@ export default function Search() {
   };
 
   const filteredProducts = getFilteredAndSorted();
+
+  useEffect(() => {
+    const term = queryParam.trim();
+    if (!term || loading || term === lastTrackedQuery.current) return;
+    lastTrackedQuery.current = term;
+    trackSearch(term, filteredProducts.length);
+  }, [queryParam, loading, filteredProducts.length]);
 
   const hasNoCatalog = !loading && allProducts.length === 0;
   const hasNoMatches =

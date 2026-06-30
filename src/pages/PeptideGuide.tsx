@@ -45,6 +45,14 @@ export default function PeptideGuide() {
 
         <GeoAnswerCapsule className="mb-14 text-left" />
 
+        <p className="text-sm text-gray-600 text-center max-w-2xl mx-auto mb-10 leading-relaxed">
+          For sequence-level chemistry detail, read our{' '}
+          <Link to="/peptide-information" className="text-blue-600 font-semibold hover:underline">
+            peptide synthesis and purity information
+          </Link>
+          .
+        </p>
+
         <section className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-14">
           {guideTopics.map((topic, idx) => (
             <motion.article
