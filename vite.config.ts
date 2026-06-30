@@ -9,9 +9,31 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, '.', '');
+  const supabaseOrigin = (() => {
+    try {
+      return env.VITE_SUPABASE_URL ? new URL(env.VITE_SUPABASE_URL).origin : '';
+    } catch {
+      return '';
+    }
+  })();
+
   return {
     cacheDir: path.join(os.tmpdir(), 'peptistore-vite-cache'),
-    plugins: [react(), tailwindcss()],
+    plugins: [
+      react(),
+      tailwindcss(),
+      {
+        name: 'inject-supabase-preconnect',
+        transformIndexHtml(html) {
+          if (!supabaseOrigin || html.includes(supabaseOrigin)) return html;
+          const tag = `<link rel='preconnect' href='${supabaseOrigin}' crossorigin />`;
+          return html.replace(
+            "<link rel='preconnect' href='https://fonts.gstatic.com' crossorigin />",
+            `<link rel='preconnect' href='https://fonts.gstatic.com' crossorigin />\n    ${tag}`,
+          );
+        },
+      },
+    ],
     optimizeDeps: {
       // Avoid scanning scratch/*.html files that include external Shopify theme imports.
       entries: ['index.html'],
