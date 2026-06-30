@@ -24,6 +24,22 @@
     <meta name='twitter:description' content='Research-grade peptides for UK laboratory workflows with documentation and research-only support.' />
     <meta name='twitter:image' content='https://www.researchpeptide.uk/og-image.png' />
     <title>Research Peptides UK | Research-Grade Peptides</title>
+    <style>
+      /* Prevent FOUC: prerender SEO HTML is for crawlers, not first paint */
+      html, body { margin: 0; background: #0A0F1E; color: #fff; }
+      #seo-prerender {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+      }
+      #root { min-height: 100vh; background: #0A0F1E; }
+    </style>
   </head>
   <body>
     <div id='root'></div>

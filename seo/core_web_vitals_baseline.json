@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-30T02:33:47.214Z",
+  "generatedAt": "2026-06-30T02:43:11.301Z",
   "status": "Requires Lighthouse/PageSpeed execution against deployed or preview URLs",
   "targets": {
     "LCP": "<= 2.5s",

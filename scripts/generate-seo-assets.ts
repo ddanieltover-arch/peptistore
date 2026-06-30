@@ -222,8 +222,10 @@ function prerenderPage(options: {
     preloadOgImage: options.preloadOgImage ?? (options.ogType === 'product' || options.ogType === 'article'),
     jsonLd: options.jsonLd,
   });
+  const prerenderHideStyle =
+    'position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0';
   const body = [
-    '<main id=\'seo-prerender\'>',
+    '<main id=\'seo-prerender\' style=\'' + prerenderHideStyle + '\'>',
     '<article>',
     '<h1>' + htmlEscape(options.h1) + '</h1>',
     '<section id=\'answer\' aria-label=\'Quick Answer\'>',
