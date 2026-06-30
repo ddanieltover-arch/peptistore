@@ -13,7 +13,7 @@ import { ProductImagePlaceholder } from '../components/products/ProductImagePlac
 import { productPath } from '../lib/productUrl';
 import Seo from '../components/Seo';
 import { buildProductJsonLd, excerpt } from '../lib/seo';
-import { PRODUCT_DETAIL_COLUMNS, SHOP_PRODUCT_COLUMNS } from '../lib/shopCatalogQuery';
+import { fetchProductDetail, SHOP_PRODUCT_COLUMNS } from '../lib/shopCatalogQuery';
 import { ScientificTextRenderer } from '../components/ui/ScientificHoverCard';
 import { GeoAnswerCapsule } from '../components/seo/GeoAnswerCapsule';
 
@@ -94,9 +94,9 @@ export default function ProductDetails() {
       setRecentlyViewed([]);
 
       try {
-        const { data: pData } = slug
-          ? await supabase.from('products').select(PRODUCT_DETAIL_COLUMNS).eq('slug', slug).maybeSingle()
-          : await supabase.from('products').select(PRODUCT_DETAIL_COLUMNS).eq('id', id as string).maybeSingle();
+        const pData = slug
+          ? await fetchProductDetail(slug, true)
+          : await fetchProductDetail(id as string, false);
 
         if (cancelled) return;
 
