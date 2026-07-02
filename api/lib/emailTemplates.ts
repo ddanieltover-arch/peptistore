@@ -191,8 +191,9 @@ export function renderOrderCreatedAdminEmail(payload: OrderEmailPayload): EmailR
       <p style="margin:0;font-size:18px;color:#78350f;font-weight:800;">${safeHtml(payload.orderId)}</p>
     </div>
     <p style="margin:0 0 12px;font-size:13px;color:#334155;">
-      Customer: <strong>${safeHtml(payload.customerName || 'Guest')}</strong> (${safeHtml(payload.customerEmail)})
+      Customer: <strong>${safeHtml(payload.customerName || 'Guest')}</strong> (<a href="mailto:${safeHtml(payload.customerEmail)}" style="color:#1d4ed8;text-decoration:none;">${safeHtml(payload.customerEmail)}</a>)
     </p>
+    <p style="margin:0 0 16px;font-size:12px;color:#64748b;">Reply to this email to contact the customer directly.</p>
     <div style="margin:0 0 16px;padding:14px;border:1px solid #e2e8f0;border-radius:12px;background:#f8fafc;">
       <p style="margin:0 0 8px;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#475569;font-weight:800;">Shipping & Contact</p>
       <p style="margin:0;font-size:13px;color:#334155;line-height:1.8;">

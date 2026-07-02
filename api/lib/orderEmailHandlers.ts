@@ -74,7 +74,8 @@ export async function handleOrderCreated(orderId: string) {
       to: getAdminRecipient(),
       subject: adminTemplate.subject,
       html: adminTemplate.html,
-      text: adminTemplate.text
+      text: adminTemplate.text,
+      replyTo: payload.customerEmail
     }),
     sendTransactionalEmail({
       to: payload.customerEmail,

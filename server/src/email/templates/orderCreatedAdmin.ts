@@ -22,8 +22,9 @@ export function renderOrderCreatedAdminEmail(payload: OrderEmailPayload): EmailR
       <p style="margin:0;font-size:18px;color:#78350f;font-weight:800;">${payload.orderId}</p>
     </div>
     <p style="margin:0 0 12px;font-size:13px;color:#334155;">
-      Customer: <strong>${payload.customerName || 'Guest'}</strong> (${payload.customerEmail})
+      Customer: <strong>${payload.customerName || 'Guest'}</strong> (<a href="mailto:${payload.customerEmail}" style="color:#1d4ed8;text-decoration:none;">${payload.customerEmail}</a>)
     </p>
+    <p style="margin:0 0 16px;font-size:12px;color:#64748b;">Reply to this email to contact the customer directly.</p>
     <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin-bottom:18px;">
       ${itemRows}
     </table>

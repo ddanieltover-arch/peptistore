@@ -116,7 +116,7 @@ async function processEvent(event: EmailEventRow) {
     const tpl = renderOrderCreated(event.payload);
     await Promise.all([
       sendEmail(String(event.payload.customerEmail), tpl.subject, tpl.html, tpl.text),
-      sendEmail(adminTo, `New ${tpl.subject}`, tpl.html, tpl.text)
+      sendEmail(adminTo, `New ${tpl.subject}`, tpl.html, tpl.text, String(event.payload.customerEmail || ''))
     ]);
     return;
   }
