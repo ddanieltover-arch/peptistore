@@ -1,0 +1,33 @@
+name: SEO Validation
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - master
+
+jobs:
+  seo:
+    runs-on: ubuntu-latest
+    env:
+      SEO_FETCH_REMOTE: 'false'
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Typecheck
+        run: npm run lint
+
+      - name: Build app and generate SEO assets
+        run: npm run build
+
+      - name: Verify prerender manifest
+        run: node -e "const m=require('./seo/prerender_manifest.json'); if(!m.count||m.count<20) { console.error('Prerender count too low:', m.count); process.exit(1); } console.log('Prerendered', m.count, 'routes');"

@@ -14,6 +14,14 @@
       "destination": "/api/product-feed"
     },
     {
+      "source": "/login",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/admin",
+      "destination": "/index.html"
+    },
+    {
       "source": "/((?!api/|assets/|favicon|src/).*)",
       "destination": "/index.html"
     }

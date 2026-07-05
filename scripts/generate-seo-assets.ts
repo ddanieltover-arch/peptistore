@@ -14,6 +14,7 @@ import {
   assetUrl,
   buildArticleJsonLd,
   buildBreadcrumbJsonLd,
+  buildFaqPageJsonLd,
   buildOrganizationJsonLd,
   buildProductJsonLd,
   buildWebsiteJsonLd,
@@ -21,8 +22,12 @@ import {
   seedKeywords,
   slugify,
   staticSeoRoutes,
+  noindexRoutes,
 } from '../src/lib/seo';
 import { resolveBlogImagePath } from '../src/lib/blogImages';
+import { getBlogEnhancement } from '../src/lib/blogEnhancements';
+import { getProductSeoEnhancement, productSeoTitle } from '../src/lib/productSeoEnhancements';
+import { geoCommonQuestions, pillarBlogSlugs } from '../src/lib/geoContent';
 
 type ProductRow = { id?: string; slug?: string | null; title?: string | null; description?: string | null; price?: number | null; images?: string[] | null; categories?: string[] | null; inventory?: number | null; created_at?: string | null };
 type BlogRow = { id?: string; slug?: string | null; title?: string | null; content?: string | null; image_url?: string | null; created_at?: string | null; updated_at?: string | null };
@@ -69,7 +74,7 @@ async function supabaseRows<T>(table: string, select: string, order = 'created_a
 }
 function productPath(item: ProductRow) { return '/product/' + (item.slug || slugify(item.title || 'product')); }
 function blogPath(item: BlogRow) { return '/blog/' + (item.slug || item.id || slugify(item.title || 'article')); }
-function routes(products: ProductRow[], posts: BlogRow[]) { return [...staticSeoRoutes.map((r) => ({ path: r.path, priority: r.priority, changefreq: r.changefreq, lastmod: r.revised })), ...products.map((p) => ({ path: productPath(p), priority: 0.8, changefreq: 'weekly', lastmod: p.created_at || today })), ...posts.map((p) => ({ path: blogPath(p), priority: 0.7, changefreq: 'monthly', lastmod: p.updated_at || p.created_at || today }))]; }
+function routes(products: ProductRow[], posts: BlogRow[]) { return [...staticSeoRoutes.filter((r) => r.index).map((r) => ({ path: r.path, priority: r.priority, changefreq: r.changefreq, lastmod: r.revised })), ...products.map((p) => ({ path: productPath(p), priority: 0.8, changefreq: 'weekly', lastmod: p.created_at || today })), ...posts.map((p) => ({ path: blogPath(p), priority: 0.7, changefreq: 'monthly', lastmod: p.updated_at || p.created_at || today }))]; }
 
 function sitemapXml(products: ProductRow[], posts: BlogRow[]) {
   const body = routes(products, posts).map((item) => ['  <url>', '    <loc>' + xmlEscape(absoluteUrl(item.path, siteUrl)) + '</loc>', '    <lastmod>' + xmlEscape(new Date(item.lastmod).toISOString().slice(0, 10)) + '</lastmod>', '    <changefreq>' + item.changefreq + '</changefreq>', '    <priority>' + item.priority + '</priority>', '  </url>'].join('\n')).join('\n');
@@ -83,6 +88,14 @@ function llmsLink(path: string, label: string, note?: string) {
 }
 
 function llmsTxt(products: ProductRow[], posts: BlogRow[]) {
+  const pillarSet = new Set<string>(pillarBlogSlugs);
+  const pillarPosts = posts.filter((p) => pillarSet.has(String(p.slug || '')));
+  const otherPosts = posts.filter((p) => !pillarSet.has(String(p.slug || '')));
+  const geoAnswers = staticSeoRoutes
+    .filter((r) => r.index)
+    .slice(0, 10)
+    .map((r) => '- **' + r.primaryKeyword + '** (' + r.path + '): ' + r.answer.split(/\s+/).slice(0, 55).join(' ') + '…');
+
   const lines = [
     '# ' + BRAND_NAME,
     '',
@@ -95,8 +108,17 @@ function llmsTxt(products: ProductRow[], posts: BlogRow[]) {
       .filter((r) => r.index)
       .map((r) => llmsLink(r.path, r.h1, r.description)),
     '',
+    '## GEO Quick Answers',
+    ...geoAnswers,
+    '',
+    '## Common Questions',
+    ...geoCommonQuestions.map((item) => '- **' + item.q + '** ' + item.a),
+    '',
     '## Primary Topics',
     ...seedKeywords.map((k) => '- ' + k),
+    '',
+    '## Pillar Articles',
+    ...pillarPosts.map((p) => llmsLink(blogPath(p), p.title || 'Peptide research article')),
     '',
     '## Product Examples',
     ...products
@@ -104,25 +126,59 @@ function llmsTxt(products: ProductRow[], posts: BlogRow[]) {
       .map((p) => llmsLink(productPath(p), p.title || 'Research peptide')),
     '',
     '## Research Articles',
-    ...posts
-      .slice(0, 20)
+    ...otherPosts
+      .slice(0, 15)
       .map((p) => llmsLink(blogPath(p), p.title || 'Peptide research article')),
     '',
     '## Contact',
     '- Email: [' + BRAND_EMAIL + '](mailto:' + BRAND_EMAIL + ')',
     llmsLink('/terms', 'Research-use-only policy'),
+    llmsLink('/faq', 'Research peptides FAQ hub'),
     '- [XML Sitemap](' + siteUrl + '/sitemap.xml)',
     '',
   ];
   return lines.join('\n');
 }
 
-function keywordMap() { return csv([['Keyword', 'Volume', 'Difficulty', 'Intent', 'Assigned Page URL', 'Page Type', 'Gap (Y/N)', 'Priority'], ['research peptides', '', '', 'Commercial', '/', 'Homepage', 'N', 'High'], ['peptides buy uk', '', '', 'Transactional', '/shop', 'Product Listing', 'N', 'High'], ['uk research peptides', '', '', 'Commercial', '/categories', 'Category Hub', 'N', 'High'], ['semaglutide peptide uk', '', '', 'Commercial', '/product/semaglutide-peptide-uk', 'Product Page', 'N', 'High'], ['peptide research uk', '', '', 'Informational', '/peptide-research', 'Guide', 'N', 'High'], ['glp-3', '', '', 'Informational', '/peptide-research', 'Guide', 'Y', 'Medium'], ['buy ghrp 2', '', '', 'Transactional', '/product/ghrp-2-peptide', 'Product Page', 'N', 'High'], ['peptides buy', '', '', 'Transactional', '/shop', 'Product Listing', 'N', 'High'], ['kpv peptide', '', '', 'Commercial', '/product/kpv-peptide', 'Product Page', 'N', 'High'], ['igf-1 peptide', '', '', 'Commercial', '/product/igf-1-peptide', 'Product Page', 'N', 'High'], ['oxford peptides', '', '', 'Local/Navigational', '/contact', 'Support/Local Landing', 'Y', 'Medium']]); }
+function keywordMap() { return csv([['Keyword', 'Volume', 'Difficulty', 'Intent', 'Assigned Page URL', 'Page Type', 'Gap (Y/N)', 'Priority'], ['research peptides', '', '', 'Commercial', '/', 'Homepage', 'N', 'High'], ['peptides buy uk', '', '', 'Transactional', '/shop', 'Product Listing', 'N', 'High'], ['uk research peptides', '', '', 'Commercial', '/categories', 'Category Hub', 'N', 'High'], ['semaglutide peptide uk', '', '', 'Commercial', '/product/semaglutide-peptide-uk', 'Product Page', 'N', 'High'], ['peptide research uk', '', '', 'Informational', '/peptide-research', 'Guide', 'N', 'High'], ['glp-3', '', '', 'Informational', '/peptide-research#glp-3', 'Guide', 'N', 'Medium'], ['buy ghrp 2', '', '', 'Transactional', '/product/ghrp-2-peptide', 'Product Page', 'N', 'High'], ['peptides buy', '', '', 'Transactional', '/shop', 'Product Listing', 'N', 'High'], ['kpv peptide', '', '', 'Commercial', '/product/kpv-peptide', 'Product Page', 'N', 'High'], ['igf-1 peptide', '', '', 'Commercial', '/product/igf-1-peptide', 'Product Page', 'N', 'High'], ['oxford peptides', '', '', 'Local/Navigational', '/contact', 'Support/Local Landing', 'N', 'Medium']]); }
 function competitorReport() { return csv([['Domain', 'Estimated Traffic', 'Top 5 Ranking Keywords', 'Domain Authority', 'Notes'], ['researchpeptide.co.uk', 'Credential required', 'research peptides; peptides buy uk; uk research peptides; peptide research; buy peptides uk', 'Credential required', 'Historical/source competitor'], ['uk-peptides.com', 'Credential required', 'buy peptides uk; research peptides uk; peptide supplier uk; bpc 157 uk; semaglutide peptide uk', 'Credential required', 'Validate with Ahrefs/SEMrush'], ['oxfordpeptides.com', 'Credential required', 'oxford peptides; custom peptide synthesis; peptide synthesis uk; research peptides', 'Credential required', 'Entity/local competitor'], ['peptidesuk.com', 'Credential required', 'peptides uk; buy peptides; research peptides uk; ghrp 2 peptide', 'Credential required', 'Validate SERP presence'], ['cambridge-research-biochemicals.com', 'Credential required', 'peptide synthesis uk; custom peptides; research peptides; peptide services', 'Credential required', 'Authority competitor']]); }
 function crawlInventory(products: ProductRow[], posts: BlogRow[]) { const rows: unknown[][] = [['URL', 'HTTP Status', 'Title Tag', 'Meta Description', 'H1', 'Word Count', 'Canonical Tag', 'Indexability Status', 'Page Type']]; staticSeoRoutes.forEach((r) => rows.push([absoluteUrl(r.path, siteUrl), '200 expected', r.title, r.description, r.h1, r.answer.split(/\s+/).length, absoluteUrl(r.path, siteUrl), 'index, follow', r.pageType])); products.forEach((p) => rows.push([absoluteUrl(productPath(p), siteUrl), '200 expected', (p.title || 'Product') + ' | ' + BRAND_NAME, p.description || 'Research-use peptide product listing.', p.title || 'Research peptide', (p.description || '').split(/\s+/).filter(Boolean).length, absoluteUrl(productPath(p), siteUrl), 'index, follow', 'Product Page'])); posts.forEach((p) => rows.push([absoluteUrl(blogPath(p), siteUrl), '200 expected', (p.title || 'Article') + ' | ' + BRAND_NAME, (p.content || '').slice(0, 155), p.title || 'Peptide research article', (p.content || '').split(/\s+/).filter(Boolean).length, absoluteUrl(blogPath(p), siteUrl), 'index, follow', 'Article'])); return csv(rows); }
 function contentBrief(title: string, keyword: string, type: string) { return ['TITLE: ' + title, 'PRIMARY KEYWORD: ' + keyword + ' | volume and difficulty require SEO-tool credentials', 'CONTENT TYPE: ' + type, 'INTENT: Validate against SERP data', 'TARGET WORD COUNT: 1,200-2,500 words', 'ANSWER CAPSULE: Define the query directly in 40-60 words with research-only framing.', 'SUGGESTED H2s:', '- What is ' + keyword + '?', '- How do researchers evaluate this topic?', '- What documentation or COA signals matter?', '- FAQs about ' + keyword, 'SCHEMA TO IMPLEMENT: Article, FAQPage, BreadcrumbList as applicable.', 'INTERNAL LINKS: /shop, /coas, /peptide-guide, /faq, /contact.', 'CTA: Compare research-use catalog options or request batch documentation.', ''].join('\n'); }
 function contentCalendar() { return csv([['Publish Date', 'Content Title', 'Content Type', 'Primary Keyword', 'Intent', 'Word Count Target', 'Status'], ['2026-05-19', 'What Are Research Peptides?', 'Guide', 'research peptides', 'Informational', 1800, 'Planned'], ['2026-05-26', 'How to Buy Research Peptides in the UK', 'Landing Page', 'peptides buy uk', 'Transactional', 1400, 'Planned'], ['2026-06-02', 'Semaglutide Peptide UK Research Brief', 'Product Guide', 'semaglutide peptide uk', 'Commercial', 1600, 'Planned'], ['2026-06-09', 'KPV Peptide Research Overview', 'Article', 'kpv peptide', 'Commercial', 1500, 'Planned'], ['2026-06-16', 'IGF-1 Peptide Research Context', 'Article', 'igf-1 peptide', 'Commercial', 1500, 'Planned'], ['2026-06-23', 'GHRP-2 Peptide Buying and Research Notes', 'Product Guide', 'buy ghrp 2', 'Transactional', 1400, 'Planned'], ['2026-06-30', 'Oxford Peptides and UK Research Sourcing', 'Local Landing Page', 'oxford peptides', 'Local', 1200, 'Planned']]); }
-function internalLinks() { return csv([['From Page', 'To Page', 'Anchor Text', 'Priority'], ['/', '/shop', 'buy research peptides in the UK', 'High'], ['/', '/peptide-guide', 'research peptide guide', 'High'], ['/shop', '/coas', 'peptide COA library', 'High'], ['/shop', '/faq', 'research peptide storage and shipping FAQ', 'Medium'], ['/peptide-guide', '/peptide-information', 'peptide synthesis and purity information', 'High'], ['/peptide-research', '/shop', 'research peptide catalog', 'Medium'], ['/faq', '/contact', 'technical peptide support', 'Medium']]); }
+function internalLinks() {
+  return csv([
+    ['From Page', 'To Page', 'Anchor Text', 'Priority', 'Status'],
+    ['/', '/shop', 'buy research peptides UK', 'High', 'Implemented'],
+    ['/', '/coas', 'tested peptides COA library', 'High', 'Implemented'],
+    ['/', '/peptide-research', 'peptide research UK', 'High', 'Implemented'],
+    ['/', '/about-us', 'peptide lab UK', 'High', 'Implemented'],
+    ['/shop', '/coas', 'peptide COA library', 'High', 'Implemented'],
+    ['/shop', '/faq', 'research peptide storage and shipping FAQ', 'Medium', 'Implemented'],
+    ['/shop', '/blog/how-to-buy-research-peptides-in-the-uk', 'how to buy research peptides in the UK', 'High', 'Implemented'],
+    ['/shop', '/categories', 'UK research peptide categories', 'High', 'Implemented'],
+    ['/peptide-guide', '/peptide-information', 'peptide synthesis and purity information', 'High', 'Implemented'],
+    ['/peptide-guide', '/peptide-research', 'peptide research UK briefs', 'High', 'Implemented'],
+    ['/peptide-research', '/shop', 'research peptide catalog', 'High', 'Implemented'],
+    ['/peptide-research', '/coas', 'tested peptides COA library', 'High', 'Implemented'],
+    ['/peptide-research', '/blog/custom-peptide-synthesis-in-the-uk-navigating-quality-and-laboratory-standards', 'custom peptide synthesis in the UK', 'High', 'Implemented'],
+    ['/categories', '/peptide-research#glp-3', 'GLP-3 research brief', 'Medium', 'Implemented'],
+    ['/peptide-guide', '/blog/custom-peptide-synthesis-in-the-uk-navigating-quality-and-laboratory-standards', 'custom peptide synthesis in the UK', 'High', 'Implemented'],
+    ['/peptide-information', '/blog/custom-peptide-synthesis-in-the-uk-navigating-quality-and-laboratory-standards', 'custom peptide synthesis UK guide', 'High', 'Implemented'],
+    ['/coas', '/peptide-guide', 'peptide quality verification guide', 'Medium', 'Implemented'],
+    ['/coas', '/contact', 'technical support', 'Medium', 'Implemented'],
+    ['/about-us', '/shop', 'research peptides UK', 'High', 'Implemented'],
+    ['/about-us', '/coas', 'tested peptide batches', 'High', 'Implemented'],
+    ['/about-us', '/peptide-research', 'peptide research briefs', 'High', 'Implemented'],
+    ['/contact', '/blog/oxford-peptides-and-uk-research-sourcing', 'Oxford peptides and UK research sourcing', 'High', 'Implemented'],
+    ['/contact', '/shop', 'research peptide catalog', 'Medium', 'Implemented'],
+    ['/peptide-research', '/contact', 'Oxford peptides and UK contact support', 'Medium', 'Implemented'],
+    ['/faq', '/contact', 'technical peptide support', 'Medium', 'Implemented'],
+    ['/product/*', '/coas', 'peptide COA library', 'High', 'Implemented'],
+    ['/product/*', '/peptide-research', 'peptide research UK', 'Medium', 'Implemented'],
+    ['/product/*', '/peptide-guide', 'research peptide guide', 'Medium', 'Implemented'],
+    ['/product/*', '/shop', 'research peptide catalog', 'Medium', 'Implemented'],
+  ]);
+}
 
 function stripMarkdown(value: string) {
   return String(value || '')
@@ -156,14 +212,16 @@ function buildPrerenderHead(options: {
   ogType?: string;
   preloadImage?: string;
   preloadOgImage?: boolean;
+  robots?: string;
   jsonLd: unknown[];
 }) {
   const canonical = absoluteUrl(options.path, siteUrl);
   const preloadHref = options.preloadImage || (options.preloadOgImage ? options.ogImage : null);
+  const robots = options.robots || 'index, follow, max-image-preview:large';
   const tags = [
     '<title>' + htmlEscape(options.title) + '</title>',
     '<meta name=\'description\' content=\'' + htmlEscape(options.description) + '\'>',
-    '<meta name=\'robots\' content=\'index, follow, max-image-preview:large\'>',
+    '<meta name=\'robots\' content=\'' + htmlEscape(robots) + '\'>',
     '<link rel=\'canonical\' href=\'' + htmlEscape(canonical) + '\'>',
     ...(preloadHref
       ? ['<link rel=\'preload\' as=\'image\' href=\'' + htmlEscape(preloadHref) + '\' fetchpriority=\'high\'>']
@@ -206,6 +264,7 @@ function prerenderPage(options: {
   ogType?: string;
   preloadImage?: string;
   preloadOgImage?: boolean;
+  robots?: string;
   bodyHtml: string;
   jsonLd: unknown[];
 }) {
@@ -220,6 +279,7 @@ function prerenderPage(options: {
     ogType: options.ogType,
     preloadImage: options.preloadImage,
     preloadOgImage: options.preloadOgImage ?? (options.ogType === 'product' || options.ogType === 'article'),
+    robots: options.robots,
     jsonLd: options.jsonLd,
   });
   const prerenderHideStyle =
@@ -268,13 +328,29 @@ function productPrerenderBody(product: ProductRow) {
     '<li><strong>Availability:</strong> ' + htmlEscape(stock) + '</li>',
     '</ul>',
     '<p>Products are supplied for laboratory research use only and are not intended for human or veterinary consumption.</p>',
+    '<nav aria-label=\'Related research resources\'>',
+    '<a href=\'/coas\'>peptide COA library</a> ',
+    '<a href=\'/peptide-research\'>peptide research UK</a> ',
+    '<a href=\'/peptide-guide\'>research peptide guide</a> ',
+    '<a href=\'/shop\'>research peptide catalog</a>',
+    '</nav>',
   ].join('');
 }
 
-function blogPrerenderBody(post: BlogRow) {
+function blogPrerenderBody(post: BlogRow, enhancement: ReturnType<typeof getBlogEnhancement>) {
   const plain = stripMarkdown(post.content || '');
-  const preview = excerpt(plain, 1200);
-  return '<p>' + htmlEscape(preview) + '</p>';
+  const preview = excerpt(plain, enhancement ? 2400 : 1200);
+  const faqHtml = enhancement?.faqs.length
+    ? [
+        '<section id=\'faq\'>',
+        '<h2>Frequently asked questions</h2>',
+        ...enhancement.faqs.map(
+          (item) => '<h3>' + htmlEscape(item.q) + '</h3><p>' + htmlEscape(item.a) + '</p>',
+        ),
+        '</section>',
+      ].join('')
+    : '';
+  return '<p>' + htmlEscape(preview) + '</p>' + faqHtml;
 }
 
 function prerenderStaticRoute(route: (typeof staticSeoRoutes)[number]) {
@@ -304,17 +380,35 @@ function prerenderStaticRoute(route: (typeof staticSeoRoutes)[number]) {
   });
 }
 
+function prerenderPrivateRoute(route: (typeof noindexRoutes)[number]) {
+  return prerenderPage({
+    path: route.path,
+    title: route.title,
+    description: route.description,
+    h1: route.h1,
+    answer: route.answer,
+    robots: 'noindex, nofollow',
+    bodyHtml: '<p>' + htmlEscape(route.description) + '</p>',
+    jsonLd: [],
+  });
+}
+
 function prerenderProduct(product: ProductRow) {
   const path = productPath(product);
-  const title = (product.title || 'Research peptide') + ' | ' + BRAND_NAME;
-  const description = excerpt(product.description || 'Research-use peptide product listing for laboratory workflows.', 155);
+  const enhancement = getProductSeoEnhancement(product);
+  const title = productSeoTitle(enhancement, product.title || 'Research peptide');
+  const description =
+    enhancement?.description ||
+    excerpt(product.description || 'Research-use peptide product listing for laboratory workflows.', 155);
   const heroImage = productOgImage(product);
   return prerenderPage({
     path,
     title,
     description,
     h1: product.title || 'Research peptide',
-    answer: 'This research peptide listing is supplied for laboratory use only, with product notes, documentation signals, and UK dispatch options for qualified research buyers.',
+    answer:
+      enhancement?.answerCapsule ||
+      'This research peptide listing is supplied for laboratory use only, with product notes, documentation signals, and UK dispatch options for qualified research buyers.',
     ogImage: heroImage,
     ogType: 'product',
     preloadImage: heroImage,
@@ -329,29 +423,54 @@ function prerenderProduct(product: ProductRow) {
 
 function prerenderBlogPost(post: BlogRow) {
   const path = blogPath(post);
+  const enhancement = getBlogEnhancement(post);
   const title = (post.title || 'Peptide research article') + ' | ' + BRAND_NAME;
-  const description = excerpt(stripMarkdown(post.content || post.title || ''), 155);
+  const description = enhancement?.seoDescription || excerpt(stripMarkdown(post.content || post.title || ''), 155);
   const imagePath = resolveBlogImagePath(post);
+  const answer = enhancement?.answerCapsule || excerpt(stripMarkdown(post.content || post.title || ''), 60);
+  const faqJsonLd = enhancement?.faqs.length ? buildFaqPageJsonLd(enhancement.faqs, siteUrl, path) : null;
+  const articlePost = {
+    ...post,
+    updated_at: enhancement?.revisedDate || post.updated_at || post.created_at,
+  };
   return prerenderPage({
     path,
     title,
     description,
     h1: post.title || 'Peptide research article',
-    answer: excerpt(stripMarkdown(post.content || post.title || ''), 60),
+    answer,
     ogImage: assetUrl(imagePath, siteUrl),
     ogType: 'article',
-    bodyHtml: blogPrerenderBody(post),
+    bodyHtml: blogPrerenderBody(post, enhancement),
     jsonLd: [
       buildOrganizationJsonLd(siteUrl),
-      buildArticleJsonLd(post, siteUrl),
+      buildArticleJsonLd(articlePost, siteUrl),
       buildBreadcrumbJsonLd(path, title, siteUrl),
-    ],
+      faqJsonLd,
+    ].filter(Boolean),
   });
+}
+
+function validateSchemasLocally(schemas: unknown[]) {
+  const errors: string[] = [];
+  schemas.forEach((node, index) => {
+    if (!node || typeof node !== 'object') {
+      errors.push('Schema #' + index + ' is empty');
+      return;
+    }
+    const record = node as Record<string, unknown>;
+    if (record['@context'] !== 'https://schema.org') errors.push('Schema #' + index + ' missing schema.org @context');
+    if (!record['@type']) errors.push('Schema #' + index + ' missing @type');
+    if (record['@type'] === 'Product' && !record.name) errors.push('Product schema #' + index + ' missing name');
+    if (record['@type'] === 'BlogPosting' && !record.headline) errors.push('BlogPosting schema #' + index + ' missing headline');
+    if (record['@type'] === 'FAQPage' && !Array.isArray(record.mainEntity)) errors.push('FAQPage schema #' + index + ' missing mainEntity');
+  });
+  return { passed: errors.length === 0, errors };
 }
 
 async function main() {
   const fetchedProducts = await supabaseRows<ProductRow>('products', 'id,slug,title,description,price,images,categories,inventory,created_at');
-  const fetchedPosts = await supabaseRows<BlogRow>('blog_posts', 'id,slug,title,content,image_url,created_at');
+  const fetchedPosts = await supabaseRows<BlogRow>('blog_posts', 'id,slug,title,content,image_url,created_at,updated_at');
   const products = fetchedProducts.length ? fetchedProducts : fallbackProducts;
   const posts = fetchedPosts;
   if (writeDist && posts.length === 0) {
@@ -377,25 +496,95 @@ async function main() {
   ensureDir('seo/content_briefs');
   write('seo/audit_report.json', JSON.stringify({ generatedAt: new Date().toISOString(), target: siteUrl, stack: 'Vite React SPA with build-time SEO prerender', crawlInventoryCount: routes(products, posts).length, highPriorityFindings: ['Monitor Core Web Vitals on production URLs after prerender deploy.', 'Validate prerender HTML in GSC URL Inspection for product and blog samples.', 'Ahrefs/SEMrush keyword volumes and GBP remain optional follow-ups.'], publicRoutes: staticSeoRoutes.map((r) => ({ path: r.path, title: r.title, indexable: r.index, primaryKeyword: r.primaryKeyword })), dynamicRoutes: { products: products.length, blogPosts: posts.length } }, null, 2));
   write('seo/crawl_inventory.csv', crawlInventory(products, posts));
-  write('seo/core_web_vitals_baseline.json', JSON.stringify({ generatedAt: new Date().toISOString(), status: 'Requires Lighthouse/PageSpeed execution against deployed or preview URLs', targets: { LCP: '<= 2.5s', INP: '<= 200ms', CLS: '< 0.1' } }, null, 2));
+  if (!existsSync('seo/core_web_vitals_baseline.json')) {
+    write('seo/core_web_vitals_baseline.json', JSON.stringify({ generatedAt: new Date().toISOString(), status: 'Requires Lighthouse/PageSpeed execution against deployed or preview URLs', targets: { LCP: '<= 2.5s', INP: '<= 200ms', CLS: '< 0.1' } }, null, 2));
+  }
   if (!existsSync('seo/seo_baseline.json')) {
     write('seo/seo_baseline.json', JSON.stringify({ generatedAt: new Date().toISOString(), gsc: 'pending', ga4: 'pending', sitemap: siteUrl + '/sitemap.xml', robots: siteUrl + '/robots.txt', indexedPages: 'pending GSC access', domainAuthority: 'pending Ahrefs/Moz access' }, null, 2));
   }
   write('seo/competitor_report.csv', competitorReport());
-  write('seo/keyword_map.csv', keywordMap());
+  if (!existsSync('seo/keyword_map.csv')) {
+    write('seo/keyword_map.csv', keywordMap());
+  }
   write('seo/seo_strategy.md', '# SEO + GEO Strategy\n\nTarget: ' + siteUrl + '\n\n## Positioning\n' + BRAND_NAME + ' should rank and be cited for UK research peptide sourcing, laboratory-use peptide education, COA visibility, and research-only compliance guidance.\n\n## Pillars\n- Commercial catalog: /shop, product pages, category hub.\n- Trust: /coas, /about-us, /terms, /privacy, /refund-returns.\n- Education: /peptide-guide, /peptide-information, /peptide-research, /blog.\n- GEO/AEO: quick answers, definitions, FAQ schema, Product schema, Article schema, llms.txt.\n');
   write('seo/internal_linking_plan.csv', internalLinks());
   write('seo/content_calendar.csv', contentCalendar());
-  write('seo/schema_validation_report.json', JSON.stringify({ generatedAt: new Date().toISOString(), status: 'Generated locally; external Rich Results Test requires live URL access.', schemasGenerated: ['Organization', 'WebSite', 'BreadcrumbList', 'Product', 'BlogPosting', 'FAQPage'], sampleProductSchemas: products.slice(0, 5).map((p) => buildProductJsonLd(p)), sampleArticleSchemas: posts.slice(0, 5).map((p) => buildArticleJsonLd(p)) }, null, 2));
-  write('seo/geo_content_briefs.md', contentBrief('GEO Content Expansion for Research Peptides UK', 'research peptides', 'GEO/AEO Plan'));
+  const sampleProductSchemas = products.slice(0, 5).map((p) => buildProductJsonLd(p));
+  const sampleArticleSchemas = posts.slice(0, 5).map((p) => buildArticleJsonLd(p));
+  const sampleStaticSchemas = [
+    buildOrganizationJsonLd(siteUrl),
+    buildWebsiteJsonLd(siteUrl),
+    buildBreadcrumbJsonLd('/shop', 'Shop', siteUrl),
+    buildFaqPageJsonLd([
+      { q: 'Who can buy research peptides in the UK?', a: 'Qualified laboratories for non-clinical use only.' },
+      { q: 'What documentation should I review?', a: 'COA references and batch purity records.' },
+    ]),
+  ];
+  const localValidation = validateSchemasLocally([
+    ...sampleProductSchemas,
+    ...sampleArticleSchemas,
+    ...sampleStaticSchemas,
+  ]);
+  write(
+    'seo/schema_validation_report.json',
+    JSON.stringify(
+      {
+        generatedAt: new Date().toISOString(),
+        status: localValidation.passed
+          ? 'Local JSON-LD validation passed; run Google Rich Results Test on live URLs before release.'
+          : 'Local JSON-LD validation failed',
+        schemasGenerated: ['Organization', 'WebSite', 'BreadcrumbList', 'Product', 'BlogPosting', 'FAQPage'],
+        localValidation,
+        richResultsTestUrls: [
+          siteUrl + '/',
+          siteUrl + '/shop',
+          siteUrl + '/faq',
+          siteUrl + '/product/semaglutide',
+          siteUrl + '/blog/custom-peptide-synthesis-in-the-uk-navigating-quality-and-laboratory-standards',
+        ],
+        sampleProductSchemas,
+        sampleArticleSchemas,
+      },
+      null,
+      2,
+    ),
+  );
+  if (!existsSync('seo/geo_content_briefs.md')) {
+    write('seo/geo_content_briefs.md', contentBrief('GEO Content Expansion for Research Peptides UK', 'research peptides', 'GEO/AEO Plan'));
+  }
   if (!existsSync('seo/analytics_setup.md')) {
     write('seo/analytics_setup.md', '# Analytics Setup\n\nSet VITE_GA4_MEASUREMENT_ID in the deployment environment.\n');
   }
-  write('seo/kpis_dashboard.md', '# KPI Dashboard\n\n- Organic sessions: baseline from GA4, target +30% in 90 days.\n- Top 10 organic keywords: baseline from GSC/Ahrefs, target 2x in 6 months.\n- CTR: target >3%.\n- LCP: <=2.5s.\n- INP: <=200ms.\n- CLS: <0.1.\n- AI citation rate: monthly tracking.\n- Conversion rate: site-specific target after GA4 baseline.\n');
-  write('seo/link_gap_opportunities.csv', csv([['Domain', 'DR', 'Linking to Competitors', 'Opportunity Type'], ['researchpeptide.co.uk', 'pending', 'pending Ahrefs/SEMrush', 'Competitor overlap'], ['oxfordpeptides.com', 'pending', 'pending Ahrefs/SEMrush', 'Entity/local competitor'], ['cambridge-research-biochemicals.com', 'pending', 'pending Ahrefs/SEMrush', 'Authority resource outreach']]));
-  write('seo/guest_post_pipeline.csv', csv([['Target Site', 'DR', 'Editor Contact', 'Pitch Status', 'Published Link'], ['Lab and biotech publications', 'pending', 'pending prospecting', 'Not started', '']]));
-  write('seo/link_building_crm.csv', csv([['Prospect Domain', 'DR', 'Contact Name', 'Email', 'Outreach Date', 'Follow-up 1 Date', 'Follow-up 2 Date', 'Status', 'Link Acquired (Y/N)', 'Link URL'], ['pending Ahrefs/SEMrush export', '', '', '', '', '', '', 'Pending credentials', 'N', '']]));
-  write('seo/email_templates.md', '# Outreach Email Templates\n\n## Unlinked Mention\nSubject: Quick note about your mention of Research Peptides UK\n\nHi [Name], I noticed you mentioned Research Peptides UK in your article. Would you consider adding a link to https://www.researchpeptide.uk so readers can find the referenced source directly?\n');
+  const preserveSeo = [
+    'seo/kpis_dashboard.md',
+    'seo/link_gap_opportunities.csv',
+    'seo/guest_post_pipeline.csv',
+    'seo/link_building_crm.csv',
+    'seo/email_templates.md',
+    'seo/rank_tracker.csv',
+    'seo/gsc_weekly_tracker.csv',
+    'seo/ai_citation_log.csv',
+    'seo/weekly_monitoring_runbook.md',
+    'seo/keyword_map.csv',
+    'seo/seo_baseline.json',
+  ];
+  if (!preserveSeo.every((file) => existsSync(file))) {
+    if (!existsSync('seo/kpis_dashboard.md')) {
+      write('seo/kpis_dashboard.md', '# KPI Dashboard\n\nSee seo/weekly_monitoring_runbook.md for cadence.\n');
+    }
+    if (!existsSync('seo/link_gap_opportunities.csv')) {
+      write('seo/link_gap_opportunities.csv', csv([['Domain', 'DR', 'Linking to Competitors', 'Opportunity Type'], ['researchpeptide.co.uk', 'pending', 'pending Ahrefs/SEMrush', 'Competitor overlap']]));
+    }
+    if (!existsSync('seo/guest_post_pipeline.csv')) {
+      write('seo/guest_post_pipeline.csv', csv([['Target Site', 'DR', 'Editor Contact', 'Pitch Status', 'Published Link'], ['Lab and biotech publications', 'pending', 'pending prospecting', 'Not started', '']]));
+    }
+    if (!existsSync('seo/link_building_crm.csv')) {
+      write('seo/link_building_crm.csv', csv([['Prospect Domain', 'DR', 'Contact Name', 'Email', 'Outreach Date', 'Follow-up 1 Date', 'Follow-up 2 Date', 'Status', 'Link Acquired (Y/N)', 'Link URL'], ['pending Ahrefs/SEMrush export', '', '', '', '', '', '', 'Pending credentials', 'N', '']]));
+    }
+    if (!existsSync('seo/email_templates.md')) {
+      write('seo/email_templates.md', '# Outreach Email Templates\n\nSee Phase 9 setup.\n');
+    }
+  }
   write('seo/disavow.txt', '# No toxic backlinks identified from local/public data. Populate only after GSC/Ahrefs/Majestic review.\n');
   [['what-are-research-peptides.md', 'What Are Research Peptides?', 'research peptides', 'Guide'], ['buy-research-peptides-uk.md', 'How to Buy Research Peptides in the UK', 'peptides buy uk', 'Landing Page'], ['semaglutide-peptide-uk.md', 'Semaglutide Peptide UK Research Brief', 'semaglutide peptide uk', 'Product Guide'], ['kpv-peptide.md', 'KPV Peptide Research Overview', 'kpv peptide', 'Article'], ['igf-1-peptide.md', 'IGF-1 Peptide Research Context', 'igf-1 peptide', 'Article']].forEach(([file, title, keyword, type]) => write('seo/content_briefs/' + file, contentBrief(title, keyword, type)));
   let prerenderCount = 0;
@@ -422,6 +611,12 @@ async function main() {
       if (prerenderBlogPost(item)) {
         prerenderCount += 1;
         prerenderManifest.push(path);
+      }
+    });
+    noindexRoutes.forEach((route) => {
+      if (prerenderPrivateRoute(route)) {
+        prerenderCount += 1;
+        prerenderManifest.push(route.path);
       }
     });
     write('seo/prerender_manifest.json', JSON.stringify({ generatedAt: new Date().toISOString(), count: prerenderCount, paths: prerenderManifest }, null, 2));

@@ -13,11 +13,13 @@ import { ProductImagePlaceholder } from '../components/products/ProductImagePlac
 import { productPath } from '../lib/productUrl';
 import Seo from '../components/Seo';
 import { buildProductJsonLd, excerpt } from '../lib/seo';
+import { getProductSeoEnhancement, productSeoTitle } from '../lib/productSeoEnhancements';
 import { fetchProductDetail, SHOP_PRODUCT_COLUMNS } from '../lib/shopCatalogQuery';
 import { getPrerenderProductHint } from '../lib/prerenderHint';
 import { trackViewItem } from '../lib/analytics';
 import { ScientificTextRenderer } from '../components/ui/ScientificHoverCard';
 import { GeoAnswerCapsule } from '../components/seo/GeoAnswerCapsule';
+import { RelatedResearchLinks } from '../components/seo/RelatedResearchLinks';
 
 const ResearchStackBuilder = React.lazy(() =>
   import('../components/products/ResearchStackBuilder').then((m) => ({ default: m.ResearchStackBuilder })),
@@ -242,7 +244,11 @@ export default function ProductDetails() {
         ? variantCompare
         : null;
 
-  const seoDescription = excerpt(String(product.title || 'Research peptide') + ' research peptide for laboratory research use. ' + String(product.description || ''), 155);
+  const productSeo = getProductSeoEnhancement(product);
+  const seoTitle = productSeoTitle(productSeo, product.title);
+  const seoDescription =
+    productSeo?.description ||
+    excerpt(String(product.title || 'Research peptide') + ' research peptide for laboratory research use. ' + String(product.description || ''), 155);
 
   const parsedMassMatch = product.title?.match(/(\d+)mg/i);
   const initialMass = parsedMassMatch ? Number(parsedMassMatch[1]) : 10;
@@ -250,7 +256,7 @@ export default function ProductDetails() {
   return (
     <>
       <Seo
-        title={(product.title || 'Research peptide') + ' | Research Peptides UK'}
+        title={seoTitle}
         description={seoDescription}
         path={productPath(product)}
         image={product.images?.[0]}
@@ -529,7 +535,14 @@ export default function ProductDetails() {
         </div>
       </div>
 
-          <GeoAnswerCapsule answer={`This page details the research profile, documentation signals, and compliance context for ${product.title}. It is supplied exclusively for non-human laboratory workflows and scientific evaluation.`} />
+          <GeoAnswerCapsule
+            answer={
+              productSeo?.answerCapsule ||
+              `This page details the research profile, documentation signals, and compliance context for ${product.title}. It is supplied exclusively for non-human laboratory workflows and scientific evaluation.`
+            }
+          />
+
+          <RelatedResearchLinks className="mt-6 mb-2" />
 
       {/* Dynamic Research Stack Bundle Builder */}
       {productReady && (

@@ -473,7 +473,7 @@ export default function Layout() {
         </Suspense>
       )}
       <ToastContainer />
-      <SmartsuppChat />
+      <SmartsuppChat enabled={location.pathname !== '/admin'} />
     </div>
   );
 }

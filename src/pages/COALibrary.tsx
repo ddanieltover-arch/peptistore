@@ -1,6 +1,8 @@
 import React from 'react';
 import { motion } from 'motion/react';
 import { FileCheck2, Search, ShieldCheck } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { GeoAnswerCapsule } from '../components/seo/GeoAnswerCapsule';
 
 type COARow = {
   product: string;
@@ -31,20 +33,43 @@ export default function COALibrary() {
   });
 
   return (
-    <div className="bg-white min-h-screen pt-12 pb-24">
+    <main className="bg-white min-h-screen pt-12 pb-24">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-12">
+        <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-10">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-600 rounded-full text-xs font-black uppercase tracking-widest mb-6">
             <FileCheck2 className="h-4 w-4" />
             Verification Portal
           </div>
-          <h1>COA Library</h1>
+          <h1>Tested Peptides &amp; COA Library</h1>
           <p className="text-gray-500 mt-4 font-medium italic max-w-3xl mx-auto">
-            Search batch-level Certificate of Analysis references for Research Peptides UK catalog lines.
+            Search third-party tested peptides and batch-level Certificate of Analysis references for Research Peptides UK catalog lines.
           </p>
         </motion.div>
 
-        <section className="mb-8">
+        <GeoAnswerCapsule className="mb-10 text-left" />
+
+        <section id="what-are-tested-peptides" className="mb-10">
+          <h2 className="text-2xl font-black text-gray-900 mb-4">What are tested peptides?</h2>
+          <p className="text-gray-600 leading-relaxed mb-4">
+            Tested peptides are research compounds verified by independent analytical laboratories before dispatch. Each batch
+            typically undergoes HPLC purity analysis and identity confirmation so laboratory teams can align incoming material
+            with internal acceptance criteria and documentation requirements.
+          </p>
+          <p className="text-gray-600 leading-relaxed">
+            The table below lists published COA references for selected catalog lines. Purity percentages reflect the analytical
+            report at time of testing. For full report packs, stability notes, or batch-specific questions, contact{' '}
+            <Link to="/contact" className="text-blue-600 font-semibold hover:underline">
+              technical support
+            </Link>{' '}
+            or review our{' '}
+            <Link to="/peptide-guide" className="text-blue-600 font-semibold hover:underline">
+              peptide quality verification guide
+            </Link>
+            .
+          </p>
+        </section>
+
+        <section className="mb-8" aria-label="COA search">
           <div className="relative max-w-xl mx-auto">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
             <input
@@ -88,13 +113,22 @@ export default function COALibrary() {
         </section>
 
         <section className="mt-8 bg-slate-950 text-white rounded-3xl p-6 md:p-8 flex items-start gap-3">
-          <ShieldCheck className="h-5 w-5 text-blue-400 mt-0.5" />
+          <ShieldCheck className="h-5 w-5 text-blue-400 mt-0.5 shrink-0" />
           <p className="text-sm text-gray-300 leading-relaxed">
             This library is provided for research documentation visibility. If you need a full report pack for a specific batch,
-            request it via <span className="font-bold text-blue-300">info@researchpeptide.uk</span>.
+            request it via{' '}
+            <Link to="/contact" className="font-bold text-blue-300 hover:underline">
+              contact support
+            </Link>{' '}
+            or email <span className="font-bold text-blue-300">info@researchpeptide.uk</span>.
+            {' '}Learn how to read batch documentation in our{' '}
+            <Link to="/peptide-guide" className="font-bold text-blue-300 hover:underline">
+              peptide quality verification guide
+            </Link>
+            .
           </p>
         </section>
       </div>
-    </div>
+    </main>
   );
 }

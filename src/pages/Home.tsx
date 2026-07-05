@@ -65,18 +65,25 @@ export default function Home() {
                 </h1>
 
                 <p className="text-gray-400 text-sm md:text-base leading-relaxed mb-4 max-w-md">
-                  Sourced for precision and purity. Third-party lab tested
-                  to ensure 99%+ consistency for your scientific studies.
-                  Fast UK-wide shipping.
+                  Research-grade peptides for UK laboratories — catalog access, batch documentation,
+                  discreet dispatch, and research-only compliance.
                 </p>
 
                 <p className="text-sm text-gray-500 mb-8 max-w-md leading-relaxed">
                   <Link to="/shop" className="text-blue-400 hover:text-blue-300 font-semibold underline-offset-2 hover:underline">
-                    Buy research peptides in the UK
+                    Buy research peptides UK
                   </Link>
                   <span className="text-gray-600"> · </span>
-                  <Link to="/peptide-guide" className="text-blue-400 hover:text-blue-300 font-semibold underline-offset-2 hover:underline">
-                    Research peptide guide
+                  <Link to="/coas" className="text-blue-400 hover:text-blue-300 font-semibold underline-offset-2 hover:underline">
+                    Tested peptides COA library
+                  </Link>
+                  <span className="text-gray-600"> · </span>
+                  <Link to="/peptide-research" className="text-blue-400 hover:text-blue-300 font-semibold underline-offset-2 hover:underline">
+                    Peptide research UK
+                  </Link>
+                  <span className="text-gray-600"> · </span>
+                  <Link to="/about-us" className="text-blue-400 hover:text-blue-300 font-semibold underline-offset-2 hover:underline">
+                    Peptide lab UK
                   </Link>
                 </p>
 
@@ -323,7 +330,7 @@ export default function Home() {
               </h2>
               <div className="space-y-8">
                 {[
-                  { icon: ShieldCheck, title: '99% Purity Protocols', desc: 'Each batch is logged and cross-referenced with COA documentation.' },
+                  { icon: ShieldCheck, title: '99% Purity Protocols', desc: '' },
                   { icon: Zap, title: 'Crypto Privacy', desc: 'Accepting BTC, ETH, USDT for complete transaction anonymity.' },
                   { icon: Truck, title: 'Guaranteed Stealth', desc: 'Bypass delays with our proprietary stealth shipping methods.' }
                 ].map((item, i) => (
@@ -336,7 +343,19 @@ export default function Home() {
                     </div>
                     <div>
                       <h4 className="text-xl font-bold mb-2">{item.title}</h4>
-                      <p className="text-gray-400 text-sm leading-relaxed">{item.desc}</p>
+                      <p className="text-gray-400 text-sm leading-relaxed">
+                        {item.title === '99% Purity Protocols' ? (
+                          <>
+                            Each batch is logged with{' '}
+                            <Link to="/coas" className="text-blue-400 font-semibold hover:underline">
+                              tested peptide COA references
+                            </Link>
+                            .
+                          </>
+                        ) : (
+                          item.desc
+                        )}
+                      </p>
                     </div>
                   </div>
                 ))}
@@ -360,24 +379,23 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Gold Standard British Peptides Section */}
+      {/* UK research supply */}
       <section className="py-24 bg-white overflow-hidden border-t border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-20 px-4">
-             <span className="text-blue-600 font-black uppercase tracking-[0.3em] text-[10px] mb-4 block animate-pulse">National Excellence</span>
+             <span className="text-blue-600 font-black uppercase tracking-[0.3em] text-[10px] mb-4 block">UK Dispatch</span>
              <h2 className="text-3xl md:text-5xl font-black text-gray-900 leading-tight">
-               THE PREMIER DESTINATION FOR <br />
-               <span className="text-blue-600 uppercase">British Peptide Research</span>
+               RESEARCH PEPTIDES UK — <br />
+               <span className="text-blue-600 uppercase">Catalog &amp; Documentation</span>
              </h2>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
-            {/* Left Column: Custom Imagery */}
             <div className="relative">
                <div className="relative z-10 rounded-[4rem] overflow-hidden shadow-2xl shadow-blue-900/10 border-[12px] border-white group">
                   <img
                     src={brandStorefrontDusk}
-                    alt="Research Peptides UK storefront — purity, precision, performance"
+                    alt="Research Peptides UK — buy research peptides UK"
                     loading="lazy"
                     decoding="async"
                     width={800}
@@ -386,52 +404,56 @@ export default function Home() {
                   />
                   <div className="absolute inset-0 bg-gradient-to-tr from-blue-900/20 via-transparent to-transparent" />
                </div>
-               {/* Decorative Gradient Blob */}
                <div className="absolute -top-12 -right-12 w-64 h-64 bg-blue-100/40 rounded-full blur-3xl -z-10" />
             </div>
 
-            {/* Right Column: Key Benefits and Call to Action */}
             <div className="space-y-12">
-               {/* 2-Row Benefit Matrix */}
                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {[
-                    { title: 'Source Purest Peptides', bg: 'bg-amber-50 border-amber-100 text-amber-900', icon: '💎' },
-                    { title: 'Elite Support Service', bg: 'bg-blue-50 border-blue-100 text-blue-900', icon: '🎧' },
-                    { title: 'VIP Eligibility Status', bg: 'bg-slate-50 border-slate-100 text-slate-900', icon: '👑' },
-                    { title: 'Institutional Purity', bg: 'bg-emerald-50 border-emerald-100 text-emerald-900', icon: '🔬' }
-                  ].map((block, i) => (
-                    <div
-                      key={i}
+                    { title: 'Browse the catalog', href: '/shop', bg: 'bg-amber-50 border-amber-100 text-amber-900', icon: '💎' },
+                    { title: 'Peptide lab UK', href: '/about-us', bg: 'bg-blue-50 border-blue-100 text-blue-900', icon: '🔬' },
+                    { title: 'Tested peptide COAs', href: '/coas', bg: 'bg-emerald-50 border-emerald-100 text-emerald-900', icon: '📋' },
+                    { title: 'Research briefs', href: '/peptide-research', bg: 'bg-slate-50 border-slate-100 text-slate-900', icon: '📚' }
+                  ].map((block) => (
+                    <Link
+                      key={block.href}
+                      to={block.href}
                       className={`p-6 rounded-[2rem] border ${block.bg} flex items-center gap-4 hover:-translate-y-1 hover:shadow-lg transition-all duration-300`}
                     >
                       <span className="text-2xl">{block.icon}</span>
                       <span className="text-[10px] font-black uppercase tracking-widest leading-tight">{block.title}</span>
-                    </div>
+                    </Link>
                   ))}
                </div>
 
-               {/* Context Paragraphs */}
                <div className="space-y-8">
                   <div className="p-1 rounded-full bg-blue-50 w-fit px-4 border border-blue-100 mb-6">
-                    <span className="text-[10px] font-black uppercase tracking-widest text-blue-600">Established Integrity</span>
+                    <span className="text-[10px] font-black uppercase tracking-widest text-blue-600">Research-only supply</span>
                   </div>
                   <div className="space-y-6 text-gray-500 font-medium leading-[1.8]">
                      <p className="text-lg text-gray-900 font-bold leading-relaxed">
-                       Research Peptides UK is the leading specialist for high-purity research compounds in the UK, bridging the gap between cutting-edge molecular engineering and institutional lab access.
+                       Order research peptides UK with batch documentation, discreet shipping, and technical support for qualified laboratory buyers.
                      </p>
                      <p>
-                       Our British-sourced peptides are engineered for precision, offering unmatched structural integrity and molecular purity. Every compound is strictly for laboratory research, provided with comprehensive technical documentation to uphold the standards your study deserves.
+                       Educational content — peptide science, pathway briefs, and synthesis guides — lives on our{' '}
+                       <Link to="/peptide-research" className="text-blue-600 font-semibold hover:underline">
+                         peptide research hub
+                       </Link>{' '}
+                       and{' '}
+                       <Link to="/peptide-guide" className="text-blue-600 font-semibold hover:underline">
+                         peptide guide
+                       </Link>
+                       , keeping this homepage focused on catalog access and ordering.
                      </p>
                   </div>
                </div>
 
-               {/* Final Call to Action */}
                <div className="pt-4">
                  <Link 
                    to="/shop" 
                    className="inline-flex items-center gap-4 bg-gray-900 text-white font-black text-xs uppercase tracking-[0.3em] px-12 py-7 rounded-3xl hover:bg-blue-600 hover:shadow-2xl hover:shadow-blue-200 transition-all active:scale-95 group"
                  >
-                   Access the Collection
+                   Buy research peptides UK
                    <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-3" />
                  </Link>
                </div>

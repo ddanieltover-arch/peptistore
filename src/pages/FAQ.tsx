@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { HelpCircle, ChevronDown, FlaskConical, Truck, CreditCard } from 'lucide-react';
+import { HelpCircle, ChevronDown, FlaskConical, Truck, CreditCard, BookOpen } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import Seo from '../components/Seo';
 import { buildFaqPageJsonLd } from '../lib/seo';
 import { GeoAnswerCapsule } from '../components/seo/GeoAnswerCapsule';
+import { geoCommonQuestions } from '../lib/geoContent';
 
 export const faqs = [
+  { category: 'Research & Buying', icon: BookOpen, questions: geoCommonQuestions },
   { category: 'Product & Safety', icon: FlaskConical, questions: [
     { q: 'Are these products safe for human or animal consumption?', a: 'No. All products sold by Research Peptides UK are strictly for laboratory research and scientific application only. They are not for human or veterinary use.' },
     { q: 'How do you verify the purity of your peptides?', a: 'Every batch is reviewed against HPLC and Mass Spec analysis. Purity levels are verified before release for research distribution.' },
@@ -46,6 +48,21 @@ export default function FAQ() {
           </motion.div>
 
           <GeoAnswerCapsule className='mb-10' />
+
+          <section id="faq-hub" className="mb-12 text-sm text-gray-600 leading-relaxed">
+            <p>
+              This FAQ hub answers common questions UK researchers ask about research peptides, COA documentation,
+              shipping, and procurement. For pathway briefs see{' '}
+              <Link to="/peptide-research" className="text-blue-600 font-semibold hover:underline">
+                peptide research UK
+              </Link>
+              ; for batch records see the{' '}
+              <Link to="/coas" className="text-blue-600 font-semibold hover:underline">
+                tested peptides COA library
+              </Link>
+              .
+            </p>
+          </section>
 
           <div className='space-y-12'>
             {faqs.map((group, groupIdx) => (

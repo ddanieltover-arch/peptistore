@@ -5,10 +5,12 @@ import { BookOpen, ArrowLeft, Clock, Share2, Tag, Calendar, ShieldCheck, Activit
 import { motion } from 'motion/react';
 import ReactMarkdown from 'react-markdown';
 import Seo from '../components/Seo';
-import { buildArticleJsonLd, excerpt } from '../lib/seo';
+import { buildArticleJsonLd, buildFaqPageJsonLd, excerpt } from '../lib/seo';
+import { getBlogEnhancement } from '../lib/blogEnhancements';
 import { blogPath } from '../lib/blogUrl';
 import { resolveBlogImageUrl } from '../lib/blogImages';
 import { productPath } from '../lib/productUrl';
+import { GeoAnswerCapsule } from '../components/seo/GeoAnswerCapsule';
 import heroBg from '../assets/hero_bg.webp';
 
 export default function BlogPost() {
@@ -85,8 +87,19 @@ export default function BlogPost() {
     );
   }
 
-  const seoDescription = excerpt(post.content || post.title, 155);
+  const enhancement = getBlogEnhancement(post);
+  const seoDescription = enhancement?.seoDescription || excerpt(post.content || post.title, 155);
   const heroImage = resolveBlogImageUrl(post);
+  const publishedAt = post.created_at ? new Date(post.created_at) : null;
+  const updatedAt = post.updated_at ? new Date(post.updated_at) : publishedAt;
+  const articleJsonLd = buildArticleJsonLd({
+    ...post,
+    image_url: heroImage,
+    updated_at: enhancement?.revisedDate || post.updated_at || post.created_at,
+  });
+  const faqJsonLd = enhancement?.faqs.length
+    ? buildFaqPageJsonLd(enhancement.faqs, undefined, blogPath(post))
+    : null;
 
   return (
     <>
@@ -96,7 +109,8 @@ export default function BlogPost() {
         path={blogPath(post)}
         image={heroImage}
         type='article'
-        jsonLd={buildArticleJsonLd({ ...post, image_url: heroImage })}
+        revised={post.updated_at || post.created_at}
+        jsonLd={[articleJsonLd, faqJsonLd].filter(Boolean)}
       />
       
       <div className="bg-slate-50 min-h-screen pb-32">
@@ -120,8 +134,17 @@ export default function BlogPost() {
             >
               <div className="flex flex-wrap items-center gap-6 mb-6 text-[10px] font-black uppercase tracking-widest text-blue-400">
                  <span className="flex items-center gap-2 px-4 py-1.5 bg-blue-500/10 border border-blue-500/20 rounded-full"><Tag className="h-3 w-3" /> Research Insight</span>
-                 <span className="flex items-center gap-2 text-gray-400"><Calendar className="h-3 w-3" /> {new Date(post.created_at).toLocaleDateString()}</span>
-                 <span className="flex items-center gap-2 text-gray-400"><Clock className="h-3 w-3" /> 5 Min Read</span>
+                 {publishedAt && (
+                   <span className="flex items-center gap-2 text-gray-400"><Calendar className="h-3 w-3" /> Published {publishedAt.toLocaleDateString('en-GB')}</span>
+                 )}
+                 {updatedAt && (
+                   <span className="flex items-center gap-2 text-gray-400">
+                     <Clock className="h-3 w-3" />
+                     {post.updated_at || enhancement?.revisedDate
+                       ? `Updated ${(enhancement?.revisedDate ? new Date(enhancement.revisedDate) : updatedAt).toLocaleDateString('en-GB')}`
+                       : '5 min read'}
+                   </span>
+                 )}
               </div>
               
               <h1 className="text-3xl md:text-5xl font-black tracking-tight leading-tight max-w-4xl text-white">
@@ -153,15 +176,18 @@ export default function BlogPost() {
               transition={{ duration: 0.8, delay: 0.2 }}
               className="lg:col-span-2 bg-white rounded-[2.5rem] p-8 md:p-12 shadow-xl shadow-blue-900/5 border border-gray-100"
             >
-              {/* Quick Summary Section */}
-              <div className="bg-blue-50/50 border border-blue-100 rounded-3xl p-6 mb-10">
-                <h4 className="text-xs font-black uppercase tracking-wider text-blue-800 mb-3 flex items-center gap-2">
-                  <ShieldCheck className="h-4 w-4 text-blue-600" /> Executive Research Summary
-                </h4>
-                <p className="text-sm font-semibold text-gray-700 leading-relaxed">
-                  This scientific brief details chemical characteristics, reconstitution parameters, and stability metrics of the subject peptide sequence. Strictly intended for in-vitro laboratory analysis.
-                </p>
-              </div>
+              {enhancement ? (
+                <GeoAnswerCapsule answer={enhancement.answerCapsule} className="mb-10 text-left" />
+              ) : (
+                <div className="bg-blue-50/50 border border-blue-100 rounded-3xl p-6 mb-10">
+                  <h4 className="text-xs font-black uppercase tracking-wider text-blue-800 mb-3 flex items-center gap-2">
+                    <ShieldCheck className="h-4 w-4 text-blue-600" /> Executive Research Summary
+                  </h4>
+                  <p className="text-sm font-semibold text-gray-700 leading-relaxed">
+                    This scientific brief details chemical characteristics, reconstitution parameters, and stability metrics of the subject peptide sequence. Strictly intended for in-vitro laboratory analysis.
+                  </p>
+                </div>
+              )}
 
               {/* Rendered Markdown Body */}
               <div className="selection:bg-blue-100">

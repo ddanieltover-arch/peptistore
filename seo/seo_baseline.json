@@ -9,20 +9,65 @@
   "keyEvents": ["purchase", "generate_lead", "begin_checkout"],
   "indexedPages": "monitor in GSC → Pages",
   "domainAuthority": "pending Ahrefs/Moz access",
+  "semrushSnapshot": {
+    "date": "2026-07-04",
+    "country": "UK",
+    "device": "desktop",
+    "organicKeywords": 10,
+    "organicTraffic": 0,
+    "trafficCostUsd": 0,
+    "notes": "All rankings page 2+ (pos 39–92); homepage cannibalization addressed in Phases 2–6"
+  },
   "organicSessions": null,
   "searchClicks": "~43 (May 2026 snapshot)",
-  "ctr": "monitor in GSC Performance",
+  "ctr": "monitor in GSC Performance — see seo/gsc_weekly_tracker.csv",
   "offPage": {
-    "linkBuildingCrm": "pending Ahrefs/SEMrush export",
-    "guestPosts": "not started",
-    "disavow": "no toxic links identified"
+    "linkBuildingCrm": "seo/link_building_crm.csv — 15 prospects seeded",
+    "guestPosts": "seo/guest_post_pipeline.csv — 5 targets queued",
+    "emailTemplates": "seo/email_templates.md — 6 templates",
+    "monthlyOutreachTarget": 50,
+    "monthlyLinkTarget": "5–10 acquired (ramp)",
+    "disavow": "no toxic links identified",
+    "linkBuildingStarted": "2026-07-06"
   },
-  "measurementNextReview": "2026-06-20",
+  "monitoring": {
+    "runbook": "seo/weekly_monitoring_runbook.md",
+    "rankTracker": "seo/rank_tracker.csv",
+    "gscWeekly": "seo/gsc_weekly_tracker.csv",
+    "aiCitations": "seo/ai_citation_log.csv",
+    "kpis": "seo/kpis_dashboard.md",
+    "cli": "npm run seo:monitoring",
+    "cadence": {
+      "semrushRanks": "weekly — Monday",
+      "gscPerformance": "weekly — Monday",
+      "ga4Snapshot": "monthly — first Monday",
+      "aiCitationCheck": "monthly — first Monday",
+      "linkOutreach": "ongoing — 10+ contacts/week"
+    }
+  },
+  "measurementNextReview": "2026-07-14",
+  "phase1Deploy": {
+    "status": "deployed",
+    "date": "2026-07-06",
+    "deploymentId": "dpl_2aFhVVWHJtbhJBn5gP9tthUVeuAZ",
+    "inspectorUrl": "https://vercel.com/peptistore3-6670s-projects/peptistore/2aFhVVWHJtbhJBn5gP9tthUVeuAZ",
+    "liveVerifyPassed": true,
+    "prerenderCount": 181,
+    "pendingManual": [
+      "GSC URL Inspection — 10 priority URLs",
+      "PageSpeed Insights — /, /shop, custom synthesis blog",
+      "GSC Performance export — May vs July baseline"
+    ]
+  },
   "gscIndexingQueue": [
-    "/blog/what-are-research-peptides",
-    "/blog/how-to-buy-research-peptides-in-the-uk",
-    "/shop",
-    "/product/adamax",
-    "/peptide-guide"
-  ]
+    "https://www.researchpeptide.uk/",
+    "https://www.researchpeptide.uk/shop",
+    "https://www.researchpeptide.uk/peptide-research",
+    "https://www.researchpeptide.uk/coas",
+    "https://www.researchpeptide.uk/contact",
+    "https://www.researchpeptide.uk/blog/custom-peptide-synthesis-in-the-uk-navigating-quality-and-laboratory-standards",
+    "https://www.researchpeptide.uk/blog/how-to-buy-research-peptides-in-the-uk",
+    "https://www.researchpeptide.uk/blog/oxford-peptides-and-uk-research-sourcing"
+  ],
+  "weeklySnapshots": []
 }

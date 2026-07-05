@@ -137,11 +137,11 @@ export default function Shop() {
     <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div>
-          <h1>Shop Peptides for Research Use</h1>
+          <h1>Buy Research Peptides UK</h1>
           <p className="text-gray-500 mt-1">
-            Showing{' '}
+            Peptides buy UK —{' '}
             <span className="font-semibold text-gray-700">{filteredProducts.length}</span> of{' '}
-            <span className="font-semibold text-gray-700">{allProducts.length}</span> products
+            <span className="font-semibold text-gray-700">{allProducts.length}</span> research compounds listed
           </p>
         </div>
         
@@ -179,16 +179,44 @@ export default function Shop() {
 
       <GeoAnswerCapsule />
 
-      <p className="text-sm text-gray-600 mb-6 leading-relaxed">
-        Verify batches in our{' '}
-        <Link to="/coas" className="text-blue-600 font-semibold hover:underline">
-          peptide COA library
-        </Link>
-        <span className="text-gray-400"> · </span>
-        <Link to="/faq" className="text-blue-600 font-semibold hover:underline">
-          research peptide storage and shipping FAQ
-        </Link>
-      </p>
+      <section id="peptides-buy-uk" className="mb-8 max-w-3xl">
+        <p className="text-sm text-gray-600 leading-relaxed mb-4">
+          When you <strong>peptides buy UK</strong> for laboratory work, shortlist compounds by pathway class, documented purity,
+          variant mass, and dispatch reliability — not headline price alone. This catalog lists research-grade peptides for
+          qualified non-clinical workflows only, including GLP incretin mimetics, GHRP secretagogues, KPV tripeptides,
+          IGF axis peptides, and specialist research lines.
+        </p>
+        <p className="text-sm text-gray-600 leading-relaxed mb-4">
+          UK laboratories typically compare batch COA references in our{' '}
+          <Link to="/coas" className="text-blue-600 font-semibold hover:underline">
+            peptide COA library
+          </Link>
+          , review{' '}
+          <Link to="/categories" className="text-blue-600 font-semibold hover:underline">
+            UK research peptide categories
+          </Link>
+          , and read our{' '}
+          <Link
+            to="/blog/how-to-buy-research-peptides-in-the-uk"
+            className="text-blue-600 font-semibold hover:underline"
+          >
+            how to buy research peptides in the UK
+          </Link>{' '}
+          guide before checkout. Products are not for human or veterinary use.
+        </p>
+        <p className="text-sm text-gray-600 leading-relaxed">
+          Filter by category or pathway below, open a product page for variant detail, then add compounds to cart for
+          discreet UK dispatch. Questions on storage, shipping, or documentation? See the{' '}
+          <Link to="/faq" className="text-blue-600 font-semibold hover:underline">
+            research peptide FAQ
+          </Link>{' '}
+          or{' '}
+          <Link to="/contact" className="text-blue-600 font-semibold hover:underline">
+            contact support
+          </Link>
+          .
+        </p>
+      </section>
 
       <motion.figure
         initial={{ opacity: 0, y: 10 }}

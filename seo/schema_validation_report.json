@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-06-30T03:14:03.738Z",
-  "status": "Generated locally; external Rich Results Test requires live URL access.",
+  "generatedAt": "2026-07-05T23:43:51.982Z",
+  "status": "Local JSON-LD validation passed; run Google Rich Results Test on live URLs before release.",
   "schemasGenerated": [
     "Organization",
     "WebSite",
@@ -8,6 +8,17 @@
     "Product",
     "BlogPosting",
     "FAQPage"
+  ],
+  "localValidation": {
+    "passed": true,
+    "errors": []
+  },
+  "richResultsTestUrls": [
+    "https://www.researchpeptide.uk/",
+    "https://www.researchpeptide.uk/shop",
+    "https://www.researchpeptide.uk/faq",
+    "https://www.researchpeptide.uk/product/semaglutide",
+    "https://www.researchpeptide.uk/blog/custom-peptide-synthesis-in-the-uk-navigating-quality-and-laboratory-standards"
   ],
   "sampleProductSchemas": [
     {

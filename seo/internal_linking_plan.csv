@@ -1,8 +1,30 @@
-From Page,To Page,Anchor Text,Priority
-/,/shop,buy research peptides in the UK,High
-/,/peptide-guide,research peptide guide,High
-/shop,/coas,peptide COA library,High
-/shop,/faq,research peptide storage and shipping FAQ,Medium
-/peptide-guide,/peptide-information,peptide synthesis and purity information,High
-/peptide-research,/shop,research peptide catalog,Medium
-/faq,/contact,technical peptide support,Medium
+From Page,To Page,Anchor Text,Priority,Status
+/,/shop,buy research peptides UK,High,Implemented
+/,/coas,tested peptides COA library,High,Implemented
+/,/peptide-research,peptide research UK,High,Implemented
+/,/about-us,peptide lab UK,High,Implemented
+/shop,/coas,peptide COA library,High,Implemented
+/shop,/faq,research peptide storage and shipping FAQ,Medium,Implemented
+/shop,/blog/how-to-buy-research-peptides-in-the-uk,how to buy research peptides in the UK,High,Implemented
+/shop,/categories,UK research peptide categories,High,Implemented
+/peptide-guide,/peptide-information,peptide synthesis and purity information,High,Implemented
+/peptide-guide,/peptide-research,peptide research UK briefs,High,Implemented
+/peptide-research,/shop,research peptide catalog,High,Implemented
+/peptide-research,/coas,tested peptides COA library,High,Implemented
+/peptide-research,/blog/custom-peptide-synthesis-in-the-uk-navigating-quality-and-laboratory-standards,custom peptide synthesis in the UK,High,Implemented
+/categories,/peptide-research#glp-3,GLP-3 research brief,Medium,Implemented
+/peptide-guide,/blog/custom-peptide-synthesis-in-the-uk-navigating-quality-and-laboratory-standards,custom peptide synthesis in the UK,High,Implemented
+/peptide-information,/blog/custom-peptide-synthesis-in-the-uk-navigating-quality-and-laboratory-standards,custom peptide synthesis UK guide,High,Implemented
+/coas,/peptide-guide,peptide quality verification guide,Medium,Implemented
+/coas,/contact,technical support,Medium,Implemented
+/about-us,/shop,research peptides UK,High,Implemented
+/about-us,/coas,tested peptide batches,High,Implemented
+/about-us,/peptide-research,peptide research briefs,High,Implemented
+/contact,/blog/oxford-peptides-and-uk-research-sourcing,Oxford peptides and UK research sourcing,High,Implemented
+/contact,/shop,research peptide catalog,Medium,Implemented
+/peptide-research,/contact,Oxford peptides and UK contact support,Medium,Implemented
+/faq,/contact,technical peptide support,Medium,Implemented
+/product/*,/coas,peptide COA library,High,Implemented
+/product/*,/peptide-research,peptide research UK,Medium,Implemented
+/product/*,/peptide-guide,research peptide guide,Medium,Implemented
+/product/*,/shop,research peptide catalog,Medium,Implemented

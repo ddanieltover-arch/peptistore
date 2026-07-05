@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-06-30T03:14:03.964Z",
-  "count": 173,
+  "generatedAt": "2026-07-05T23:43:52.236Z",
+  "count": 181,
   "paths": [
     "/",
     "/shop",
@@ -174,6 +174,14 @@
     "/blog/bpc-157-acetate-vs-bpc-157-arginate-stability-half-life-and-lab-protocols",
     "/blog/custom-peptide-synthesis-in-the-uk-navigating-quality-and-laboratory-standards",
     "/blog/igf-1-peptide-in-clinical-workflows-receptor-dynamics-and-analytical-standards",
-    "/blog/kpv-peptide-research-overview-clinical-directions-and-biological-stability"
+    "/blog/kpv-peptide-research-overview-clinical-directions-and-biological-stability",
+    "/cart",
+    "/checkout",
+    "/admin",
+    "/login",
+    "/profile",
+    "/orders",
+    "/wishlist",
+    "/search"
   ]
 }

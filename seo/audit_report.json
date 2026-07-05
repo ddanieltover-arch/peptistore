@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-30T03:14:03.727Z",
+  "generatedAt": "2026-07-05T23:43:51.972Z",
   "target": "https://www.researchpeptide.uk",
   "stack": "Vite React SPA with build-time SEO prerender",
   "crawlInventoryCount": 173,
@@ -11,19 +11,19 @@
   "publicRoutes": [
     {
       "path": "/",
-      "title": "Research Peptides UK | Research-Grade Peptides",
+      "title": "Research Peptides UK | Buy Research Peptides UK",
       "indexable": true,
-      "primaryKeyword": "research peptides"
+      "primaryKeyword": "research peptides uk"
     },
     {
       "path": "/shop",
-      "title": "Buy Research Peptides UK | Peptide Catalog",
+      "title": "Peptides Buy UK | Research Peptide Catalog",
       "indexable": true,
       "primaryKeyword": "peptides buy uk"
     },
     {
       "path": "/categories",
-      "title": "Peptide Categories UK | Research Compound Groups",
+      "title": "UK Research Peptides | Category Hub",
       "indexable": true,
       "primaryKeyword": "uk research peptides"
     },
@@ -47,15 +47,15 @@
     },
     {
       "path": "/contact",
-      "title": "Contact Research Peptides UK | Technical Support",
+      "title": "Oxford Peptides UK | Contact Research Peptides UK",
       "indexable": true,
-      "primaryKeyword": "research peptides uk contact"
+      "primaryKeyword": "oxford peptides"
     },
     {
       "path": "/about-us",
-      "title": "About Research Peptides UK | Research-Only Supplier",
+      "title": "Peptide Lab UK | About Research Peptides UK",
       "indexable": true,
-      "primaryKeyword": "uk research peptides"
+      "primaryKeyword": "peptide lab uk"
     },
     {
       "path": "/peptide-guide",
@@ -71,9 +71,9 @@
     },
     {
       "path": "/coas",
-      "title": "COA Library UK | Peptide Batch Verification",
+      "title": "Tested Peptides UK | COA Library & Batch Verification",
       "indexable": true,
-      "primaryKeyword": "peptide coa uk"
+      "primaryKeyword": "tested peptides"
     },
     {
       "path": "/peptide-information",
@@ -83,7 +83,7 @@
     },
     {
       "path": "/peptide-research",
-      "title": "Peptide Research UK | GLP, KPV and IGF Briefs",
+      "title": "Peptide Research UK | GLP-3, KPV and IGF Briefs",
       "indexable": true,
       "primaryKeyword": "peptide research uk"
     },

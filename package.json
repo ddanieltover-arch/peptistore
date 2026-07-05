@@ -20,9 +20,13 @@
     "db:migrate-images": "tsx server/scripts/migrate-product-images.ts",
     "db:insert-content-calendar": "tsx server/scripts/insert-content-calendar.ts",
     "db:backfill-blog-slugs": "tsx server/scripts/backfill-blog-slugs.ts",
+    "db:update-custom-synthesis-blog": "tsx server/scripts/update-custom-peptide-synthesis-blog.ts",
     "optimize:brand-images": "tsx scripts/optimize-brand-images.ts",
     "seo:generate": "tsx scripts/generate-seo-assets.ts",
-    "seo:validate": "tsx scripts/validate-seo.ts"
+    "seo:validate": "tsx scripts/validate-seo.ts",
+    "seo:monitoring": "tsx scripts/seo-monitoring-report.ts",
+    "seo:verify:dist": "tsx scripts/phase1-verify-dist.ts",
+    "seo:verify:live": "tsx scripts/phase1-verify-live.ts"
   },
   "dependencies": {
     "@google/genai": "^1.29.0",

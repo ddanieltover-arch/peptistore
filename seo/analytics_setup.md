@@ -170,6 +170,17 @@ SUPABASE_SERVICE_ROLE_KEY=...   # server-only; enables product + blog fetch
 
 ### You can do now (no extra tools)
 
+**Weekly monitoring:** run `npm run seo:monitoring` and follow `seo/weekly_monitoring_runbook.md`.
+
+| Tracker | File |
+|---------|------|
+| Semrush ranks (10 kw) | `seo/rank_tracker.csv` |
+| GSC impressions/clicks | `seo/gsc_weekly_tracker.csv` |
+| AI citations (monthly) | `seo/ai_citation_log.csv` |
+| Link outreach CRM | `seo/link_building_crm.csv` |
+| Guest posts | `seo/guest_post_pipeline.csv` |
+| KPI targets | `seo/kpis_dashboard.md` |
+
 **GSC — request indexing** (after each deploy with new content):
 
 | Priority | URL |

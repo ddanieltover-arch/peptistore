@@ -11,11 +11,18 @@ declare global {
 /**
  * Smartsupp loader — deferred until interaction or idle to protect LCP.
  */
-export default function SmartsuppChat() {
+export default function SmartsuppChat({ enabled = true }: { enabled?: boolean }) {
   const key = (import.meta.env.VITE_SMARTSUPP_KEY as string | undefined)?.trim();
 
   useEffect(() => {
     if (!key) return;
+
+    if (!enabled) {
+      window.smartsupp?.('chat:hide');
+      return;
+    }
+
+    window.smartsupp?.('chat:show');
 
     const brandColor =
       (import.meta.env.VITE_SMARTSUPP_COLOR as string | undefined)?.trim() || '#2563eb';
@@ -66,7 +73,7 @@ export default function SmartsuppChat() {
       window.removeEventListener('pointerdown', onInteract);
       window.removeEventListener('keydown', onInteract);
     };
-  }, [key]);
+  }, [key, enabled]);
 
   return null;
 }
