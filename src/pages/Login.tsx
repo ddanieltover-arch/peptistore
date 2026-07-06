@@ -4,6 +4,7 @@ import { supabase } from '../supabase';
 import { LogIn, Mail, Lock, Loader2 } from 'lucide-react';
 import { trackEvent } from '../lib/analytics';
 import { getPostLoginPath, useAuthStore } from '../store/useAuthStore';
+import { siteUrl } from '../lib/siteUrl';
 
 export default function Login() {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -54,6 +55,9 @@ export default function Login() {
         const { data, error: signUpError } = await supabase.auth.signUp({
           email,
           password,
+          options: {
+            emailRedirectTo: siteUrl('/login', { oauth: '1', redirect: redirectParam }),
+          },
         });
         if (signUpError) throw signUpError;
         if (data.user) {
@@ -79,13 +83,10 @@ export default function Login() {
 
   const handleGoogleLogin = async () => {
     try {
-      const oauthReturn = new URL(`${window.location.origin}/login`);
-      oauthReturn.searchParams.set('oauth', '1');
-      if (redirectParam) oauthReturn.searchParams.set('redirect', redirectParam);
       await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: oauthReturn.toString(),
+          redirectTo: siteUrl('/login', { oauth: '1', redirect: redirectParam }),
         },
       });
     } catch (err: any) {
