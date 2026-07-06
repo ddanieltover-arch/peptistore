@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '../supabase';
 import { useAuthStore, isConfiguredAdminEmail } from '../store/useAuthStore';
 import { formatCurrency } from '../lib/utils';
@@ -13,7 +14,8 @@ import { useToastStore } from '../store/useToastStore';
 import { postOrderStatusEmail } from '../lib/transactionalEmailApi';
 
 export default function AdminDashboard() {
-  const { profile, user } = useAuthStore();
+  const { profile, user, isAuthReady } = useAuthStore();
+  const navigate = useNavigate();
   const [products, setProducts] = useState<any[]>([]);
   const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -107,6 +109,12 @@ export default function AdminDashboard() {
       setIsSeeding(false);
     }
   };
+
+  useEffect(() => {
+    if (isAuthReady && !user) {
+      navigate('/login?redirect=/admin', { replace: true });
+    }
+  }, [isAuthReady, user, navigate]);
 
   useEffect(() => {
     fetchData();
@@ -318,12 +326,19 @@ export default function AdminDashboard() {
     totalProducts: products.length
   };
 
+  if (!isAuthReady || !user) {
+    return <DashboardSkeleton />;
+  }
+
   if (profile?.role !== 'admin') {
     const hint = isConfiguredAdminEmail(user?.email);
     return (
       <div className="max-w-xl mx-auto px-4 py-16 text-center space-y-4">
         <p className="text-red-600 font-bold uppercase tracking-widest">Access denied</p>
         <p className="text-gray-600 text-sm">Only accounts with <span className="font-mono">role = &apos;admin&apos;</span> in the <span className="font-mono">users</span> table can open this page.</p>
+        <Link to="/login?redirect=/admin" className="inline-block text-blue-600 font-bold hover:underline text-sm">
+          Sign in with an admin account
+        </Link>
         {hint && user?.id && (
           <div className="text-left bg-amber-50 border border-amber-200 rounded-2xl p-5 text-sm text-amber-950">
             <p className="font-bold mb-2">Your email is listed in VITE_ADMIN_EMAILS but the database role is still not admin.</p>

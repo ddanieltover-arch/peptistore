@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { supabase } from '../supabase';
 import { LogIn, Mail, Lock, Loader2 } from 'lucide-react';
 import { trackEvent } from '../lib/analytics';
+import { getPostLoginPath, useAuthStore } from '../store/useAuthStore';
 
 export default function Login() {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -12,6 +13,35 @@ export default function Login() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const redirectParam = searchParams.get('redirect');
+  const oauthReturn = searchParams.get('oauth') === '1';
+  const { user, isAuthReady, fetchProfile } = useAuthStore();
+  const hasRedirected = useRef(false);
+
+  const completeSignIn = async (
+    authUser: NonNullable<typeof user>,
+    requestedRedirect?: string | null,
+  ) => {
+    await fetchProfile(
+      authUser.id,
+      authUser.email || '',
+      authUser.user_metadata?.full_name || null,
+      authUser.user_metadata?.avatar_url || null,
+    );
+    const { profile: latestProfile } = useAuthStore.getState();
+    navigate(
+      getPostLoginPath(authUser.email, latestProfile?.role, requestedRedirect),
+      { replace: true },
+    );
+  };
+
+  useEffect(() => {
+    if (!isAuthReady || !user || hasRedirected.current) return;
+    if (!oauthReturn && !redirectParam) return;
+    hasRedirected.current = true;
+    void completeSignIn(user, redirectParam);
+  }, [isAuthReady, user, redirectParam, oauthReturn]);
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,7 +67,7 @@ export default function Login() {
         });
         if (loginError) throw loginError;
         if (data.user) {
-          navigate('/profile');
+          await completeSignIn(data.user, redirectParam);
         }
       }
     } catch (err: any) {
@@ -49,10 +79,13 @@ export default function Login() {
 
   const handleGoogleLogin = async () => {
     try {
+      const oauthReturn = new URL(`${window.location.origin}/login`);
+      oauthReturn.searchParams.set('oauth', '1');
+      if (redirectParam) oauthReturn.searchParams.set('redirect', redirectParam);
       await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/profile`,
+          redirectTo: oauthReturn.toString(),
         },
       });
     } catch (err: any) {

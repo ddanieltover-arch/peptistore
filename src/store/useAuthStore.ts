@@ -20,7 +20,7 @@ interface AuthState {
   fetchProfile: (uid: string, email: string, displayName: string | null, photoURL: string | null) => Promise<void>;
 }
 
-const adminEmails = (import.meta.env.VITE_ADMIN_EMAILS || 'admin@researchpeptide.co.uk')
+const adminEmails = (import.meta.env.VITE_ADMIN_EMAILS || 'admin@researchpeptide.co.uk,peptistore3@gmail.com')
   .split(',')
   .map((e) => e.trim().toLowerCase())
   .filter(Boolean);
@@ -28,6 +28,28 @@ const adminEmails = (import.meta.env.VITE_ADMIN_EMAILS || 'admin@researchpeptide
 export function isConfiguredAdminEmail(email: string | undefined | null) {
   if (!email) return false;
   return adminEmails.includes(email.toLowerCase());
+}
+
+export function isAdminUser(
+  email: string | undefined | null,
+  role?: UserProfile['role'] | null,
+) {
+  return role === 'admin' || isConfiguredAdminEmail(email);
+}
+
+export function getPostLoginPath(
+  email: string | undefined | null,
+  role?: UserProfile['role'] | null,
+  requestedRedirect?: string | null,
+) {
+  const safeRedirect =
+    requestedRedirect &&
+    requestedRedirect.startsWith('/') &&
+    !requestedRedirect.startsWith('//')
+      ? requestedRedirect
+      : null;
+  if (safeRedirect) return safeRedirect;
+  return isAdminUser(email, role) ? '/admin' : '/profile';
 }
 
 function isAdminEmail(email: string | undefined | null) {
