@@ -195,6 +195,12 @@ const enhancements = {
     'Semaglutide peptide UK listings supply research-grade material for non-clinical laboratory models. UK buyers compare documentation, variant sizes, and research-only compliance before ordering.',
     'semaglutide peptide uk',
   ),
+  tirzepatide: entry(
+    'Tirzepatide | Laboratory Research Listing',
+    'Tirzepatide for laboratory research — catalogue listing, documentation signals, COA references, and UK dispatch for non-clinical use.',
+    'Tirzepatide on this page is the main research listing for non-clinical laboratory work. The 100mg single-vial page is a separate size and is not a substitute for this listing.',
+    'tirzepatide',
+  ),
 };
 
 function normalizeSlug(slug?: string | null) {
@@ -236,7 +242,8 @@ function matchSlug(slug: string): ProductSeoEnhancement | null {
   if (slug === 'ghrp-2-10mg') return enhancements['ghrp-2-10mg'];
   if (slug === 'ghrp-2-pralmorelin-5mg') return enhancements['ghrp-2-5mg'];
   if (slug === 'ghrp-2-acetate' || slug === 'ghrp-2') return enhancements['ghrp-2'];
-  if (slug.startsWith('semaglutide')) return enhancements.semaglutide;
+  if (slug === 'semaglutide') return enhancements.semaglutide;
+  if (slug === 'tirzepatide') return enhancements.tirzepatide;
   return null;
 }
 

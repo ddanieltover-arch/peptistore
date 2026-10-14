@@ -1,6 +1,9 @@
 export const DEFAULT_SITE_URL = 'https://www.researchpeptide.uk';
 export const BRAND_NAME = 'Research Peptides UK';
 export const BRAND_EMAIL = 'info@researchpeptide.uk';
+export const WHATSAPP_NUMBER = '+447402248728';
+export const WHATSAPP_DISPLAY = '+44 7402 248728';
+export const WHATSAPP_URL = `https://wa.me/${WHATSAPP_NUMBER.replace('+', '')}`;
 export const DEFAULT_OG_IMAGE = '/og-image.png';
 export const SEO_REVISED_DATE = '2026-05-12';
 

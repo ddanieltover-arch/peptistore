@@ -1,8 +1,8 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { supabase } from '../supabase';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { formatCurrency } from '../lib/utils';
-import { ShoppingCart, Heart, Filter, X, ChevronDown, ShieldCheck } from 'lucide-react';
+import { ShoppingCart, Heart, Filter, X, ChevronDown, ShieldCheck, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useCartStore } from '../store/useCartStore';
 import { useWishlistStore } from '../store/useWishlistStore';
 import { useAuthStore } from '../store/useAuthStore';
@@ -24,11 +24,30 @@ import brandLabOperationsWide from '../assets/brand/brand-lab-operations-wide.we
 import { PathwayFilters } from '../components/products/PathwayFilters';
 import { PATHWAYS } from '../lib/scientificPathways';
 import { GeoAnswerCapsule } from '../components/seo/GeoAnswerCapsule';
+import { getProductWhatsAppUrl } from '../lib/whatsapp';
+import { WhatsAppIcon } from '../components/common/WhatsAppIcon';
+
+const PRODUCTS_PER_PAGE = 30;
+
+function getPageNumbers(current: number, total: number): (number | string)[] {
+  if (total <= 7) {
+    return Array.from({ length: total }, (_, i) => i + 1);
+  }
+  if (current <= 4) {
+    return [1, 2, 3, 4, 5, '...', total];
+  }
+  if (current >= total - 3) {
+    return [1, '...', total - 4, total - 3, total - 2, total - 1, total];
+  }
+  return [1, '...', current - 1, current, current + 1, '...', total];
+}
 
 export default function Shop() {
   const [allProducts, setAllProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [categories, setCategories] = useState<string[]>([]);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const catalogTopRef = useRef<HTMLDivElement>(null);
   
   // Filters State
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
@@ -37,6 +56,9 @@ export default function Shop() {
   const [showMobileFilters, setShowMobileFilters] = useState(false);
   const [selectedPathway, setSelectedPathway] = useState<string | null>(null);
   const mobileFilterPanelRef = useRef<HTMLDivElement>(null);
+
+  const pageParam = parseInt(searchParams.get('page') || '1', 10);
+  const currentPage = isNaN(pageParam) || pageParam < 1 ? 1 : pageParam;
 
   const addItem = useCartStore(state => state.addItem);
   const { productIds, toggleWishlist } = useWishlistStore();
@@ -102,10 +124,54 @@ export default function Shop() {
 
   const addToast = useToastStore(state => state.addToast);
 
+  const totalPages = Math.max(1, Math.ceil(filteredProducts.length / PRODUCTS_PER_PAGE));
+
+  const paginatedProducts = useMemo(() => {
+    const startIndex = (currentPage - 1) * PRODUCTS_PER_PAGE;
+    return filteredProducts.slice(startIndex, startIndex + PRODUCTS_PER_PAGE);
+  }, [filteredProducts, currentPage]);
+
+  const setPage = (newPage: number) => {
+    if (newPage < 1 || newPage > totalPages) return;
+    setSearchParams(
+      (prev) => {
+        const next = new URLSearchParams(prev);
+        if (newPage <= 1) {
+          next.delete('page');
+        } else {
+          next.set('page', String(newPage));
+        }
+        return next;
+      },
+      { replace: false },
+    );
+    catalogTopRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const resetPage = () => {
+    if (searchParams.has('page')) {
+      setSearchParams(
+        (prev) => {
+          const next = new URLSearchParams(prev);
+          next.delete('page');
+          return next;
+        },
+        { replace: true },
+      );
+    }
+  };
+
+  useEffect(() => {
+    if (currentPage > totalPages && totalPages > 0) {
+      setPage(1);
+    }
+  }, [totalPages, currentPage]);
+
   const toggleCategory = (cat: string) => {
     setSelectedCategories(prev => 
       prev.includes(cat) ? prev.filter(c => c !== cat) : [...prev, cat]
     );
+    resetPage();
   };
 
   const clearFilters = () => {
@@ -113,6 +179,7 @@ export default function Shop() {
     setSelectedPathway(null);
     setPriceRange(catalogPriceSliderMax(allProducts));
     setSortBy('newest');
+    resetPage();
   };
 
   if (loading) return (
@@ -126,7 +193,7 @@ export default function Shop() {
            <div className="h-40 bg-gray-100 animate-pulse rounded-2xl"></div>
            <div className="h-40 bg-gray-100 animate-pulse rounded-2xl"></div>
         </div>
-        <div className="lg:col-span-3 grid grid-cols-2 xl:grid-cols-4 gap-4 md:gap-6">
+        <div className="lg:col-span-3 grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
           {[...Array(6)].map((_, i) => <ProductSkeleton key={i} />)}
         </div>
       </div>
@@ -163,7 +230,10 @@ export default function Shop() {
             <select 
               id="shop-sort"
               value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as CatalogSortKey)}
+              onChange={(e) => {
+                setSortBy(e.target.value as CatalogSortKey);
+                resetPage();
+              }}
               className="appearance-none pl-4 pr-10 py-2 bg-white border border-gray-200 rounded-lg text-sm font-bold text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all cursor-pointer"
             >
               <option value="featured">Featured</option>
@@ -218,6 +288,23 @@ export default function Shop() {
         </p>
       </section>
 
+      <nav aria-label="Most requested research listings" className="mb-8 flex flex-col sm:flex-row gap-3">
+        <Link
+          to="/product/tirzepatide"
+          className="flex-1 rounded-2xl border border-blue-100 bg-blue-50 px-5 py-4 text-sm font-bold text-blue-800 hover:border-blue-300"
+        >
+          Tirzepatide
+          <span className="mt-1 block text-xs font-medium text-blue-600">Most requested research listing</span>
+        </Link>
+        <Link
+          to="/product/semaglutide"
+          className="flex-1 rounded-2xl border border-blue-100 bg-blue-50 px-5 py-4 text-sm font-bold text-blue-800 hover:border-blue-300"
+        >
+          Semaglutide peptide UK
+          <span className="mt-1 block text-xs font-medium text-blue-600">Most requested research listing</span>
+        </Link>
+      </nav>
+
       <motion.figure
         initial={{ opacity: 0, y: 10 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -267,7 +354,10 @@ export default function Shop() {
               max={priceSliderMax}
               step={priceSliderStep}
               value={Math.min(priceRange, priceSliderMax)}
-              onChange={(e) => setPriceRange(parseInt(e.target.value, 10))}
+              onChange={(e) => {
+                setPriceRange(parseInt(e.target.value, 10));
+                resetPage();
+              }}
               className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
               aria-label="Maximum price filter"
             />
@@ -339,7 +429,10 @@ export default function Shop() {
                       max={priceSliderMax}
                       step={priceSliderStep}
                       value={Math.min(priceRange, priceSliderMax)}
-                      onChange={(e) => setPriceRange(parseInt(e.target.value, 10))}
+                      onChange={(e) => {
+                        setPriceRange(parseInt(e.target.value, 10));
+                        resetPage();
+                      }}
                       className="w-full"
                       aria-label="Maximum price filter"
                     />
@@ -366,11 +459,14 @@ export default function Shop() {
         </AnimatePresence>
 
         {/* Product Grid & Active Filters */}
-        <div className="lg:col-span-3">
+        <div ref={catalogTopRef} className="lg:col-span-3 scroll-mt-24">
           {/* Scientific Pathway Filters */}
           <PathwayFilters 
             selectedPathway={selectedPathway} 
-            onSelectPathway={setSelectedPathway} 
+            onSelectPathway={(id) => {
+              setSelectedPathway(id);
+              resetPage();
+            }} 
           />
 
           {/* Active Filter Chips */}
@@ -379,7 +475,7 @@ export default function Shop() {
               {selectedPathway && (
                 <span className="inline-flex items-center px-3 py-1 rounded-full bg-blue-600 text-white text-xs font-bold shadow-sm">
                   {PATHWAYS.find(p => p.id === selectedPathway)?.label}
-                  <button type="button" onClick={() => setSelectedPathway(null)} className="ml-2 hover:text-blue-200" aria-label="Remove pathway filter"><X className="h-3 w-3" /></button>
+                  <button type="button" onClick={() => { setSelectedPathway(null); resetPage(); }} className="ml-2 hover:text-blue-200" aria-label="Remove pathway filter"><X className="h-3 w-3" /></button>
                 </span>
               )}
               {selectedCategories.map(cat => (
@@ -391,7 +487,7 @@ export default function Shop() {
               {priceRange < priceSliderMax && (
                 <span className="inline-flex items-center px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-bold border border-blue-100">
                   Under {formatCurrency(priceRange)}
-                  <button type="button" onClick={() => setPriceRange(priceSliderMax)} className="ml-2 hover:text-blue-900" aria-label="Remove maximum price filter"><X className="h-3 w-3" /></button>
+                  <button type="button" onClick={() => { setPriceRange(priceSliderMax); resetPage(); }} className="ml-2 hover:text-blue-900" aria-label="Remove maximum price filter"><X className="h-3 w-3" /></button>
                 </span>
               )}
             </div>
@@ -417,8 +513,9 @@ export default function Shop() {
               </button>
             </div>
           ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-2 xl:grid-cols-4 gap-4 md:gap-6">
-              {filteredProducts.map((product) => {
+            <>
+              <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+              {paginatedProducts.map((product) => {
                 const primaryBadge = getPrimaryProductBadge(product);
                 return (
                 <div
@@ -487,29 +584,110 @@ export default function Shop() {
                         </div>
                         <ProductCardPriceBlock product={product} />
                       </div>
-                      <button 
-                        type="button"
-                        onClick={() => {
-                          addItem({
-                            productId: product.id,
-                            title: product.title,
-                            price: product.price,
-                            quantity: 1,
-                            imageUrl: product.images?.[0] || ''
-                          });
-                          addToast(`${product.title} added to cart!`);
-                        }}
-                        className="bg-blue-600 text-white p-3.5 rounded-xl hover:bg-blue-700 transition-all shadow-md hover:shadow-blue-200/50 active:scale-95"
-                        aria-label={`Add ${product.title} to cart`}
-                      >
-                        <ShoppingCart className="h-5 w-5" />
-                      </button>
+                      <div className="flex items-center gap-1.5 sm:gap-2">
+                        <a
+                          href={getProductWhatsAppUrl(product)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="bg-[#25D366] hover:bg-[#1ebe5d] text-white p-3.5 rounded-xl transition-all shadow-md hover:shadow-emerald-200/50 active:scale-95 flex items-center justify-center shrink-0"
+                          aria-label={`Inquire about ${product.title} on WhatsApp`}
+                          title="Inquire via WhatsApp"
+                        >
+                          <WhatsAppIcon className="h-5 w-5" />
+                        </a>
+                        <button 
+                          type="button"
+                          onClick={() => {
+                            addItem({
+                              productId: product.id,
+                              title: product.title,
+                              price: product.price,
+                              quantity: 1,
+                              imageUrl: product.images?.[0] || ''
+                            });
+                            addToast(`${product.title} added to cart!`);
+                          }}
+                          className="bg-blue-600 text-white p-3.5 rounded-xl hover:bg-blue-700 transition-all shadow-md hover:shadow-blue-200/50 active:scale-95 shrink-0"
+                          aria-label={`Add ${product.title} to cart`}
+                        >
+                          <ShoppingCart className="h-5 w-5" />
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
               )})}
             </div>
-          )}
+
+            {totalPages > 1 && (
+              <nav
+                aria-label="Shop catalog pagination"
+                className="mt-12 pt-8 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-4"
+              >
+                <p className="text-sm text-gray-500 order-2 sm:order-1">
+                  Showing <span className="font-semibold text-gray-800">{(currentPage - 1) * PRODUCTS_PER_PAGE + 1}</span>–
+                  <span className="font-semibold text-gray-800">
+                    {Math.min(currentPage * PRODUCTS_PER_PAGE, filteredProducts.length)}
+                  </span>{' '}
+                  of <span className="font-semibold text-gray-800">{filteredProducts.length}</span> compounds
+                </p>
+
+                <div className="flex items-center gap-1.5 order-1 sm:order-2">
+                  <button
+                    type="button"
+                    onClick={() => setPage(currentPage - 1)}
+                    disabled={currentPage <= 1}
+                    className="px-3 py-2 rounded-lg border border-gray-200 text-sm font-semibold text-gray-700 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent flex items-center gap-1 transition-colors"
+                    aria-label="Previous page"
+                  >
+                    <ChevronLeft className="h-4 w-4" aria-hidden />
+                    <span className="hidden sm:inline">Previous</span>
+                  </button>
+
+                  <div className="flex items-center gap-1">
+                    {getPageNumbers(currentPage, totalPages).map((p, idx) => {
+                      if (p === '...') {
+                        return (
+                          <span key={`ellipsis-${idx}`} className="px-2 py-1 text-gray-400 select-none">
+                            …
+                          </span>
+                        );
+                      }
+                      const pageNum = Number(p);
+                      const isActive = pageNum === currentPage;
+                      return (
+                        <button
+                          key={pageNum}
+                          type="button"
+                          onClick={() => setPage(pageNum)}
+                          aria-current={isActive ? 'page' : undefined}
+                          className={`min-w-[40px] h-10 rounded-lg text-sm font-bold transition-all ${
+                            isActive
+                              ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20'
+                              : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-50'
+                          }`}
+                        >
+                          {pageNum}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => setPage(currentPage + 1)}
+                    disabled={currentPage >= totalPages}
+                    className="px-3 py-2 rounded-lg border border-gray-200 text-sm font-semibold text-gray-700 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent flex items-center gap-1 transition-colors"
+                    aria-label="Next page"
+                  >
+                    <span className="hidden sm:inline">Next</span>
+                    <ChevronRight className="h-4 w-4" aria-hidden />
+                  </button>
+                </div>
+              </nav>
+            )}
+          </>
+        )}
         </div>
       </div>
     </main>

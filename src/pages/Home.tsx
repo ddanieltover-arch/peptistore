@@ -20,11 +20,200 @@ import { getPrimaryProductBadge } from '../lib/productBadges';
 import { SHOP_PRODUCT_COLUMNS } from '../lib/shopCatalogQuery';
 import { resolveProductImageUrl } from '../lib/productImages';
 import { GeoAnswerCapsule } from '../components/seo/GeoAnswerCapsule';
+import { getProductWhatsAppUrl } from '../lib/whatsapp';
+import { WhatsAppIcon } from '../components/common/WhatsAppIcon';
 
 const HERO_CATALOG_IMAGE = '/hero-catalog.webp';
 
+type HomeProduct = {
+  id: string;
+  slug?: string;
+  title: string;
+  price: number;
+  images?: string[];
+  categories?: string[];
+  rating?: number;
+  review_count?: number;
+  inventory?: number;
+  compare_at_price?: number;
+  variants?: unknown;
+  created_at?: string;
+};
+
+type HomeCatalogSection = {
+  id: string;
+  eyebrow: string;
+  heading: string;
+  accent: string;
+  copy: string;
+  href: string;
+  cta: string;
+  products: HomeProduct[];
+};
+
+const HOME_CATALOG_SECTIONS: Array<Omit<HomeCatalogSection, 'products'> & { match: string[] }> = [
+  {
+    id: 'repair',
+    eyebrow: 'Recovery pathways',
+    heading: 'TISSUE & REPAIR',
+    accent: 'PEPTIDES',
+    copy: 'BPC-157, TB-500, GHK-Cu, and thymosin listings for connective-tissue and regeneration studies.',
+    href: '/search?q=BPC',
+    cta: 'View repair peptides',
+    match: ['bpc', 'tb-500', 'tb500', 'thymosin', 'ghk'],
+  },
+  {
+    id: 'growth',
+    eyebrow: 'GH axis',
+    heading: 'GROWTH & IGF',
+    accent: 'COMPOUNDS',
+    copy: 'IGF-1, CJC-1295, Ipamorelin, and related secretagogue listings for growth-factor research.',
+    href: '/search?q=IGF',
+    cta: 'View growth peptides',
+    match: ['igf', 'cjc', 'ipamorelin', 'ghrp', 'mk-677', 'ibutamoren'],
+  },
+  {
+    id: 'metabolic',
+    eyebrow: 'Incretin research',
+    heading: 'METABOLIC PATHWAY',
+    accent: 'LISTINGS',
+    copy: 'Retatrutide, MOTS-c, tesofensine, and fragment listings beyond the two lead compounds above.',
+    href: '/search?q=retatrutide',
+    cta: 'View metabolic peptides',
+    match: ['retatrutide', 'mots', 'tesofensine', 'hgh fragment', 'aod'],
+  },
+  {
+    id: 'blends',
+    eyebrow: 'Combined vials',
+    heading: 'PEPTIDE',
+    accent: 'BLENDS',
+    copy: 'Multi-compound vials and blend packs for laboratories comparing combined research formulations.',
+    href: '/search?category=peptide-blends',
+    cta: 'View peptide blends',
+    match: ['blend', 'peptide-blends'],
+  },
+];
+
+function productHaystack(product: HomeProduct) {
+  return `${product.title || ''} ${product.slug || ''} ${(product.categories || []).join(' ')}`.toLowerCase();
+}
+
+function isBlendProduct(product: HomeProduct) {
+  const haystack = productHaystack(product);
+  return haystack.includes('blend') || (product.categories || []).some((category) => category.toLowerCase().includes('blend'));
+}
+
+function takeMatching(products: HomeProduct[], needles: string[], used: Set<string>, limit = 4, skip?: (product: HomeProduct) => boolean) {
+  const picked: HomeProduct[] = [];
+  for (const product of products) {
+    if (used.has(String(product.id)) || skip?.(product)) continue;
+    const haystack = productHaystack(product);
+    if (!needles.some((needle) => haystack.includes(needle))) continue;
+    picked.push(product);
+    used.add(String(product.id));
+    if (picked.length === limit) break;
+  }
+  return picked;
+}
+
+function HomeCatalogCard({
+  product,
+  wished,
+  onToggleWishlist,
+  onAddToCart,
+}: {
+  product: HomeProduct;
+  wished: boolean;
+  onToggleWishlist: () => void;
+  onAddToCart: () => void;
+}) {
+  const primaryBadge = getPrimaryProductBadge(product);
+  return (
+    <div className="group relative bg-white rounded-[3rem] p-4 shadow-xl shadow-gray-200/40 border border-gray-100 hover:shadow-2xl hover:shadow-blue-500/10 transition-all duration-500 hover:-translate-y-3">
+      <div className="absolute top-4 left-4 md:top-8 md:left-8 z-20 flex flex-col items-start gap-1">
+        {primaryBadge ? <ProductBadge type={primaryBadge} size="sm" className="animate-pulse" /> : <ProductBadge type="elite" size="sm" className="animate-pulse" />}
+        {Number(product.inventory) < 10 ? <ProductBadge type="low_stock" size="sm" /> : null}
+      </div>
+
+      <Link to={productPath(product)} className="block relative aspect-[4/5] rounded-[2.5rem] overflow-hidden bg-gray-50 mb-8">
+        {product.images?.[0] ? (
+          <img
+            src={resolveProductImageUrl(product)}
+            alt={product.title}
+            width={320}
+            height={400}
+            loading="lazy"
+            decoding="async"
+            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000"
+          />
+        ) : (
+          <ProductImagePlaceholder productId={String(product.id)} title={product.title} className="h-full min-h-full rounded-[2.5rem]" />
+        )}
+        <div className="absolute inset-0 bg-gradient-to-t from-gray-900/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+
+        <button
+          type="button"
+          onClick={(e) => {
+            e.preventDefault();
+            onToggleWishlist();
+          }}
+          className="absolute top-4 right-4 p-4 rounded-full bg-white/90 backdrop-blur-md text-gray-300 hover:text-red-500 transition-all active:scale-75 shadow-xl hover:shadow-red-100"
+          aria-label={wished ? `Remove ${product.title} from wishlist` : `Add ${product.title} to wishlist`}
+        >
+          <Heart className="h-5 w-5" fill={wished ? 'currentColor' : 'none'} />
+        </button>
+      </Link>
+
+      <div className="px-6 pb-8">
+        <div className="flex items-center gap-2 mb-3">
+          <span className="w-2 h-2 rounded-full bg-emerald-500" />
+          <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">In Stock: UK Dispatch</span>
+        </div>
+
+        <Link to={productPath(product)} className="text-xl font-black text-gray-900 group-hover:text-blue-600 transition-colors line-clamp-1 mb-2">
+          {product.title}
+        </Link>
+        <ProductCardRating
+          rating={product.rating}
+          reviewCount={product.review_count}
+          className="mb-3"
+          starClassName="h-3.5 w-3.5"
+        />
+
+        <div className="flex items-center justify-between mt-4 pt-6 border-t border-gray-50">
+          <div>
+            <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">Stock Verified</p>
+            <ProductCardPriceBlock product={product} />
+          </div>
+          <div className="flex items-center gap-2">
+            <a
+              href={getProductWhatsAppUrl(product)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-[#25D366] hover:bg-[#1ebe5d] text-white p-5 rounded-2xl hover:shadow-2xl hover:shadow-emerald-200 transition-all active:scale-95 flex items-center justify-center shrink-0"
+              aria-label={`Inquire about ${product.title} on WhatsApp`}
+              title="Inquire via WhatsApp"
+            >
+              <WhatsAppIcon className="h-6 w-6" />
+            </a>
+            <button
+              type="button"
+              onClick={onAddToCart}
+              className="bg-gray-900 text-white p-5 rounded-2xl hover:bg-blue-600 hover:shadow-2xl hover:shadow-blue-200 transition-all active:scale-95 group/btn shrink-0"
+              aria-label={`Add ${product.title} to cart`}
+            >
+              <ShoppingCart className="h-6 w-6 transition-transform group-hover/btn:scale-110" />
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function Home() {
-  const [featured, setFeatured] = useState<any[]>([]);
+  const [featured, setFeatured] = useState<HomeProduct[]>([]);
+  const [catalogSections, setCatalogSections] = useState<HomeCatalogSection[]>([]);
   const [loading, setLoading] = useState(true);
   const addItem = useCartStore(state => state.addItem);
   const addToast = useToastStore(state => state.addToast);
@@ -33,12 +222,62 @@ export default function Home() {
   const { openWizard } = useWizardStore();
 
   useEffect(() => {
-    const fetchFeatured = async () => {
-      const { data } = await supabase.from('products').select(SHOP_PRODUCT_COLUMNS).limit(4);
-      if (data) setFeatured(data);
+    const prioritySlugs = ['tirzepatide', 'semaglutide'];
+    const fetchCatalog = async () => {
+      const [{ data: priority }, { data: catalog }] = await Promise.all([
+        supabase.from('products').select(SHOP_PRODUCT_COLUMNS).in('slug', prioritySlugs),
+        supabase.from('products').select(SHOP_PRODUCT_COLUMNS).order('created_at', { ascending: false }).limit(36),
+      ]);
+      const merged = new Map<string, HomeProduct>();
+      for (const product of [...(priority || []), ...(catalog || [])] as HomeProduct[]) {
+        merged.set(String(product.id), product);
+      }
+      const products = [...merged.values()];
+      const bySlug = new Map(products.map((product) => [product.slug, product]));
+      const orderedPriority = prioritySlugs.map((slug) => bySlug.get(slug)).filter(Boolean) as HomeProduct[];
+      const rest = products.filter((product) => !prioritySlugs.includes(product.slug || ''));
+      const featuredProducts = [...orderedPriority, ...rest].slice(0, 4);
+      const used = new Set(featuredProducts.map((product) => String(product.id)));
+      const sections = HOME_CATALOG_SECTIONS
+        .map((section) => ({
+          id: section.id,
+          eyebrow: section.eyebrow,
+          heading: section.heading,
+          accent: section.accent,
+          copy: section.copy,
+          href: section.href,
+          cta: section.cta,
+          products: takeMatching(
+            products,
+            section.match,
+            used,
+            4,
+            section.id === 'blends' ? undefined : isBlendProduct,
+          ),
+        }))
+        .filter((section) => section.products.length > 0);
+
+      const leftovers = products.filter((product) => !used.has(String(product.id)));
+      if (leftovers.length > 0 && sections.length < 2) {
+        const more = leftovers.slice(0, 4);
+        more.forEach((product) => used.add(String(product.id)));
+        sections.push({
+          id: 'more',
+          eyebrow: 'Full catalogue',
+          heading: 'MORE RESEARCH',
+          accent: 'LISTINGS',
+          copy: 'Additional compounds from the same UK research catalogue, supplied for non-clinical laboratory use.',
+          href: '/shop',
+          cta: 'Explore full catalog',
+          products: more,
+        });
+      }
+
+      setFeatured(featuredProducts);
+      setCatalogSections(sections);
       setLoading(false);
     };
-    fetchFeatured();
+    fetchCatalog();
   }, []);
 
   return (
@@ -67,6 +306,17 @@ export default function Home() {
                 <p className="text-gray-400 text-sm md:text-base leading-relaxed mb-4 max-w-md">
                   Research-grade peptides for UK laboratories — catalog access, batch documentation,
                   discreet dispatch, and research-only compliance.
+                </p>
+
+                <p className="text-sm text-gray-500 mb-3 max-w-md leading-relaxed">
+                  Most requested:{' '}
+                  <Link to="/product/tirzepatide" className="text-blue-400 hover:text-blue-300 font-semibold underline-offset-2 hover:underline">
+                    Tirzepatide
+                  </Link>
+                  <span className="text-gray-600"> · </span>
+                  <Link to="/product/semaglutide" className="text-blue-400 hover:text-blue-300 font-semibold underline-offset-2 hover:underline">
+                    Semaglutide
+                  </Link>
                 </p>
 
                 <p className="text-sm text-gray-500 mb-8 max-w-md leading-relaxed">
@@ -213,7 +463,7 @@ export default function Home() {
               <span className="text-blue-600 font-black uppercase tracking-[0.3em] text-[10px] mb-4 block">Proven Efficacy</span>
               <h2 className="text-3xl md:text-5xl font-black text-gray-900 leading-tight">MOST ACCLAIMED <br /><span className="text-blue-600 uppercase">Research Compounds</span></h2>
               <p className="mt-4 text-gray-500 font-medium leading-relaxed">
-                Scientifically proven sequences with unrivaled purification records. Pioneering the next generation of metabolic and cognitive research protocols.
+                Tirzepatide and semaglutide lead this row. The other cards are additional research listings from the same catalogue, supplied for non-clinical laboratory use.
               </p>
             </div>
             <Link to="/shop" className="group flex items-center gap-4 bg-gray-50 px-8 py-4 rounded-2xl text-xs font-black uppercase tracking-widest text-gray-900 hover:bg-blue-600 hover:text-white transition-all duration-300 shadow-sm">
@@ -228,94 +478,68 @@ export default function Home() {
             </div>
           ) : (
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-10">
-              {featured.map((product, i) => {
-                const primaryBadge = getPrimaryProductBadge(product);
-                return (
-                <div
+              {featured.map((product) => (
+                <HomeCatalogCard
                   key={product.id}
-                  className="group relative bg-white rounded-[3rem] p-4 shadow-xl shadow-gray-200/40 border border-gray-100 hover:shadow-2xl hover:shadow-blue-500/10 transition-all duration-500 hover:-translate-y-3"
-                >
-                  {/* Badge */}
-                  <div className="absolute top-4 left-4 md:top-8 md:left-8 z-20 flex flex-col items-start gap-1">
-                    {primaryBadge ? <ProductBadge type={primaryBadge} size="sm" className="animate-pulse" /> : <ProductBadge type="elite" size="sm" className="animate-pulse" />}
-                    {Number(product.inventory) < 10 ? <ProductBadge type="low_stock" size="sm" /> : null}
-                  </div>
-
-                  <Link to={productPath(product)} className="block relative aspect-[4/5] rounded-[2.5rem] overflow-hidden bg-gray-50 mb-8">
-                    {product.images?.[0] ? (
-                      <img
-                        src={resolveProductImageUrl(product)}
-                        alt={product.title}
-                        width={320}
-                        height={400}
-                        loading="lazy"
-                        decoding="async"
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000"
-                      />
-                    ) : (
-                      <ProductImagePlaceholder productId={String(product.id)} title={product.title} className="h-full min-h-full rounded-[2.5rem]" />
-                    )}
-                    <div className="absolute inset-0 bg-gradient-to-t from-gray-900/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        toggleWishlist(product.id, user?.id || '');
-                      }}
-                      className="absolute top-4 right-4 p-4 rounded-full bg-white/90 backdrop-blur-md text-gray-300 hover:text-red-500 transition-all active:scale-75 shadow-xl hover:shadow-red-100"
-                      aria-label={productIds.includes(product.id) ? `Remove ${product.title} from wishlist` : `Add ${product.title} to wishlist`}
-                    >
-                      <Heart className="h-5 w-5" fill={productIds.includes(product.id) ? "currentColor" : "none"} />
-                    </button>
-                  </Link>
-
-                  <div className="px-6 pb-8">
-                    <div className="flex items-center gap-2 mb-3">
-                       <span className="w-2 h-2 rounded-full bg-emerald-500" />
-                       <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">In Stock: UK Dispatch</span>
-                    </div>
-                    
-                    <Link to={productPath(product)} className="text-xl font-black text-gray-900 group-hover:text-blue-600 transition-colors line-clamp-1 mb-2">
-                      {product.title}
-                    </Link>
-                    <ProductCardRating
-                      rating={product.rating}
-                      reviewCount={product.review_count}
-                      className="mb-3"
-                      starClassName="h-3.5 w-3.5"
-                    />
-                    
-                    <div className="flex items-center justify-between mt-4 pt-6 border-t border-gray-50">
-                      <div>
-                        <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">Stock Verified</p>
-                        <ProductCardPriceBlock product={product} />
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          addItem({
-                            productId: product.id,
-                            title: product.title,
-                            price: product.price,
-                            quantity: 1,
-                            imageUrl: product.images?.[0] || ''
-                          });
-                          addToast(`${product.title} secured in cart`);
-                        }}
-                        className="bg-gray-900 text-white p-5 rounded-2xl hover:bg-blue-600 hover:shadow-2xl hover:shadow-blue-200 transition-all active:scale-95 group/btn"
-                        aria-label={`Add ${product.title} to cart`}
-                      >
-                        <ShoppingCart className="h-6 w-6 transition-transform group-hover/btn:scale-110" />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              )})}
+                  product={product}
+                  wished={productIds.includes(product.id)}
+                  onToggleWishlist={() => toggleWishlist(product.id, user?.id || '')}
+                  onAddToCart={() => {
+                    addItem({
+                      productId: product.id,
+                      title: product.title,
+                      price: product.price,
+                      quantity: 1,
+                      imageUrl: product.images?.[0] || '',
+                    });
+                    addToast(`${product.title} secured in cart`);
+                  }}
+                />
+              ))}
             </div>
           )}
         </div>
       </section>
+
+      {catalogSections.map((section, index) => (
+        <section key={section.id} className={`py-24 ${index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}`}>
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-8">
+              <div className="max-w-2xl">
+                <span className="text-blue-600 font-black uppercase tracking-[0.3em] text-[10px] mb-4 block">{section.eyebrow}</span>
+                <h2 className="text-3xl md:text-5xl font-black text-gray-900 leading-tight">
+                  {section.heading} <br />
+                  <span className="text-blue-600 uppercase">{section.accent}</span>
+                </h2>
+                <p className="mt-4 text-gray-500 font-medium leading-relaxed">{section.copy}</p>
+              </div>
+              <Link to={section.href} className="group flex items-center gap-4 bg-white px-8 py-4 rounded-2xl text-xs font-black uppercase tracking-widest text-gray-900 hover:bg-blue-600 hover:text-white transition-all duration-300 shadow-sm border border-gray-100">
+                {section.cta} <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-2" />
+              </Link>
+            </div>
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-10">
+              {section.products.map((product) => (
+                <HomeCatalogCard
+                  key={product.id}
+                  product={product}
+                  wished={productIds.includes(product.id)}
+                  onToggleWishlist={() => toggleWishlist(product.id, user?.id || '')}
+                  onAddToCart={() => {
+                    addItem({
+                      productId: product.id,
+                      title: product.title,
+                      price: product.price,
+                      quantity: 1,
+                      imageUrl: product.images?.[0] || '',
+                    });
+                    addToast(`${product.title} secured in cart`);
+                  }}
+                />
+              ))}
+            </div>
+          </div>
+        </section>
+      ))}
 
       {/* Features Multi-Grid */}
       <section className="py-24 bg-gray-900 text-white relative overflow-hidden">

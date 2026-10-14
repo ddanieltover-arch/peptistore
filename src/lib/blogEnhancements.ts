@@ -15,6 +15,9 @@ const CJC_COMPARE_SLUG = 'cjc-1295-with-dac-compared-with-the-no-dac-ipamorelin-
 const IGF_COMPARE_SLUG = 'igf-1-lr3-and-igf-1-des-separate-research-listings';
 const GLOW_BLEND_SLUG = 'ghk-cu-bpc-157-and-tb-500-in-a-glow-research-blend';
 const NAD_SIZES_SLUG = 'nad-500mg-and-nad-250mg-research-vial-sizes';
+const SEMA_LINES_SLUG = 'semaglutide-the-glp-1-vial-and-the-cagrilintide-blend';
+const TIRZ_VIAL_SLUG = 'tirzepatide-catalogue-listing-and-the-100mg-vial';
+const INCRETIN_LISTINGS_SLUG = 'semaglutide-tirzepatide-and-retatrutide-as-separate-research-listings';
 
 export const blogEnhancements: Record<string, BlogEnhancement> = {
   [BUY_GUIDE_SLUG]: {
@@ -232,6 +235,72 @@ export const blogEnhancements: Record<string, BlogEnhancement> = {
       {
         q: 'Are administration amounts included?',
         a: 'No. Experimental design stays with the laboratory.',
+      },
+    ],
+  },
+  [SEMA_LINES_SLUG]: {
+    slug: SEMA_LINES_SLUG,
+    answerCapsule:
+      'Semaglutide peptide UK searches belong on the main semaglutide listing. The GLP-1 named vial and the cagrilintide blend are separate catalogue lines.',
+    seoDescription:
+      'Semaglutide, the GLP-1 named vial, and the cagrilintide blend — which research listing matches the purchasing note.',
+    revisedDate: '2026-07-14',
+    faqs: [
+      {
+        q: 'Which page answers semaglutide peptide UK?',
+        a: 'The main semaglutide research listing. The blend and the GLP-1 named vial are separate lines.',
+      },
+      {
+        q: 'Is the cagrilintide blend a semaglutide size?',
+        a: 'No. It is a combined vial. Order it when the method names both components.',
+      },
+      {
+        q: 'Are preparation amounts included?',
+        a: 'No. The laboratory owns the method.',
+      },
+    ],
+  },
+  [TIRZ_VIAL_SLUG]: {
+    slug: TIRZ_VIAL_SLUG,
+    answerCapsule:
+      'Tirzepatide searches for the main catalogue line belong on the tirzepatide research listing. The 100mg one-vial page is a separate size.',
+    seoDescription:
+      'Tirzepatide catalogue listing and the 100mg one-vial page — which line matches a pack, and which matches a single vial.',
+    revisedDate: '2026-07-28',
+    faqs: [
+      {
+        q: 'Which page is the main tirzepatide listing?',
+        a: 'The tirzepatide catalogue page. The 100mg one-vial page is a single-vial size.',
+      },
+      {
+        q: 'Does 100mg always mean the one-vial page?',
+        a: 'No. The main listing also has a 100mg pack. Read whether the note says one vial or a pack.',
+      },
+      {
+        q: 'Can semaglutide replace tirzepatide in the record?',
+        a: 'No. They are separate listings and need separate batch records.',
+      },
+    ],
+  },
+  [INCRETIN_LISTINGS_SLUG]: {
+    slug: INCRETIN_LISTINGS_SLUG,
+    answerCapsule:
+      'Semaglutide, tirzepatide, and retatrutide are three research listings. Each name stays on its own product page.',
+    seoDescription:
+      'Semaglutide, tirzepatide, and retatrutide as separate research listings — one product page for each compound name.',
+    revisedDate: '2026-08-07',
+    faqs: [
+      {
+        q: 'Where should a retatrutide UK buy search land?',
+        a: 'On the retatrutide research listing, not on the semaglutide or tirzepatide page.',
+      },
+      {
+        q: 'Do these three share one COA?',
+        a: 'No. Each listing keeps its own batch record.',
+      },
+      {
+        q: 'Are the listings for human use?',
+        a: 'No. They are supplied for non-clinical laboratory research only.',
       },
     ],
   },

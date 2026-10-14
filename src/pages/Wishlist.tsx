@@ -13,6 +13,8 @@ import { productPath } from '../lib/productUrl';
 import { formatCurrency } from '../lib/utils';
 import { ProductBadge } from '../components/products/ProductBadge';
 import { getPrimaryProductBadge } from '../lib/productBadges';
+import { getProductWhatsAppUrl } from '../lib/whatsapp';
+import { WhatsAppIcon } from '../components/common/WhatsAppIcon';
 
 export default function Wishlist() {
   const { user, profile } = useAuthStore();
@@ -216,6 +218,16 @@ export default function Wishlist() {
                              <ProductCardPriceBlock product={product} />
                             
                             <div className="flex gap-2">
+                               <a
+                                 href={getProductWhatsAppUrl(product)}
+                                 target="_blank"
+                                 rel="noopener noreferrer"
+                                 className="flex items-center justify-center bg-[#25D366] text-white w-12 h-12 rounded-2xl hover:bg-[#1ebe5d] hover:shadow-lg transition-all duration-300 shadow-emerald-100"
+                                 aria-label={`Inquire about ${product.title} on WhatsApp`}
+                                 title="Inquire via WhatsApp"
+                               >
+                                 <WhatsAppIcon className="h-5 w-5" />
+                               </a>
                                <button 
                                  type="button"
                                  onClick={() => addItem({

@@ -17,6 +17,8 @@ import { productPath } from '../lib/productUrl';
 import { ProductBadge } from '../components/products/ProductBadge';
 import { getPrimaryProductBadge } from '../lib/productBadges';
 import { trackSearch } from '../lib/analytics';
+import { getProductWhatsAppUrl } from '../lib/whatsapp';
+import { WhatsAppIcon } from '../components/common/WhatsAppIcon';
 
 export default function Search() {
   const [allProducts, setAllProducts] = useState<any[]>([]);
@@ -312,17 +314,29 @@ export default function Search() {
                               <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Stock Verified</p>
                               <ProductCardPriceBlock product={product} />
                            </div>
-                           <button 
-                             type="button"
-                             onClick={() => {
-                               addItem({ productId: product.id, title: product.title, price: product.price, quantity: 1, imageUrl: product.images?.[0] || '' });
-                               addToast(`${product.title} archived in cart`);
-                             }}
-                             className="bg-gray-900 text-white p-4 rounded-2xl hover:bg-blue-600 hover:shadow-xl hover:shadow-blue-200 transition-all active:scale-95"
-                             aria-label={`Add ${product.title} to cart`}
-                           >
-                              <ShoppingCart className="h-5 w-5" />
-                           </button>
+                           <div className="flex items-center gap-1.5 sm:gap-2">
+                             <a
+                               href={getProductWhatsAppUrl(product)}
+                               target="_blank"
+                               rel="noopener noreferrer"
+                               className="bg-[#25D366] hover:bg-[#1ebe5d] text-white p-3.5 rounded-2xl transition-all shadow-md hover:shadow-emerald-200/50 active:scale-95 flex items-center justify-center shrink-0"
+                               aria-label={`Inquire about ${product.title} on WhatsApp`}
+                               title="Inquire via WhatsApp"
+                             >
+                               <WhatsAppIcon className="h-5 w-5" />
+                             </a>
+                             <button
+                               type="button"
+                               onClick={() => {
+                                 addItem({ productId: product.id, title: product.title, price: product.price, quantity: 1, imageUrl: product.images?.[0] || '' });
+                                 addToast(`${product.title} archived in cart`);
+                               }}
+                               className="bg-gray-900 text-white p-4 rounded-2xl hover:bg-blue-600 hover:shadow-xl hover:shadow-blue-200 transition-all active:scale-95 shrink-0"
+                               aria-label={`Add ${product.title} to cart`}
+                             >
+                               <ShoppingCart className="h-5 w-5" />
+                             </button>
+                           </div>
                         </div>
                      </div>
                   </motion.div>

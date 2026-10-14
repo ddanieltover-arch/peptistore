@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-07-05T23:43:51.972Z",
+  "generatedAt": "2026-10-14T11:00:42.266Z",
   "target": "https://www.researchpeptide.uk",
   "stack": "Vite React SPA with build-time SEO prerender",
-  "crawlInventoryCount": 173,
+  "crawlInventoryCount": 182,
   "highPriorityFindings": [
     "Monitor Core Web Vitals on production URLs after prerender deploy.",
     "Validate prerender HTML in GSC URL Inspection for product and blog samples.",
@@ -17,9 +17,9 @@
     },
     {
       "path": "/shop",
-      "title": "Peptides Buy UK | Research Peptide Catalog",
+      "title": "Buy Peptides UK | Research Peptide Catalog",
       "indexable": true,
-      "primaryKeyword": "peptides buy uk"
+      "primaryKeyword": "buy peptides uk"
     },
     {
       "path": "/categories",
@@ -31,7 +31,7 @@
       "path": "/blog",
       "title": "Peptide Research Blog UK | Scientific Insights",
       "indexable": true,
-      "primaryKeyword": "peptide research uk"
+      "primaryKeyword": "peptide research blog"
     },
     {
       "path": "/faq",
@@ -61,7 +61,7 @@
       "path": "/peptide-guide",
       "title": "Peptide Guide UK | Research Handling Basics",
       "indexable": true,
-      "primaryKeyword": "peptide research uk"
+      "primaryKeyword": "peptide guide uk"
     },
     {
       "path": "/peptide-calculator",
@@ -79,7 +79,7 @@
       "path": "/peptide-information",
       "title": "Peptide Information UK | Synthesis and Purity Basics",
       "indexable": true,
-      "primaryKeyword": "peptide research uk"
+      "primaryKeyword": "peptide information uk"
     },
     {
       "path": "/peptide-research",
@@ -108,6 +108,6 @@
   ],
   "dynamicRoutes": {
     "products": 146,
-    "blogPosts": 11
+    "blogPosts": 20
   }
 }

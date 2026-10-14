@@ -52,15 +52,15 @@ export default function SalesNotification() {
       {currentEvent && (
         <motion.div
           key={currentEvent.id}
-          initial={{ opacity: 0, y: 50, scale: 0.9 }}
+          initial={{ opacity: 0, y: 24, scale: 0.96 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, scale: 0.9, y: 20 }}
+          exit={{ opacity: 0, scale: 0.96, y: 16 }}
           transition={{ type: "spring", stiffness: 300, damping: 25 }}
-          className="fixed z-[60] bottom-20 md:bottom-6 md:left-6 left-1/2 -translate-x-1/2 md:translate-x-0 w-11/12 max-w-[340px]"
+          className="fixed inset-x-0 bottom-0 z-[60] flex items-end justify-center px-4 pb-20 md:pb-6 pointer-events-none"
         >
           <div 
             onClick={() => currentEvent && navigate(`/search?q=${encodeURIComponent(currentEvent.product)}`)}
-            className="bg-white rounded-xl shadow-2xl shadow-blue-900/10 border border-blue-50 overflow-hidden flex items-stretch cursor-pointer hover:bg-gray-50 transition-colors"
+            className="pointer-events-auto relative bg-white rounded-xl shadow-2xl shadow-blue-900/10 border border-blue-50 overflow-hidden flex items-stretch cursor-pointer hover:bg-gray-50 transition-colors w-full max-w-[340px]"
           >
             
             <div className="bg-blue-600 flex items-center justify-center px-4">

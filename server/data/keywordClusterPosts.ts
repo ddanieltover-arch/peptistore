@@ -358,4 +358,143 @@ No. Experimental design stays with the laboratory. The catalogue identifies the 
 
 Open [NAD 500mg](/product/nad-500mg) or [NAD 250mg](/product/nad-250mg), then store the batch ID with that mass before the material is booked into an experiment.${DISCLAIMER}`,
   },
+  {
+    title: 'Semaglutide, the GLP-1 Vial, and the Cagrilintide Blend',
+    slug: 'semaglutide-the-glp-1-vial-and-the-cagrilintide-blend',
+    publishedAt: '2026-07-14T09:30:00.000Z',
+    imagePath: '/blog/storefront-street.png',
+    content: `**Quick Answer:** Semaglutide peptide UK searches belong on the main semaglutide research listing. The GLP-1 named vial and the cagrilintide blend are separate catalogue lines and need their own batch records.
+
+## Three Catalogue Lines
+
+Laboratories comparing incretin-pathway material often land on more than one semaglutide name. This catalogue keeps them apart:
+
+- [Semaglutide](/product/semaglutide) is the main research listing for semaglutide peptide UK queries.
+- [Semaglutide – GLP-1](/product/semaglutide-glp-1) is a named vial of its own. It does not replace the main listing.
+- [Cagrilintide + semaglutide blend](/product/cagrilintide-semaglutide-blend) is a combined vial. Order it only when the method names both components.
+
+A size label on the main listing, such as 2mg × 10 vials or 10mg × 10 vials, is still that listing. It is not the GLP-1 named page and it is not the blend.
+
+## What to Match Before Ordering
+
+1. **Compound name.** Semaglutide alone, or semaglutide plus cagrilintide.
+2. **Page title.** The main listing, the GLP-1 named vial, or the blend.
+3. **Mass on the label.** Record the vial size the purchasing note asked for.
+4. **Batch record.** File the COA against the line that was received.
+
+[Tirzepatide](/product/tirzepatide) and [retatrutide](/product/retatrutide) are different compounds. They are not alternate names for semaglutide.
+
+## Documentation
+
+Review the [COA library](/coas) for the batch you intend to book in. Pathway background sits on [peptide research](/peptide-research). The existing [semaglutide peptide UK research brief](/blog/semaglutide-peptide-uk-research-brief) covers the laboratory context. This article only separates the catalogue lines.
+
+Storage and dispatch notes are on [shipping](/shipping). Research-only limits are in the [terms](/terms).
+
+## FAQs
+
+### Does “semaglutide peptide UK” open the blend page?
+
+No. That wording belongs on the main semaglutide listing. Open the blend only when the method names cagrilintide as well.
+
+### Is the GLP-1 named vial the same order line?
+
+No. Treat it as its own listing and keep a separate batch record.
+
+### Are preparation volumes included?
+
+No. The laboratory owns the method. These pages identify the catalogue line.
+
+## Next Step
+
+Open the listing that matches the purchasing note, then confirm the batch ID before the vial is released to the bench.${DISCLAIMER}`,
+  },
+  {
+    title: 'Tirzepatide Catalogue Listing and the 100mg Vial',
+    slug: 'tirzepatide-catalogue-listing-and-the-100mg-vial',
+    publishedAt: '2026-07-28T11:10:00.000Z',
+    imagePath: '/blog/storefront-wet-street.png',
+    content: `**Quick Answer:** Tirzepatide searches for the main catalogue line belong on the tirzepatide research listing. The 100mg one-vial page is a separate size and should not be ordered in its place unless that mass was requested.
+
+## Which Page to Open
+
+- [Tirzepatide](/product/tirzepatide) is the main research listing. Pack sizes on that page, from 5mg × 10 vials through 100mg × 10 vials, stay on that listing.
+- [Tirzepatide 100mg one vial](/product/tirzepatide-100mg-one-vial) is a single-vial size. It is not the pack listing.
+
+“Tirzepatide” on its own should open the main listing. A purchasing note that says one 100mg vial should open the single-vial page. Do not assume the word 100mg always means the same SKU. One page sells a 10-vial pack at that mass. The other sells one vial.
+
+## What to Write Down
+
+1. Pack or single vial.
+2. Mass printed on the chosen page.
+3. Batch ID matched to that line.
+4. Research-only status in the laboratory notebook.
+
+[Semaglutide](/product/semaglutide) and [retatrutide](/product/retatrutide) are separate compounds. A tirzepatide method does not authorise substituting either of them.
+
+## Documentation
+
+COA checks are described in [how UK laboratories review peptide COA references](/blog/how-uk-laboratories-review-peptide-coa-references) and the [COA library](/coas). The wider comparison of these three listings is in [semaglutide, tirzepatide, and retatrutide as separate research listings](/blog/semaglutide-tirzepatide-and-retatrutide-as-separate-research-listings).
+
+Dispatch notes are on [shipping](/shipping). Questions about which line a method means can go through [contact](/contact).
+
+## FAQs
+
+### Is the 100mg one-vial page the main tirzepatide listing?
+
+No. The main listing is the tirzepatide catalogue page. The one-vial page is the single 100mg size.
+
+### Can a 10-vial pack replace one vial in the record?
+
+Only if the purchasing note accepts that pack. Otherwise keep the single-vial line and its own batch record.
+
+### Does this page set an experimental amount?
+
+No. Amounts and schedules stay in the institutional SOP.
+
+## Next Step
+
+Open [tirzepatide](/product/tirzepatide) or the [100mg one-vial listing](/product/tirzepatide-100mg-one-vial), then file the batch against the line you actually received.${DISCLAIMER}`,
+  },
+  {
+    title: 'Semaglutide, Tirzepatide, and Retatrutide as Separate Research Listings',
+    slug: 'semaglutide-tirzepatide-and-retatrutide-as-separate-research-listings',
+    publishedAt: '2026-08-07T14:20:00.000Z',
+    imagePath: '/blog/reception-wide.png',
+    content: `**Quick Answer:** Semaglutide, tirzepatide, and retatrutide are three research listings. Each name stays on its own product page. A shared incretin-pathway topic does not make the vials interchangeable.
+
+## One Name, One Page
+
+- [Semaglutide](/product/semaglutide) answers semaglutide peptide UK queries. The [GLP-1 named vial](/product/semaglutide-glp-1) and the [cagrilintide blend](/product/cagrilintide-semaglutide-blend) are further semaglutide-related lines, explained in the [listing comparison](/blog/semaglutide-the-glp-1-vial-and-the-cagrilintide-blend).
+- [Tirzepatide](/product/tirzepatide) answers tirzepatide queries. The [100mg one-vial page](/product/tirzepatide-100mg-one-vial) is a size, covered in the [tirzepatide listing notes](/blog/tirzepatide-catalogue-listing-and-the-100mg-vial).
+- [Retatrutide](/product/retatrutide) answers retatrutide UK buy queries. Other retatrutide catalogue rows do not take that place.
+
+Use the name written in the method. Do not replace one of these listings with another because the pathway notes look similar.
+
+## How Laboratories Keep the Record Straight
+
+1. Copy the product title into the purchasing note.
+2. Record the mass and pack size from that page.
+3. Attach the COA to that batch only.
+4. Link pathway reading from [peptide research](/peptide-research) without changing which vial was ordered.
+
+The [shop](/shop) still lists the rest of the catalogue. These three are the listings most often requested for incretin-pathway work. That demand does not merge their pages.
+
+## FAQs
+
+### Can one COA cover all three compounds?
+
+No. Each listing has its own batch record.
+
+### Where should a retatrutide UK buy search land?
+
+On the retatrutide research listing, not on the semaglutide or tirzepatide page.
+
+### Are consumer directions included?
+
+No. The catalogue is for non-clinical laboratory research. Experimental design stays with the laboratory.
+
+## Next Step
+
+Open the page named in the method — [semaglutide](/product/semaglutide), [tirzepatide](/product/tirzepatide), or [retatrutide](/product/retatrutide) — and confirm the batch before the material is booked in.${DISCLAIMER}`,
+  },
 ];

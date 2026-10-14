@@ -27,6 +27,7 @@ const SHIPPING_METHODS = {
 };
 
 const EUROPEAN_COUNTRIES = Array.from(new Set(europeanLocations.map(l => l.country)));
+const CRYPTO_ONLY_ORDER_LIMIT = 100;
 
 export default function Checkout() {
   const { items, getTotal, getSubtotal, clearCart, hasHydrated } = useCartStore();
@@ -147,8 +148,11 @@ export default function Checkout() {
   
   const subtotalValue = getSubtotal();
   const promoDiscountValue = Math.min(appliedDiscount, subtotalValue);
+  const payableBeforeCrypto = subtotalValue - promoDiscountValue + shippingCost;
+  const cryptoOnlyCheckout = payableBeforeCrypto < CRYPTO_ONLY_ORDER_LIMIT;
+  const activePaymentMethod = cryptoOnlyCheckout ? 'crypto' : paymentMethod;
   // Calculate crypto discount after promo discount is applied.
-  const cryptoDiscount = paymentMethod === 'crypto' ? (subtotalValue - promoDiscountValue) * 0.05 : 0;
+  const cryptoDiscount = activePaymentMethod === 'crypto' ? (subtotalValue - promoDiscountValue) * 0.05 : 0;
   const finalTotalValue = subtotalValue - promoDiscountValue - cryptoDiscount + shippingCost;
 
   const applyPromo = () => {
@@ -198,7 +202,7 @@ export default function Checkout() {
 
   const validatePaymentStep = () => {
     const errors: Record<string, string> = {};
-    if (!paymentMethod) errors.paymentMethod = 'Please select a payment method.';
+    if (!activePaymentMethod) errors.paymentMethod = 'Please select a payment method.';
     setPaymentErrors(errors);
     if (Object.keys(errors).length > 0) {
       return false;
@@ -248,7 +252,7 @@ export default function Checkout() {
         status: 'pending',
         shipping_address: {
           ...shipping,
-          payment_method: paymentMethod,
+          payment_method: activePaymentMethod,
           billing_callback_note: '',
           crypto_discount: cryptoDiscount,
           shipping_method: selectedMethod.name,
@@ -267,7 +271,7 @@ export default function Checkout() {
         transaction_id: orderId,
         value: finalTotalValue,
         items: checkoutItems,
-        payment_method: paymentMethod,
+        payment_method: activePaymentMethod,
       });
 
       let emailDispatchFailed = false;
@@ -280,7 +284,7 @@ export default function Checkout() {
 
       if (emailDispatchFailed) {
         setCheckoutMessage('Order placed, but one or more transactional emails failed. Please contact support with your order ID.');
-      } else if (paymentMethod === 'crypto') {
+      } else if (activePaymentMethod === 'crypto') {
         try {
           const result = await postPsilioCreateInvoice({
             order_id: orderId,
@@ -442,13 +446,17 @@ export default function Checkout() {
                   <button type="button" onClick={() => setStep(1)} className="text-xs font-black text-blue-600 uppercase tracking-widest hover:underline">Edit Shipping</button>
                 </div>
 
+                {cryptoOnlyCheckout && (
+                  <p className="text-sm font-bold text-gray-500">Orders under £100 are paid with cryptocurrency.</p>
+                )}
+
                 <div className="grid grid-cols-1 gap-4" role="radiogroup" aria-labelledby="checkout-payment-heading">
                   {[
-                    { id: 'crypto', name: 'Cryptocurrency', icon: Bitcoin, subtext: 'Pay with BTC, ETH, USDT (+5% OFF)', badge: 'Save 5%' },
-                    { id: 'bank', name: 'Bank Transfer', icon: Landmark, subtext: 'Direct Structural Payment' },
-                  ].map((method) => (
-                    <button key={method.id} type="button" role="radio" aria-checked={paymentMethod === method.id} onClick={() => setPaymentMethod(method.id as 'bank' | 'crypto')} className={`relative flex items-center gap-5 p-6 rounded-[2rem] border-2 transition-all ${paymentMethod === method.id ? 'border-blue-600 bg-blue-50/30' : 'border-gray-50 bg-gray-50/30 hover:border-gray-200'}`}>
-                      <div className={`w-14 h-14 rounded-2xl flex items-center justify-center ${paymentMethod === method.id ? 'bg-blue-600 text-white' : 'bg-white text-gray-400 border border-gray-100'}`}>
+                    { id: 'crypto' as const, name: 'Cryptocurrency', icon: Bitcoin, subtext: 'Pay with BTC, ETH, USDT (+5% OFF)', badge: 'Save 5%' },
+                    { id: 'bank' as const, name: 'Bank Transfer', icon: Landmark, subtext: 'Direct Structural Payment' },
+                  ].filter((method) => !cryptoOnlyCheckout || method.id === 'crypto').map((method) => (
+                    <button key={method.id} type="button" role="radio" aria-checked={activePaymentMethod === method.id} onClick={() => setPaymentMethod(method.id)} className={`relative flex items-center gap-5 p-6 rounded-[2rem] border-2 transition-all ${activePaymentMethod === method.id ? 'border-blue-600 bg-blue-50/30' : 'border-gray-50 bg-gray-50/30 hover:border-gray-200'}`}>
+                      <div className={`w-14 h-14 rounded-2xl flex items-center justify-center ${activePaymentMethod === method.id ? 'bg-blue-600 text-white' : 'bg-white text-gray-400 border border-gray-100'}`}>
                         <method.icon className="w-8 h-8" aria-hidden />
                       </div>
                       <div className="text-left flex-1">
@@ -458,8 +466,8 @@ export default function Checkout() {
                         </div>
                         <p className="text-xs font-bold text-gray-400">{method.subtext}</p>
                       </div>
-                      <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${paymentMethod === method.id ? 'border-blue-600 bg-blue-600' : 'border-gray-200'}`}>
-                        {paymentMethod === method.id && <div className="w-2.5 h-2.5 rounded-full bg-white shadow-sm" />}
+                      <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${activePaymentMethod === method.id ? 'border-blue-600 bg-blue-600' : 'border-gray-200'}`}>
+                        {activePaymentMethod === method.id && <div className="w-2.5 h-2.5 rounded-full bg-white shadow-sm" />}
                       </div>
                     </button>
                   ))}
@@ -479,7 +487,7 @@ export default function Checkout() {
                   <button type="button" onClick={() => setStep(2)} className="text-xs font-black text-blue-600 uppercase tracking-widest hover:underline">Change Method</button>
                 </div>
 
-                {paymentMethod === 'bank' && (
+                {activePaymentMethod === 'bank' && (
                   <div className="bg-gray-50 p-8 rounded-[2rem] text-center space-y-4">
                     <Landmark className="w-16 h-16 text-gray-900 mx-auto opacity-20" />
                     <div>
@@ -491,7 +499,7 @@ export default function Checkout() {
                   </div>
                 )}
 
-                {paymentMethod === 'crypto' && (
+                {activePaymentMethod === 'crypto' && (
                   <div className="bg-orange-50 p-8 rounded-[2rem] text-center space-y-4 border border-orange-100">
                     <Bitcoin className="w-16 h-16 text-orange-500 mx-auto" />
                     <div>
@@ -521,7 +529,7 @@ export default function Checkout() {
                    <p className="text-lg font-black text-blue-600 select-all tracking-wider">{placedOrderId || 'Processing...'}</p>
                 </div>
                 <p className="text-gray-500 mt-6 max-w-sm mx-auto font-medium">
-                  {paymentMethod === 'bank' 
+                  {activePaymentMethod === 'bank' 
                     ? "An admin will contact you shortly via email with transfer details." 
                     : "Your order is now being processed by our analytical team."}
                 </p>

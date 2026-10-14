@@ -188,7 +188,19 @@ export default function PeptideResearch() {
             <Link to="/blog/semaglutide-peptide-uk-research-brief" className="text-blue-600 font-semibold hover:underline">
               semaglutide peptide UK research brief
             </Link>
-            , and browse{' '}
+            , the{' '}
+            <Link to="/blog/semaglutide-the-glp-1-vial-and-the-cagrilintide-blend" className="text-blue-600 font-semibold hover:underline">
+              semaglutide listing comparison
+            </Link>
+            , the{' '}
+            <Link to="/blog/tirzepatide-catalogue-listing-and-the-100mg-vial" className="text-blue-600 font-semibold hover:underline">
+              tirzepatide listing notes
+            </Link>
+            , and the{' '}
+            <Link to="/blog/semaglutide-tirzepatide-and-retatrutide-as-separate-research-listings" className="text-blue-600 font-semibold hover:underline">
+              separate-listing comparison
+            </Link>
+            . Then browse{' '}
             <Link to="/categories" className="text-blue-600 font-semibold hover:underline">
               GLP peptide categories
             </Link>

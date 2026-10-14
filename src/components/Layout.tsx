@@ -11,6 +11,7 @@ import SmartsuppChat from './chat/SmartsuppChat';
 import logo from '../assets/logo.webp';
 import { postNewsletterSubscribe } from '../lib/transactionalEmailApi';
 import { trackEvent } from '../lib/analytics';
+import { WHATSAPP_DISPLAY, WHATSAPP_URL } from '../lib/seo';
 
 const LiveTicker = React.lazy(() => import('./ticker/LiveTicker'));
 const SalesNotification = React.lazy(() => import('./SalesNotification'));
@@ -438,15 +439,30 @@ export default function Layout() {
           </div>
         </div>
       </footer>
-      {showBackToTop ? (
-        <button
-          type="button"
-          onClick={handleBackToTop}
-          className="fixed bottom-24 md:bottom-8 left-4 md:left-8 z-50 bg-blue-600 hover:bg-blue-700 text-white rounded-full p-3 shadow-xl shadow-blue-600/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
-          aria-label="Back to top"
-        >
-          <ArrowUp className="h-5 w-5" aria-hidden />
-        </button>
+      {location.pathname !== '/admin' ? (
+        <div className="fixed bottom-24 md:bottom-8 left-4 md:left-8 z-50 flex items-center gap-3">
+          {showBackToTop ? (
+            <button
+              type="button"
+              onClick={handleBackToTop}
+              className="bg-blue-600 hover:bg-blue-700 text-white rounded-full p-3 shadow-xl shadow-blue-600/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
+              aria-label="Back to top"
+            >
+              <ArrowUp className="h-5 w-5" aria-hidden />
+            </button>
+          ) : null}
+          <a
+            href={WHATSAPP_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="bg-[#25D366] hover:bg-[#1ebe5d] text-white rounded-full p-3 shadow-xl shadow-emerald-600/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#25D366] focus-visible:ring-offset-2 focus-visible:ring-offset-white"
+            aria-label={`Chat on WhatsApp at ${WHATSAPP_DISPLAY}`}
+          >
+            <svg viewBox="0 0 24 24" className="h-5 w-5" fill="currentColor" aria-hidden>
+              <path d="M20.52 3.48A11.8 11.8 0 0 0 12.06 0C5.5 0 .16 5.33.16 11.89c0 2.1.55 4.15 1.6 5.96L0 24l6.3-1.65a11.86 11.86 0 0 0 5.76 1.47h.01c6.56 0 11.9-5.34 11.9-11.9 0-3.18-1.24-6.16-3.45-8.44zM12.07 21.3h-.01a9.4 9.4 0 0 1-4.79-1.31l-.34-.2-3.74.98 1-3.64-.22-.37a9.36 9.36 0 0 1-1.44-5c0-5.18 4.22-9.4 9.42-9.4 2.51 0 4.87.98 6.65 2.76a9.35 9.35 0 0 1 2.75 6.64c0 5.18-4.22 9.4-9.28 9.54zm5.16-7.03c-.28-.14-1.67-.82-1.93-.92-.26-.1-.45-.14-.64.14-.19.28-.73.92-.9 1.1-.16.19-.33.21-.61.07-.28-.14-1.17-.43-2.23-1.37-.82-.73-1.38-1.64-1.54-1.92-.16-.28-.02-.43.12-.57.13-.13.28-.33.42-.5.14-.16.19-.28.28-.47.1-.19.05-.35-.02-.5-.07-.14-.64-1.54-.88-2.11-.23-.55-.47-.48-.64-.49h-.55c-.19 0-.5.07-.76.35-.26.28-1 1-1 2.43s1.02 2.82 1.16 3.01c.14.19 2.01 3.07 4.87 4.3.68.29 1.21.47 1.62.6.68.22 1.3.19 1.79.11.55-.08 1.67-.68 1.9-1.34.24-.66.24-1.22.17-1.34-.07-.12-.26-.19-.54-.33z" />
+            </svg>
+          </a>
+        </div>
       ) : null}
       <MobileBottomNav />
       <Suspense fallback={null}>

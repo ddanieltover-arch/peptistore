@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-05T23:43:51.982Z",
+  "generatedAt": "2026-10-14T11:00:42.362Z",
   "status": "Local JSON-LD validation passed; run Google Rich Results Test on live URLs before release.",
   "schemasGenerated": [
     "Organization",
@@ -151,81 +151,9 @@
     {
       "@context": "https://schema.org",
       "@type": "BlogPosting",
-      "@id": "https://www.researchpeptide.uk/blog/oxford-peptides-and-uk-research-sourcing#article",
-      "headline": "Oxford Peptides and UK Research Sourcing",
-      "description": "**Quick Answer:** Researchers searching “Oxford peptides” usually want UK-trusted research peptide sourcing with documentation, discreet dispatch, and r...",
-      "image": [
-        "https://www.researchpeptide.uk/blog/storefront-wet-street.png"
-      ],
-      "author": {
-        "@type": "Organization",
-        "name": "Research Peptides UK Editorial Board",
-        "url": "https://www.researchpeptide.uk"
-      },
-      "publisher": {
-        "@id": "https://www.researchpeptide.uk#organization"
-      },
-      "datePublished": "2026-06-30T03:10:22.074696+00:00",
-      "dateModified": "2026-06-30T03:10:22.074696+00:00",
-      "mainEntityOfPage": {
-        "@type": "WebPage",
-        "@id": "https://www.researchpeptide.uk/blog/oxford-peptides-and-uk-research-sourcing"
-      }
-    },
-    {
-      "@context": "https://schema.org",
-      "@type": "BlogPosting",
-      "@id": "https://www.researchpeptide.uk/blog/ghrp-2-peptide-buying-and-research-notes#article",
-      "headline": "GHRP-2 Peptide Buying and Research Notes",
-      "description": "**Quick Answer:** GHRP-2 (pralmorelin) is a growth-hormone secretagogue peptide used in UK laboratories to study ghrelin receptor (GHS-R) signalling—not...",
-      "image": [
-        "https://www.researchpeptide.uk/blog/reception-wide.png"
-      ],
-      "author": {
-        "@type": "Organization",
-        "name": "Research Peptides UK Editorial Board",
-        "url": "https://www.researchpeptide.uk"
-      },
-      "publisher": {
-        "@id": "https://www.researchpeptide.uk#organization"
-      },
-      "datePublished": "2026-06-30T03:10:21.743857+00:00",
-      "dateModified": "2026-06-30T03:10:21.743857+00:00",
-      "mainEntityOfPage": {
-        "@type": "WebPage",
-        "@id": "https://www.researchpeptide.uk/blog/ghrp-2-peptide-buying-and-research-notes"
-      }
-    },
-    {
-      "@context": "https://schema.org",
-      "@type": "BlogPosting",
-      "@id": "https://www.researchpeptide.uk/blog/igf-1-peptide-research-context#article",
-      "headline": "IGF-1 Peptide Research Context",
-      "description": "**Quick Answer:** IGF-1 peptides—including LR3 and DES variants—are studied in UK labs for insulin-like growth factor pathway modelling, receptor bindin...",
-      "image": [
-        "https://www.researchpeptide.uk/blog/igf-1-peptide.png"
-      ],
-      "author": {
-        "@type": "Organization",
-        "name": "Research Peptides UK Editorial Board",
-        "url": "https://www.researchpeptide.uk"
-      },
-      "publisher": {
-        "@id": "https://www.researchpeptide.uk#organization"
-      },
-      "datePublished": "2026-06-30T03:10:21.404157+00:00",
-      "dateModified": "2026-06-30T03:10:21.404157+00:00",
-      "mainEntityOfPage": {
-        "@type": "WebPage",
-        "@id": "https://www.researchpeptide.uk/blog/igf-1-peptide-research-context"
-      }
-    },
-    {
-      "@context": "https://schema.org",
-      "@type": "BlogPosting",
-      "@id": "https://www.researchpeptide.uk/blog/semaglutide-peptide-uk-research-brief#article",
-      "headline": "Semaglutide Peptide UK Research Brief",
-      "description": "**Quick Answer:** Semaglutide is a GLP-1 receptor agonist peptide studied in UK laboratories for incretin-pathway models—not for human prescribing. Rese...",
+      "@id": "https://www.researchpeptide.uk/blog/nad-500mg-and-nad-250mg-research-vial-sizes#article",
+      "headline": "NAD 500mg and NAD 250mg Research Vial Sizes",
+      "description": "**Quick Answer:** The NAD peptide listing for general catalogue searches is the 500mg research vial. The 250mg vial is a smaller size with its own page....",
       "image": [
         "https://www.researchpeptide.uk/blog/storefront-night.png"
       ],
@@ -237,21 +165,21 @@
       "publisher": {
         "@id": "https://www.researchpeptide.uk#organization"
       },
-      "datePublished": "2026-06-30T03:10:21.072768+00:00",
-      "dateModified": "2026-06-30T03:10:21.072768+00:00",
+      "datePublished": "2026-10-08T08:50:00+00:00",
+      "dateModified": "2026-10-08T08:50:00+00:00",
       "mainEntityOfPage": {
         "@type": "WebPage",
-        "@id": "https://www.researchpeptide.uk/blog/semaglutide-peptide-uk-research-brief"
+        "@id": "https://www.researchpeptide.uk/blog/nad-500mg-and-nad-250mg-research-vial-sizes"
       }
     },
     {
       "@context": "https://schema.org",
       "@type": "BlogPosting",
-      "@id": "https://www.researchpeptide.uk/blog/how-to-buy-research-peptides-in-the-uk#article",
-      "headline": "How to Buy Research Peptides in the UK",
-      "description": "**Quick Answer:** To buy research peptides in the UK, qualified laboratories should verify research-only supplier policies, compare COA documentation, c...",
+      "@id": "https://www.researchpeptide.uk/blog/ghk-cu-bpc-157-and-tb-500-in-a-glow-research-blend#article",
+      "headline": "GHK-Cu, BPC-157 and TB-500 in a Glow Research Blend",
+      "description": "**Quick Answer:** The glow peptide listing is a research blend of GHK-Cu, BPC-157 and TB-500 in one vial. It is not a general name for every copper pept...",
       "image": [
-        "https://www.researchpeptide.uk/blog/storefront-street.png"
+        "https://www.researchpeptide.uk/blog/kpv-peptide.png"
       ],
       "author": {
         "@type": "Organization",
@@ -261,11 +189,83 @@
       "publisher": {
         "@id": "https://www.researchpeptide.uk#organization"
       },
-      "datePublished": "2026-06-30T03:10:20.73947+00:00",
-      "dateModified": "2026-06-30T03:10:20.73947+00:00",
+      "datePublished": "2026-09-29T16:30:00+00:00",
+      "dateModified": "2026-09-29T16:30:00+00:00",
       "mainEntityOfPage": {
         "@type": "WebPage",
-        "@id": "https://www.researchpeptide.uk/blog/how-to-buy-research-peptides-in-the-uk"
+        "@id": "https://www.researchpeptide.uk/blog/ghk-cu-bpc-157-and-tb-500-in-a-glow-research-blend"
+      }
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BlogPosting",
+      "@id": "https://www.researchpeptide.uk/blog/igf-1-lr3-and-igf-1-des-separate-research-listings#article",
+      "headline": "IGF-1 LR3 and IGF-1 DES: Separate Research Listings",
+      "description": "**Quick Answer:** IGF-1 LR3 and IGF-1 DES are different research listings. LR3 is not a spelling of DES, and a 1mg vial is a size of one of those listin...",
+      "image": [
+        "https://www.researchpeptide.uk/blog/igf-1-peptide.png"
+      ],
+      "author": {
+        "@type": "Organization",
+        "name": "Research Peptides UK Editorial Board",
+        "url": "https://www.researchpeptide.uk"
+      },
+      "publisher": {
+        "@id": "https://www.researchpeptide.uk#organization"
+      },
+      "datePublished": "2026-09-18T10:20:00+00:00",
+      "dateModified": "2026-09-18T10:20:00+00:00",
+      "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "https://www.researchpeptide.uk/blog/igf-1-lr3-and-igf-1-des-separate-research-listings"
+      }
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BlogPosting",
+      "@id": "https://www.researchpeptide.uk/blog/cjc-1295-with-dac-compared-with-the-no-dac-ipamorelin-blend#article",
+      "headline": "CJC-1295 with DAC Compared with the No-DAC Ipamorelin Blend",
+      "description": "**Quick Answer:** CJC-1295 with DAC and the CJC-1295 no-DAC plus ipamorelin blend are different catalogue entries. DAC is a compound form. The blend is...",
+      "image": [
+        "https://www.researchpeptide.uk/blog/reception-wide.png"
+      ],
+      "author": {
+        "@type": "Organization",
+        "name": "Research Peptides UK Editorial Board",
+        "url": "https://www.researchpeptide.uk"
+      },
+      "publisher": {
+        "@id": "https://www.researchpeptide.uk#organization"
+      },
+      "datePublished": "2026-09-08T14:05:00+00:00",
+      "dateModified": "2026-09-08T14:05:00+00:00",
+      "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "https://www.researchpeptide.uk/blog/cjc-1295-with-dac-compared-with-the-no-dac-ipamorelin-blend"
+      }
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BlogPosting",
+      "@id": "https://www.researchpeptide.uk/blog/bacteriostatic-water-and-bacteriostatic-saline-for-laboratory-dilution#article",
+      "headline": "Bacteriostatic Water and Bacteriostatic Saline for Laboratory Dilution",
+      "description": "**Quick Answer:** Bacteriostatic water and bacteriostatic saline are different laboratory diluents. The water listing is the benzyl-alcohol research dil...",
+      "image": [
+        "https://www.researchpeptide.uk/blog/reception-lobby.png"
+      ],
+      "author": {
+        "@type": "Organization",
+        "name": "Research Peptides UK Editorial Board",
+        "url": "https://www.researchpeptide.uk"
+      },
+      "publisher": {
+        "@id": "https://www.researchpeptide.uk#organization"
+      },
+      "datePublished": "2026-08-28T11:40:00+00:00",
+      "dateModified": "2026-08-28T11:40:00+00:00",
+      "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "https://www.researchpeptide.uk/blog/bacteriostatic-water-and-bacteriostatic-saline-for-laboratory-dilution"
       }
     }
   ]

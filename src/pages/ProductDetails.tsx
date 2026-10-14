@@ -4,7 +4,7 @@ import { supabase } from '../supabase';
 import { useCartStore } from '../store/useCartStore';
 import { useAuthStore } from '../store/useAuthStore';
 import { formatCurrency } from '../lib/utils';
-import { ShoppingCart, Star, Heart, Share2, LinkIcon, ShieldCheck, Zap, Truck, CheckCircle2 } from 'lucide-react';
+import { ShoppingCart, Star, Heart, Share2, LinkIcon, ShieldCheck, Zap, Truck, CheckCircle2, ChevronDown } from 'lucide-react';
 import { useWishlistStore } from '../store/useWishlistStore';
 import { useToastStore } from '../store/useToastStore';
 import { DetailedProductSkeleton } from '../components/Skeleton';
@@ -20,6 +20,8 @@ import { trackViewItem } from '../lib/analytics';
 import { ScientificTextRenderer } from '../components/ui/ScientificHoverCard';
 import { GeoAnswerCapsule } from '../components/seo/GeoAnswerCapsule';
 import { RelatedResearchLinks } from '../components/seo/RelatedResearchLinks';
+import { getProductWhatsAppUrl } from '../lib/whatsapp';
+import { WhatsAppIcon } from '../components/common/WhatsAppIcon';
 
 const ResearchStackBuilder = React.lazy(() =>
   import('../components/products/ResearchStackBuilder').then((m) => ({ default: m.ResearchStackBuilder })),
@@ -266,8 +268,8 @@ export default function ProductDetails() {
       />
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <article>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-16">
-        <div className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 md:gap-x-12 gap-y-8 mb-16">
+        <div className="order-1 space-y-4 md:col-start-1 md:row-start-1">
           <div className="bg-white rounded-3xl aspect-square overflow-hidden flex items-center justify-center border border-gray-100 shadow-sm relative group">
             {product.images && product.images.length > 0 ? (
               <img
@@ -323,7 +325,7 @@ export default function ProductDetails() {
           )}
         </div>
 
-        <div>
+        <div className="order-2 md:col-start-2 md:row-start-1 md:row-span-2">
           <div className="flex justify-between items-start">
             <h1 className="text-3xl font-bold text-gray-900 mb-2">{product.title}</h1>
             <div className="flex space-x-2 relative">
@@ -388,40 +390,29 @@ export default function ProductDetails() {
           {/* New Variant Selector Section */}
           {product.variants && product.variants.length > 0 && (
             <div className="mb-8 p-4 bg-gray-50 rounded-xl border border-gray-100">
-              <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-4">Specification</h3>
-              <div className="flex flex-wrap gap-2">
-                {product.variants.map((v: any, i: number) => {
-                  const label = v.attributes?.attribute_pa_peptides || v.display_name;
-                  return (
-                    <button
-                      key={v.variation_id || i}
-                      type="button"
-                      onClick={() => setSelectedVariant(v)}
-                      className={`px-4 py-2 rounded-lg text-sm font-medium border-2 transition-all ${
-                        selectedVariant?.variation_id === v.variation_id
-                          ? 'border-blue-600 bg-blue-50 text-blue-700 shadow-sm'
-                          : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300'
-                      }`}
-                      aria-pressed={selectedVariant?.variation_id === v.variation_id}
-                    >
-                      {label}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          )}
-
-          {product.specifications && product.specifications.length > 0 && (
-            <div className="mb-8">
-              <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-3">Product Profile</h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {product.specifications.map((spec: string, i: number) => (
-                  <div key={i} className="flex items-center text-sm text-gray-600 bg-gray-50 px-4 py-2 rounded-lg border border-gray-100">
-                    <CheckCircle2 className="h-4 w-4 text-blue-500 mr-2 flex-shrink-0" />
-                    <span className="line-clamp-1">{spec}</span>
-                  </div>
-                ))}
+              <label htmlFor="product-specification" className="block text-sm font-bold text-gray-900 uppercase tracking-wider mb-4">
+                Specification
+              </label>
+              <div className="relative">
+                <select
+                  id="product-specification"
+                  value={String(selectedVariant?.variation_id ?? product.variants[0]?.variation_id ?? '')}
+                  onChange={(e) => {
+                    const next = product.variants.find((v: any) => String(v.variation_id) === e.target.value);
+                    if (next) setSelectedVariant(next);
+                  }}
+                  className="w-full appearance-none pl-4 pr-10 py-3 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
+                >
+                  {product.variants.map((v: any, i: number) => {
+                    const label = v.attributes?.attribute_pa_peptides || v.display_name;
+                    return (
+                      <option key={v.variation_id || i} value={String(v.variation_id ?? i)}>
+                        {label}
+                      </option>
+                    );
+                  })}
+                </select>
+                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" aria-hidden />
               </div>
             </div>
           )}
@@ -531,8 +522,33 @@ export default function ProductDetails() {
             >
                  <ShoppingCart className="mr-2 h-5 w-5" aria-hidden /> {fetchingDetails ? 'Loading…' : 'Add to Cart'}
             </button>
+            <a
+              href={getProductWhatsAppUrl(product, selectedVariant?.attributes?.attribute_pa_peptides || selectedVariant?.display_name)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-[#25D366] hover:bg-[#1ebe5d] text-white py-4 px-5 rounded-xl font-bold flex items-center justify-center transition-all shadow-lg hover:shadow-xl active:scale-95 gap-2 shrink-0"
+              aria-label={`Inquire about ${product.title} on WhatsApp`}
+              title="Order / Inquire via WhatsApp"
+            >
+              <WhatsAppIcon className="h-5 w-5" />
+              <span className="hidden sm:inline text-sm">WhatsApp</span>
+            </a>
           </div>
         </div>
+
+        {product.specifications && product.specifications.length > 0 && (
+          <div className="order-3 md:col-start-1 md:row-start-2">
+            <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-3">Product Profile</h3>
+            <div className="grid grid-cols-1 gap-3">
+              {product.specifications.map((spec: string, i: number) => (
+                <div key={i} className="flex items-start text-sm text-gray-600 bg-gray-50 px-4 py-2 rounded-lg border border-gray-100">
+                  <CheckCircle2 className="h-4 w-4 text-blue-500 mr-2 mt-0.5 flex-shrink-0" />
+                  <span>{spec}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
           <GeoAnswerCapsule

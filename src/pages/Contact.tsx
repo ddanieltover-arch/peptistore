@@ -7,6 +7,7 @@ import { postContactEmail } from '../lib/transactionalEmailApi';
 import { trackEvent } from '../lib/analytics';
 import brandReceptionLobby from '../assets/brand/brand-reception-lobby.webp';
 import { GeoAnswerCapsule } from '../components/seo/GeoAnswerCapsule';
+import { WHATSAPP_DISPLAY, WHATSAPP_URL } from '../lib/seo';
 
 export default function Contact() {
   const addToast = useToastStore((state) => state.addToast);
@@ -117,6 +118,16 @@ export default function Contact() {
                 <h3 className="text-xs font-black uppercase tracking-widest text-gray-400 mb-2">Email Protocols</h3>
                 <p className="font-bold text-gray-900 break-words">info@researchpeptide.uk</p>
               </div>
+              <a
+                href={WHATSAPP_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-8 bg-gray-50 rounded-[2rem] border border-gray-100 sm:col-span-2 hover:border-emerald-200 hover:bg-emerald-50/40 transition-colors"
+              >
+                <MessageSquare className="h-6 w-6 text-[#25D366] mb-4" />
+                <h3 className="text-xs font-black uppercase tracking-widest text-gray-400 mb-2">WhatsApp</h3>
+                <p className="font-bold text-gray-900">{WHATSAPP_DISPLAY}</p>
+              </a>
               <div className="p-8 bg-gray-50 rounded-[2rem] border border-gray-100 sm:col-span-2">
                 <MapPin className="h-6 w-6 text-blue-600 mb-4" />
                 <h3 className="text-xs font-black uppercase tracking-widest text-gray-400 mb-2">Office Address</h3>
