@@ -106,7 +106,12 @@ export default function Blog() {
 
                  <div className="px-2 flex-grow flex flex-col">
                    <div className="flex items-center gap-6 text-[10px] font-black uppercase tracking-widest text-gray-400 mb-5">
-                     <span className="flex items-center gap-2"><Clock className="h-3 w-3" /> 4 Min Read</span>
+                     <span className="flex items-center gap-2">
+                       <Clock className="h-3 w-3" />
+                       {post.created_at
+                         ? new Date(post.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
+                         : '4 Min Read'}
+                     </span>
                      <span className="flex items-center gap-2"><User className="h-3 w-3" /> Editorial Team</span>
                    </div>
                    

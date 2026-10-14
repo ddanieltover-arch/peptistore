@@ -139,9 +139,9 @@ export default function Shop() {
         <div>
           <h1>Buy Research Peptides UK</h1>
           <p className="text-gray-500 mt-1">
-            Peptides buy UK —{' '}
+            Buy peptides UK —{' '}
             <span className="font-semibold text-gray-700">{filteredProducts.length}</span> of{' '}
-            <span className="font-semibold text-gray-700">{allProducts.length}</span> research compounds listed
+            <span className="font-semibold text-gray-700">{allProducts.length}</span> research compounds in this peptides shop
           </p>
         </div>
         

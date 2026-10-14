@@ -1,12 +1,36 @@
 Keyword,Volume,Difficulty,Intent,Assigned Page URL,Page Type,Gap (Y/N),Priority
 research peptides,,,Commercial,/,Homepage,N,High
+research peptides uk,590,30,Commercial,/,Homepage,N,High
 peptides buy uk,,,Transactional,/shop,Product Listing,N,High
+buy peptides uk,1600,53,Transactional,/shop,Product Listing,N,High
+buy peptides online,480,51,Transactional,/shop,Product Listing,N,High
+peptide buy,170,38,"Informational, Transactional",/shop,Product Listing,N,High
+peptides shop,140,53,Commercial,/shop,Product Listing,N,High
 uk research peptides,,,Commercial,/categories,Category Hub,N,High
-semaglutide peptide uk,,,Commercial,/product/semaglutide-peptide-uk,Product Page,N,High
-peptide research uk,,,Informational,/peptide-research,Guide,N,High
+semaglutide peptide uk,,,Commercial,/product/semaglutide,Product Page,N,High
+peptide research uk,90,37,Informational,/peptide-research,Guide,N,High
+peptide research,140,57,Informational,/peptide-research,Guide,N,Medium
+peptide science uk,170,44,Informational,/peptide-research,Guide,N,Medium
 glp-3,,,Informational,/peptide-research,Guide,Y,Medium
-buy ghrp 2,,,Transactional,/product/ghrp-2-peptide,Product Page,N,High
+buy ghrp 2,,,Transactional,/product/ghrp-2-acetate,Product Page,N,High
+ghrp-2,590,31,Informational,/product/ghrp-2-acetate,Product Page,N,High
 peptides buy,,,Transactional,/shop,Product Listing,N,High
-kpv peptide,,,Commercial,/product/kpv-peptide,Product Page,N,High
-igf-1 peptide,,,Commercial,/product/igf-1-peptide,Product Page,N,High
+kpv peptide,3600,18,Informational,/product/kpv,Product Page,N,High
+igf-1 peptide,,,Commercial,/product/igf-1-1-3-1mg,Product Page,N,High
+igf-1 lr3,1900,38,Informational,/product/igf-1-lr3,Product Page,N,High
+igf-1 des,90,17,Informational,/product/igf-des,Product Page,N,Medium
+bacteriostatic water,6600,31,Informational,/product/bacteriostatic-water,Product Page,N,High
+hospira bacteriostatic water,880,15,Informational,/product/bacteriostatic-water-0-9-benzyl-alcohol-10ml-hospira-injection-usp,Product Page,N,High
+glow peptide,4400,16,Informational,/product/glow-blend-ghk-cu-bpc157-tb500,Product Page,N,High
+cjc 1295 ipamorelin,2900,29,Informational,/product/cjc-1295-no-dac-5mg-ipamorelin-5mg-10mg-total-peptide-blend,Product Page,N,High
+cjc 1295 dac,480,11,Informational,/product/cjc-1295-with-dac,Product Page,N,High
+5 amino 1mq,1600,14,Informational,/product/5-amino-1mq,Product Page,N,High
+retatrutide uk buy,1600,26,Transactional,/product/retatrutide,Product Page,N,High
+peptides semax,1300,26,Informational,/product/semax,Product Page,N,High
+bpc157 tb500,1300,13,Informational,/product/bpc-10mg-tb-10mg-20mg-peptide-blend,Product Page,N,High
+follistatin,1000,53,Informational,/product/follistatin,Product Page,N,High
+follistatin 344,390,18,Informational,/product/follistatin,Product Page,N,High
+nad peptide,1000,20,Informational,/product/nad-500mg,Product Page,N,High
+hgh fragment 176-191,720,44,Informational,/product/hgh-fragment-176-191,Product Page,N,High
+peptide testing uk,210,18,Informational,/blog/how-uk-laboratories-review-peptide-coa-references,Article,N,Medium
 oxford peptides,,,Local/Navigational,/contact,Support/Local Landing,Y,Medium

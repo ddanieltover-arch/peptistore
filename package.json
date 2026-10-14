@@ -19,6 +19,7 @@
     "db:import:powder": "tsx server/scripts/import-peptide-powder-catalog.ts",
     "db:migrate-images": "tsx server/scripts/migrate-product-images.ts",
     "db:insert-content-calendar": "tsx server/scripts/insert-content-calendar.ts",
+    "db:insert-keyword-posts": "tsx server/scripts/insert-keyword-cluster-posts.ts",
     "db:backfill-blog-slugs": "tsx server/scripts/backfill-blog-slugs.ts",
     "db:update-custom-synthesis-blog": "tsx server/scripts/update-custom-peptide-synthesis-blog.ts",
     "optimize:brand-images": "tsx scripts/optimize-brand-images.ts",
