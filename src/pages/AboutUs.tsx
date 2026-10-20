@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import brandStorefrontFrosted from '../assets/brand/brand-storefront-frosted.webp';
 import brandStorefrontNight from '../assets/brand/brand-storefront-night.webp';
 import { GeoAnswerCapsule } from '../components/seo/GeoAnswerCapsule';
+import { HubBuyerQuestionsPanel } from '../components/seo/HubBuyerQuestionsPanel';
 
 export default function AboutUs() {
   return (
@@ -124,6 +125,8 @@ export default function AboutUs() {
             </div>
           </div>
         </section>
+
+        <HubBuyerQuestionsPanel path="/about-us" className="mt-12" />
       </div>
     </main>
   );

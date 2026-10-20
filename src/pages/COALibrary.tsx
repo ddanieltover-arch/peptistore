@@ -3,6 +3,7 @@ import { motion } from 'motion/react';
 import { FileCheck2, Search, ShieldCheck } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { GeoAnswerCapsule } from '../components/seo/GeoAnswerCapsule';
+import { HubBuyerQuestionsPanel } from '../components/seo/HubBuyerQuestionsPanel';
 
 type COARow = {
   product: string;
@@ -128,6 +129,8 @@ export default function COALibrary() {
             .
           </p>
         </section>
+
+        <HubBuyerQuestionsPanel path="/coas" className="mt-10" heading="UK buying questions & COA checks" />
       </div>
     </main>
   );

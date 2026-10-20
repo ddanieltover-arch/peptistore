@@ -106,9 +106,9 @@ const enhancements = {
     '5 amino 1mq',
   ),
   retatrutide: entry(
-    'Retatrutide UK | Laboratory Research Listing',
-    'Retatrutide for UK laboratory research — catalogue listing with documentation signals, COA references, and research-only UK dispatch.',
-    'Retatrutide UK orders from this page are for non-clinical laboratory research. Researchers compare documentation, vial options, and research-only compliance before buying from the catalogue.',
+    'Retatrutide UK | How to Buy & UK Pricing',
+    'How to buy retatrutide in the United Kingdom, where UK labs order research-grade retatrutide, and pricing for this listing — COAs and UK dispatch.',
+    'How to buy retatrutide in the United Kingdom: open this catalogue listing, verify research-only compliance and documentation, then add to cart or message support. Where can I buy retatrutide in London or Edinburgh? UK-wide dispatch applies through this shop. How much for retatrutide in the UK? See the GBP price on this page for this vial listing before ordering.',
     'retatrutide uk buy',
   ),
   semax: entry(
@@ -190,15 +190,15 @@ const enhancements = {
     'ghrp-2 5mg',
   ),
   semaglutide: entry(
-    'Semaglutide Peptide UK | Laboratory Research',
-    'Semaglutide peptide UK for GLP-1 pathway research — research-grade listing, batch documentation, COA references, and UK dispatch.',
-    'Semaglutide peptide UK listings supply research-grade material for non-clinical laboratory models. UK buyers compare documentation, variant sizes, and research-only compliance before ordering.',
+    'Semaglutide Peptide UK | How to Buy & UK Pricing',
+    'How to buy semaglutide in the United Kingdom, where UK labs order research-grade GLP-1 peptide, and pricing for this listing — COAs, variants, and UK dispatch.',
+    'How to buy semaglutide in the United Kingdom: browse this listing, confirm the vial size and research-only terms, then checkout or WhatsApp for lab procurement. Where can I buy semaglutide in London or Manchester? Order here for UK-wide dispatch (including Scotland and Wales) — not pharmacy GLP-1 medicines. How much for semaglutide in the UK? The price shown on this page is for this research listing; compare documentation and size before ordering.',
     'semaglutide peptide uk',
   ),
   tirzepatide: entry(
-    'Tirzepatide | Laboratory Research Listing',
-    'Tirzepatide for laboratory research — catalogue listing, documentation signals, COA references, and UK dispatch for non-clinical use.',
-    'Tirzepatide on this page is the main research listing for non-clinical laboratory work. The 100mg single-vial page is a separate size and is not a substitute for this listing.',
+    'Tirzepatide | How to Buy & UK Pricing',
+    'How to buy tirzepatide in the United Kingdom, where UK labs order research-grade tirzepatide, and pricing for this main listing — COAs, variants, and UK dispatch.',
+    'How to buy tirzepatide in the United Kingdom: use this main research listing, confirm vial specification and research-only terms, then checkout or WhatsApp for lab procurement. Where can I buy tirzepatide in Birmingham or Leeds? Order here for UK-wide dispatch including Wales and Scotland. How much for tirzepatide in the UK? The price on this page applies to this listing; the 100mg one-vial row is priced separately.',
     'tirzepatide',
   ),
 };

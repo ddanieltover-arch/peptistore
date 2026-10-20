@@ -26,7 +26,8 @@ import {
 } from '../src/lib/seo';
 import { resolveBlogImagePath } from '../src/lib/blogImages';
 import { getBlogEnhancement } from '../src/lib/blogEnhancements';
-import { getProductSeoEnhancement, productSeoTitle } from '../src/lib/productSeoEnhancements';
+import { getProductSeoEnhancement } from '../src/lib/productSeoEnhancements';
+import { resolveProductPageSeo } from '../src/lib/ukBuyerQuestions';
 import { geoCommonQuestions, pillarBlogSlugs } from '../src/lib/geoContent';
 
 type ProductRow = { id?: string; slug?: string | null; title?: string | null; description?: string | null; price?: number | null; images?: string[] | null; categories?: string[] | null; inventory?: number | null; created_at?: string | null };
@@ -436,9 +437,10 @@ function prerenderPrivateRoute(route: (typeof noindexRoutes)[number]) {
 function prerenderProduct(product: ProductRow) {
   const path = productPath(product);
   const enhancement = getProductSeoEnhancement(product);
-  const title = productSeoTitle(enhancement, product.title || 'Research peptide');
+  const pageSeo = resolveProductPageSeo(product, enhancement, { displayPrice: product.price });
+  const title = pageSeo.seoTitle;
   const description =
-    enhancement?.description ||
+    pageSeo.seoDescription ||
     excerpt(product.description || 'Research-use peptide product listing for laboratory workflows.', 155);
   const heroImage = productOgImage(product);
   return prerenderPage({
@@ -447,7 +449,7 @@ function prerenderProduct(product: ProductRow) {
     description,
     h1: product.title || 'Research peptide',
     answer:
-      enhancement?.answerCapsule ||
+      pageSeo.answerCapsule ||
       'This research peptide listing is supplied for laboratory use only, with product notes, documentation signals, and UK dispatch options for qualified research buyers.',
     ogImage: heroImage,
     ogType: 'product',

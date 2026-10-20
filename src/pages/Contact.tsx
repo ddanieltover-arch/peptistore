@@ -7,6 +7,7 @@ import { postContactEmail } from '../lib/transactionalEmailApi';
 import { trackEvent } from '../lib/analytics';
 import brandReceptionLobby from '../assets/brand/brand-reception-lobby.webp';
 import { GeoAnswerCapsule } from '../components/seo/GeoAnswerCapsule';
+import { HubBuyerQuestionsPanel } from '../components/seo/HubBuyerQuestionsPanel';
 import { WHATSAPP_DISPLAY, WHATSAPP_URL } from '../lib/seo';
 
 export default function Contact() {
@@ -247,6 +248,10 @@ export default function Contact() {
               </button>
             </form>
           </motion.div>
+        </div>
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
+          <HubBuyerQuestionsPanel path="/contact" heading="Oxford & UK-wide buyer questions" />
         </div>
       </div>
     </main>

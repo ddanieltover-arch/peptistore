@@ -5,6 +5,7 @@ import { BookOpen, Sparkles, ArrowRight, Clock, User } from 'lucide-react';
 import { motion } from 'motion/react';
 import { resolveBlogImageUrl } from '../lib/blogImages';
 import Seo from '../components/Seo';
+import { HubBuyerQuestionsPanel } from '../components/seo/HubBuyerQuestionsPanel';
 import { DEFAULT_SITE_URL, absoluteUrl, buildArticleJsonLd } from '../lib/seo';
 import { blogPath } from '../lib/blogUrl';
 
@@ -141,6 +142,10 @@ export default function Blog() {
              ))}
            </div>
          )}
+
+         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
+           <HubBuyerQuestionsPanel path="/blog" heading="How UK labs buy research peptides" />
+         </div>
       </main>
       </div>
     </>

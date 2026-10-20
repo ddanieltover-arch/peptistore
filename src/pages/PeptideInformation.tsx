@@ -3,6 +3,7 @@ import { motion } from 'motion/react';
 import { BookText, FlaskConical, TestTube2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { GeoAnswerCapsule } from '../components/seo/GeoAnswerCapsule';
+import { HubBuyerQuestionsPanel } from '../components/seo/HubBuyerQuestionsPanel';
 
 const infoArticles = [
   { title: 'Intro to Peptides', readTime: '8 min', summary: 'Core terminology, structure basics, and key lab concepts for handling peptide compounds.' },
@@ -118,6 +119,8 @@ export default function PeptideInformation() {
             </p>
           </div>
         </section>
+
+        <HubBuyerQuestionsPanel path="/peptide-information" className="mt-12" />
       </div>
     </main>
   );

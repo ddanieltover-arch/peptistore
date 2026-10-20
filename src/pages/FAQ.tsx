@@ -6,6 +6,7 @@ import Seo from '../components/Seo';
 import { buildFaqPageJsonLd } from '../lib/seo';
 import { GeoAnswerCapsule } from '../components/seo/GeoAnswerCapsule';
 import { geoCommonQuestions } from '../lib/geoContent';
+import { HubBuyerQuestionsPanel } from '../components/seo/HubBuyerQuestionsPanel';
 
 export const faqs = [
   { category: 'Research & Buying', icon: BookOpen, questions: geoCommonQuestions },
@@ -97,6 +98,8 @@ export default function FAQ() {
               </section>
             ))}
           </div>
+
+          <HubBuyerQuestionsPanel path="/faq" className="mt-16" heading="Location-specific UK buyer questions" />
 
           <div className='mt-20 p-8 bg-slate-950 rounded-[2.5rem] text-center relative overflow-hidden'>
             <div className='absolute top-0 right-0 w-32 h-32 bg-blue-600/10 rounded-full blur-3xl' />

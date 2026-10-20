@@ -3,6 +3,7 @@ import { motion } from 'motion/react';
 import { BookOpen, FlaskConical, ShieldCheck, Beaker } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { GeoAnswerCapsule } from '../components/seo/GeoAnswerCapsule';
+import { HubBuyerQuestionsPanel } from '../components/seo/HubBuyerQuestionsPanel';
 
 const guideTopics = [
   {
@@ -117,6 +118,8 @@ export default function PeptideGuide() {
             and align in-house checks with your analytical SOPs before committing material to long study timelines.
           </p>
         </section>
+
+        <HubBuyerQuestionsPanel path="/peptide-guide" className="mb-14" heading="UK buyer questions before you order" />
 
         <section className="bg-slate-950 text-white rounded-[2.5rem] p-8 md:p-12">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">

@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import Seo from '../components/Seo';
 import { DEFAULT_SITE_URL, absoluteUrl } from '../lib/seo';
 import { GeoAnswerCapsule } from '../components/seo/GeoAnswerCapsule';
+import { HubBuyerQuestionsPanel } from '../components/seo/HubBuyerQuestionsPanel';
 
 const categorySeoHints: Record<string, string> = {
   'glp peptides': 'GLP and incretin-mimetic research peptides for UK metabolic pathway models.',
@@ -107,7 +108,11 @@ export default function Categories() {
               Browse the full research peptide catalog
             </Link>
           </div>
-        ) : (
+        ) : null}
+
+        <HubBuyerQuestionsPanel path="/categories" className="max-w-3xl mx-auto mb-12" heading="How to buy by category in the UK" />
+
+        {!loading && categories.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {categories.map((category) => (
               <Link
@@ -120,7 +125,7 @@ export default function Categories() {
               </Link>
             ))}
           </div>
-        )}
+        ) : null}
       </main>
     </>
   );

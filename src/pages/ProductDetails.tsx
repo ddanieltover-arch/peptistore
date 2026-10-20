@@ -12,8 +12,10 @@ import { ProductBadge } from '../components/products/ProductBadge';
 import { ProductImagePlaceholder } from '../components/products/ProductImagePlaceholder';
 import { productPath } from '../lib/productUrl';
 import Seo from '../components/Seo';
-import { buildProductJsonLd, excerpt } from '../lib/seo';
-import { getProductSeoEnhancement, productSeoTitle } from '../lib/productSeoEnhancements';
+import { buildFaqPageJsonLd, buildProductJsonLd, excerpt } from '../lib/seo';
+import { resolveProductPageSeo } from '../lib/ukBuyerQuestions';
+import { ProductUkBuyerSection } from '../components/seo/ProductUkBuyerSection';
+import { getProductSeoEnhancement } from '../lib/productSeoEnhancements';
 import { fetchProductDetail, SHOP_PRODUCT_COLUMNS } from '../lib/shopCatalogQuery';
 import { getPrerenderProductHint } from '../lib/prerenderHint';
 import { trackViewItem } from '../lib/analytics';
@@ -22,6 +24,7 @@ import { GeoAnswerCapsule } from '../components/seo/GeoAnswerCapsule';
 import { RelatedResearchLinks } from '../components/seo/RelatedResearchLinks';
 import { getProductWhatsAppUrl } from '../lib/whatsapp';
 import { WhatsAppIcon } from '../components/common/WhatsAppIcon';
+import { filterProductSpecificationsForDisplay } from '../lib/productSpecifications';
 
 const ResearchStackBuilder = React.lazy(() =>
   import('../components/products/ResearchStackBuilder').then((m) => ({ default: m.ResearchStackBuilder })),
@@ -246,11 +249,15 @@ export default function ProductDetails() {
         ? variantCompare
         : null;
 
+  const displaySpecifications = filterProductSpecificationsForDisplay(product.specifications);
+
   const productSeo = getProductSeoEnhancement(product);
-  const seoTitle = productSeoTitle(productSeo, product.title);
+  const pageSeo = resolveProductPageSeo(product, productSeo, { displayPrice: currentPrice });
+  const seoTitle = pageSeo.seoTitle;
   const seoDescription =
-    productSeo?.description ||
+    pageSeo.seoDescription ||
     excerpt(String(product.title || 'Research peptide') + ' research peptide for laboratory research use. ' + String(product.description || ''), 155);
+  const productFaqJsonLd = buildFaqPageJsonLd(pageSeo.faqs, undefined, productPath(product));
 
   const parsedMassMatch = product.title?.match(/(\d+)mg/i);
   const initialMass = parsedMassMatch ? Number(parsedMassMatch[1]) : 10;
@@ -264,7 +271,7 @@ export default function ProductDetails() {
         image={product.images?.[0]}
         preloadImage={product.images?.[0]}
         type='product'
-        jsonLd={buildProductJsonLd(product, reviews)}
+        jsonLd={[buildProductJsonLd(product, reviews), productFaqJsonLd]}
       />
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <article>
@@ -326,9 +333,14 @@ export default function ProductDetails() {
         </div>
 
         <div className="order-2 md:col-start-2 md:row-start-1 md:row-span-2">
-          <div className="flex justify-between items-start">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">{product.title}</h1>
-            <div className="flex space-x-2 relative">
+          <div className="flex justify-between items-start gap-4">
+            <div className="min-w-0 flex-1">
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">{product.title}</h1>
+              {pageSeo.subtitle ? (
+                <p className="text-sm text-gray-500 font-medium leading-relaxed mb-2 max-w-xl">{pageSeo.subtitle}</p>
+              ) : null}
+            </div>
+            <div className="flex shrink-0 space-x-2 relative">
               <button 
                 type="button"
                 onClick={() => setShowShare(!showShare)}
@@ -381,6 +393,8 @@ export default function ProductDetails() {
             </div>
           </div>
           
+          <p className="text-gray-600 text-sm md:text-[15px] leading-relaxed mb-6 font-medium">{pageSeo.intro}</p>
+
           <div className="text-gray-600 mb-8 whitespace-pre-line">
             <Suspense fallback={<p>{product.description}</p>}>
               <ScientificTextRenderer text={product.description} />
@@ -536,11 +550,11 @@ export default function ProductDetails() {
           </div>
         </div>
 
-        {product.specifications && product.specifications.length > 0 && (
+        {displaySpecifications.length > 0 && (
           <div className="order-3 md:col-start-1 md:row-start-2">
             <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-3">Product Profile</h3>
             <div className="grid grid-cols-1 gap-3">
-              {product.specifications.map((spec: string, i: number) => (
+              {displaySpecifications.map((spec: string, i: number) => (
                 <div key={i} className="flex items-start text-sm text-gray-600 bg-gray-50 px-4 py-2 rounded-lg border border-gray-100">
                   <CheckCircle2 className="h-4 w-4 text-blue-500 mr-2 mt-0.5 flex-shrink-0" />
                   <span>{spec}</span>
@@ -553,10 +567,12 @@ export default function ProductDetails() {
 
           <GeoAnswerCapsule
             answer={
-              productSeo?.answerCapsule ||
+              pageSeo.answerCapsule ||
               `This page details the research profile, documentation signals, and compliance context for ${product.title}. It is supplied exclusively for non-human laboratory workflows and scientific evaluation.`
             }
           />
+
+          <ProductUkBuyerSection faqs={pageSeo.faqs} />
 
           <RelatedResearchLinks className="mt-6 mb-2" />
 

@@ -20,6 +20,7 @@ import { getPrimaryProductBadge } from '../lib/productBadges';
 import { SHOP_PRODUCT_COLUMNS } from '../lib/shopCatalogQuery';
 import { resolveProductImageUrl } from '../lib/productImages';
 import { GeoAnswerCapsule } from '../components/seo/GeoAnswerCapsule';
+import { HubBuyerQuestionsPanel } from '../components/seo/HubBuyerQuestionsPanel';
 import { getProductWhatsAppUrl } from '../lib/whatsapp';
 import { WhatsAppIcon } from '../components/common/WhatsAppIcon';
 
@@ -380,6 +381,10 @@ export default function Home() {
       </div>
 
       <CatalogTrustStrip />
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <HubBuyerQuestionsPanel path="/" />
+      </div>
 
       {/* Trust Stats Section */}
       <section className="bg-gray-50 py-16">

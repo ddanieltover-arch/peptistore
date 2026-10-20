@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Truck, ShieldCheck, Globe, Clock, PackageCheck, AlertTriangle } from 'lucide-react';
 import { motion } from 'motion/react';
 import { GeoAnswerCapsule } from '../components/seo/GeoAnswerCapsule';
+import { HubBuyerQuestionsPanel } from '../components/seo/HubBuyerQuestionsPanel';
 
 export default function Shipping() {
   return (
@@ -124,6 +125,8 @@ export default function Shipping() {
               Please contact our logistics liaison if your order has exceeded the estimated delivery window by more than 48 hours.
             </p>
           </section>
+
+          <HubBuyerQuestionsPanel path="/shipping" className="mt-12" heading="Delivery to UK cities & nations" />
         </div>
       </div>
     </main>

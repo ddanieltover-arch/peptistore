@@ -177,9 +177,8 @@ async function main() {
 
       const specifications = [
         MARKER,
-        'Lyophilized powder catalog line (research use only).',
-        `Wholesale list amounts were USD nominal; stored as GBP using rate ${usdGbpRate} (see import script / FX cache).`,
-        ...entry.variants.map((r) => `${r.sku}: ${r.specLabel}`),
+        'Lyophilized powder',
+        'Research use only',
       ];
 
       const variantsJson = JSON.stringify(

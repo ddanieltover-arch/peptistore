@@ -4,6 +4,7 @@ import { Microscope, ShieldAlert, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import brandReceptionSuite from '../assets/brand/brand-reception-suite.webp';
 import { GeoAnswerCapsule } from '../components/seo/GeoAnswerCapsule';
+import { HubBuyerQuestionsPanel } from '../components/seo/HubBuyerQuestionsPanel';
 
 type ResearchCard = {
   category: string;
@@ -302,6 +303,8 @@ export default function PeptideResearch() {
             </Link>
           </div>
         </section>
+
+        <HubBuyerQuestionsPanel path="/peptide-research" className="mt-12" heading="How to buy pathway peptides in the UK" />
       </div>
     </main>
   );

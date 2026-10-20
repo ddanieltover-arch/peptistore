@@ -17,6 +17,18 @@ export const geoCommonQuestions: Array<{ q: string; a: string }> = [
     a: 'Qualified laboratories compare research-only catalog listings, COA references, UK dispatch options, and institutional procurement rules before checkout. See the buy guide and shop catalog for peptides buy UK workflows.',
   },
   {
+    q: 'Where can I buy research peptides in London or Manchester?',
+    a: 'Order through the online research catalogue with UK-wide dispatch to England, Scotland, Wales, and Northern Ireland. Open product pages for variant pricing, documentation signals, and research-only terms — not retail pharmacy supply.',
+  },
+  {
+    q: 'How much do research peptides cost in the United Kingdom?',
+    a: 'Pricing is listed in GBP per product page. Compare vial size, pathway class, and COA documentation before checkout — the lowest headline price is not a substitute for batch verification or lawful research-only use.',
+  },
+  {
+    q: 'How to buy peptides in Scotland or Wales for laboratory research?',
+    a: 'Use the same UK checkout flow as London orders: confirm institutional eligibility, review COA references, select variants on each product page, and arrange tracked dispatch to your lab address.',
+  },
+  {
     q: 'What is custom peptide synthesis?',
     a: 'Custom peptide synthesis is on-demand production of a specific amino-acid sequence for laboratory research, usually via solid-phase synthesis with HPLC and mass-spec verification before batch release.',
   },

@@ -24,6 +24,7 @@ import brandLabOperationsWide from '../assets/brand/brand-lab-operations-wide.we
 import { PathwayFilters } from '../components/products/PathwayFilters';
 import { PATHWAYS } from '../lib/scientificPathways';
 import { GeoAnswerCapsule } from '../components/seo/GeoAnswerCapsule';
+import { HubBuyerQuestionsPanel } from '../components/seo/HubBuyerQuestionsPanel';
 import { getProductWhatsAppUrl } from '../lib/whatsapp';
 import { WhatsAppIcon } from '../components/common/WhatsAppIcon';
 
@@ -304,6 +305,8 @@ export default function Shop() {
           <span className="mt-1 block text-xs font-medium text-blue-600">Most requested research listing</span>
         </Link>
       </nav>
+
+      <HubBuyerQuestionsPanel path="/shop" className="mb-10" heading="Where to buy peptides in the UK" />
 
       <motion.figure
         initial={{ opacity: 0, y: 10 }}
